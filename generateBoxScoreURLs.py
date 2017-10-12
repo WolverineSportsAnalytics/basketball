@@ -29,6 +29,8 @@ def getTeams(cursor):
 
 def generateBasketballReferenceURLs(cursor):
     #year month day 0 team
+    # if pipe is broken, must delete all the values from the first day, then restart the boxscore url from
+    # that day that was just deleted
     dates = generateDates(constants.startDayP, constants.startMonthP, constants.startYearP,
                   constants.endDayP, constants.endMonthP, constants.endYearP)
 
@@ -42,7 +44,7 @@ def generateBasketballReferenceURLs(cursor):
         for team in teams:
             shouldSave = len(urls) % 20
             if shouldSave == 0 and len(urls) != 0:
-                queryBoxScoreURL = "INSERT INTO box_score_urls (url) VALUES (%s)"
+                queryBoxScoreURL = "INSERT INTO box_score_urls (url, dateID) VALUES (%s, %s)"
                 cursor.executemany(queryBoxScoreURL, urls)
                 cnx.commit()
                 print "Inserted + Committed URLs"
@@ -64,12 +66,19 @@ def generateBasketballReferenceURLs(cursor):
             newURL = baseURL + str(date.year) + month + day + str(0) + team + ".html"
             try:
                 urllib2.urlopen(newURL)
-                urlTuple = (newURL, )
+                dateSelect = "SELECT iddates FROM new_dates WHERE date = %s"
+
+                dateQuery = (date,)
+                cursor.execute(dateSelect, dateQuery)
+
+                boxScoreID = 0
+                for id in cursor:
+                    boxScoreID = id[0]
+
+                urlTuple = (newURL, boxScoreID)
                 urls.append(urlTuple)
             except urllib2.HTTPError, e:
                 badURLs.append(newURL)
-
-    return urls
 
 
 if __name__ == "__main__":

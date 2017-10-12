@@ -20,12 +20,14 @@ def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
 
 def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, endYear):
     urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+
+    cursor = cnx.cursor(buffered=True)
+
     for url in urls:
-        cnx = mysql.connector.connect(user=constants.databaseUser,
-                                      host=constants.databaseHost,
-                                      database=constants.databaseName,
-                                      password=constants.databasePassword)
-        cursor = cnx.cursor(buffered=True)
 
         page = requests.get(url)
         soup = BeautifulSoup(page.text, 'html.parser')
@@ -60,12 +62,13 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
             except:
                 pass
 
-        cursor.close()
         cnx.commit()
-        cnx.close()
 
         print "Updated Basketball Players in Player Ref for URL: " + str(url)
 
+    cursor.close()
+    cnx.commit()
+    cnx.close()
 
 if __name__ == "__main__":
     updateAndInsertPlayerRef(constants.startDayP, constants.startMonthP, constants.startYearP,
