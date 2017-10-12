@@ -18,9 +18,14 @@ def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
                     '&day=' + str(single_date.day) + '&year=' + str(single_date.year))
     return urls
 
-def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
+def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, endYear):
     urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
     for url in urls:
+        cnx = mysql.connector.connect(user=constants.databaseUser,
+                                      host=constants.databaseHost,
+                                      database=constants.databaseName,
+                                      password=constants.databasePassword)
+        cursor = cnx.cursor(buffered=True)
 
         page = requests.get(url)
         soup = BeautifulSoup(page.text, 'html.parser')
@@ -32,6 +37,7 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 
         for tr in soup.find_all('tr')[1:]:
             # first find, then update
+
             try:
                 tds = tr.find_all('td')
                 nickName = tds[0].a.text
@@ -51,22 +57,16 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
                     # update
                     updatePQ = (team, bbref)
                     cursor.execute(updatePlayer, updatePQ)
-
             except:
                 pass
 
+        cursor.close()
+        cnx.commit()
+        cnx.close()
+
         print "Updated Basketball Players in Player Ref for URL: " + str(url)
 
+
 if __name__ == "__main__":
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-    cursor = cnx.cursor(buffered=True)
-
     updateAndInsertPlayerRef(constants.startDayP, constants.startMonthP, constants.startYearP,
-                             constants.endDayP, constants.endMonthP, constants.endYearP, cursor )
-
-    cursor.close()
-    cnx.commit()
-    cnx.close()
+                             constants.endDayP, constants.endMonthP, constants.endYearP)
