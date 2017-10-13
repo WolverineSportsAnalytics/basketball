@@ -18,8 +18,15 @@ def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
                     '&day=' + str(single_date.day) + '&year=' + str(single_date.year))
     return urls
 
-def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
+def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, endYear):
     urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+
+    cursor = cnx.cursor(buffered=True)
+
     for url in urls:
 
         page = requests.get(url)
@@ -32,6 +39,7 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 
         for tr in soup.find_all('tr')[1:]:
             # first find, then update
+
             try:
                 tds = tr.find_all('td')
                 nickName = tds[0].a.text
@@ -51,22 +59,17 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
                     # update
                     updatePQ = (team, bbref)
                     cursor.execute(updatePlayer, updatePQ)
-
             except:
                 pass
 
+        cnx.commit()
+
         print "Updated Basketball Players in Player Ref for URL: " + str(url)
-
-if __name__ == "__main__":
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-    cursor = cnx.cursor(buffered=True)
-
-    updateAndInsertPlayerRef(constants.startDayP, constants.startMonthP, constants.startYearP,
-                             constants.endDayP, constants.endMonthP, constants.endYearP, cursor )
 
     cursor.close()
     cnx.commit()
     cnx.close()
+
+if __name__ == "__main__":
+    updateAndInsertPlayerRef(constants.startDayP, constants.startMonthP, constants.startYearP,
+                             constants.endDayP, constants.endMonthP, constants.endYearP)
