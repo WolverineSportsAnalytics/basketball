@@ -23,13 +23,24 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 	
 	soup.findAll(text=lambda text:isinstance(text, Comment))
 	comments = soup.findAll(text=lambda text:isinstance(text, Comment))
-		
 	comment = comments[len(comments) - 23]
-	#print comment
+
 	soup1 = BeautifulSoup(comment, "html.parser")
 	for tr in soup1.find_all('tr')[2:]:
+		
+		#team name
+		team = tr.find_all('th')[0].text
+	
+		#table columns
 		tds = tr.find_all('td')
-		print tds[0].text
+		pace = tds[0].text
+		eShooting = tds[1].text
+		turnoverPercent = tds[2].text
+		oReboundPercent = tds[3].text
+		FTOverFQAttempts = tds[4].text
+		ORTG = tds[5].text
+
+		print pace, eShooting, turnoverPercent, oReboundPercent, FTOverFQAttempts, ORTG
 	
 
 	for tr in soup.find_all('tr')[2:]:
