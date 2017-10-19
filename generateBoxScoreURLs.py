@@ -5,6 +5,17 @@ from bs4 import BeautifulSoup
 import urllib2
 import requests
 
+def findDate(year, month, day):
+    findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
+    findGameData = (date(year, month, day),)
+    cursor.execute(findGame, findGameData)
+
+    dateID = -1
+    for datez in cursor:
+        dateID = datez[0]
+
+    return dateID
+
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
@@ -42,7 +53,7 @@ def generateBasketballReferenceURLs(cursor):
 
     for date in dates:
         for team in teams:
-            shouldSave = len(urls) % 20
+            shouldSave = len(urls) % 1
             if shouldSave == 0 and len(urls) != 0:
                 queryBoxScoreURL = "INSERT INTO box_score_urls (url, dateID) VALUES (%s, %s)"
                 cursor.executemany(queryBoxScoreURL, urls)
@@ -66,14 +77,7 @@ def generateBasketballReferenceURLs(cursor):
             newURL = baseURL + str(date.year) + month + day + str(0) + team + ".html"
             try:
                 urllib2.urlopen(newURL)
-                dateSelect = "SELECT iddates FROM new_dates WHERE date = %s"
-
-                dateQuery = (date,)
-                cursor.execute(dateSelect, dateQuery)
-
-                boxScoreID = 0
-                for id in cursor:
-                    boxScoreID = id[0]
+                boxScoreID = findDate(date.year, date.month, date.day)
 
                 urlTuple = (newURL, boxScoreID)
                 urls.append(urlTuple)
