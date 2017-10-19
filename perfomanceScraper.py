@@ -1,7 +1,7 @@
 import mysql.connector
 from datetime import timedelta, date
 import constants
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Comment
 import urllib2
 import requests
 
@@ -19,11 +19,22 @@ def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
                     '&day=' + str(single_date.day) + '&year=' + str(single_date.year))
     return urls
 
-def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
+def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, endYear,cursor,cnx ):
     
     # set range of dates	
     # urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
-    urls = ["https://www.basketball-reference.com/boxscores/201704070DAL.html"]
+
+
+    select_dates = "Select * from box_score_urls;"
+    cursor.execute(select_dates)
+    box_url = cursor.fetchall()
+    url = []
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+
+
     start_date = date(startYear, startMonth, startDay)
     end_date = date(endYear, endMonth, endDay)
    
@@ -32,28 +43,44 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 	    dates.append(str(single_date.year) + '-' + str(single_date.month) + '-' + str(single_date.day))
 	
 
-    select_date = "select iddates from new_dates where date = \""
     selec_id = "select playerID from player_reference where nickName=\"" 
     date_counter = 0
     
     # loop through all url's 
-    for url in urls:
-	get_date = select_date + dates[date_counter] + "\""
-        #print get_date
+    for score in box_url:
+    	cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+	cursor = cnx.cursor(buffered=True)
+   
+	url = score[1]    
+	#print get_date
 	page = requests.get(url)
         soup = BeautifulSoup(page.text, 'html.parser')
+	soup.findAll(text=lambda text:isinstance(text, Comment))
+	comments = soup.findAll(text=lambda text:isinstance(text, Comment))
+	
+	comment = comments[len(comments)-24]
+	soup1 = BeautifulSoup(comment, "html.parser")
 
-	cursor.execute(get_date)
-	date_id = cursor.fetchall()[0][0]
+	teams=[]
+	for i in soup1.find_all('tr')[2:]:
+		l = i.find_all("td")[0].text
+		teams.append(l)
+	date_id = score[2] 
 
 	tables = soup.find_all("tbody")
         
-	team_tables = [[tables[0],tables[1]],[tables[2],tables[3]]]
+	team_tables = [[tables[0],tables[1], teams[0],teams[1], 0],[tables[2],tables[3],teams[1],teams[0],1]]
 
 	for team in team_tables:
-		
+		# set team specific data
+		tea = team[2]
+		opp = team[3]
 		rows_1 = team[0].find_all('tr')
 		rows_2 = team[1].find_all('tr')
+		home = team[4]
 		# scrape regular stats
 		for number in range(len(rows_1)):
 	            # first find, then updated
@@ -98,7 +125,7 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 					ft_percent = tds1[9].text
 
 				pf = tds1[17].text
-				plus_minus = tds1[18].text
+				plus_minus = tds1[19].text
 
 				# advanced statistics 
 				tds = rows_2[number].find_all('td')
@@ -135,28 +162,29 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 					double_double = 1
 
 
-				inserts = (player_id, date_id, points, minutes, fgs, fga, fgpercent, tpm, tpa, tp_percent, free_throws, fta, ft_percent, o_rebs, d_rebs, rebounds, assists, steals, blocks, to, pf, plus_minus, TS, eFG, TPAR, FTR, ORBR, DRBR, TRBR, ASTR, STLR, BLKR, TOVR, USGR, ORtg, DRtg, triple_double, double_double)
+				inserts = (player_id, date_id, points, minutes, fgs, fga, fgpercent, tpm, tpa, tp_percent, free_throws, fta, ft_percent, o_rebs, d_rebs, rebounds, assists, steals, blocks, to, pf, plus_minus, TS, eFG, TPAR, FTR, ORBR, DRBR, TRBR, ASTR, STLR, BLKR, TOVR, USGR, ORtg, DRtg, triple_double, double_double, tea, opp, home)
 	
-		        	update_performance = "INSERT INTO performance (playerID, dateID, points, minutesPlayed, fieldGoals, fieldGoalsAttempted, fieldGoalPercent, 3PM, 3PA, 3PPercent, FT, FTA, FTPercent, offensiveRebounds, defensiveRebounds, totalRebounds, assists,  steals, blocks, turnovers, personalFouls, plusMinus, trueShootingPercent, effectiveFieldGoalPercent, 3pointAttemptRate, freeThrowAttemptRate, offensiveReboundPercent, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, turnoverPercent, usagePercent, offensiveRating, defensiveRating,  tripleDouble, doubleDouble) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+		        	update_performance = "INSERT INTO performance (playerID, dateID, points, minutesPlayed, fieldGoals, fieldGoalsAttempted, fieldGoalPercent, 3PM, 3PA, 3PPercent, FT, FTA, FTPercent, offensiveRebounds, defensiveRebounds, totalRebounds, assists,  steals, blocks, turnovers, personalFouls, plusMinus, trueShootingPercent, effectiveFieldGoalPercent, 3pointAttemptRate, freeThrowAttemptRate, offensiveReboundPercent, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, turnoverPercent, usagePercent, offensiveRating, defensiveRating,  tripleDouble, doubleDouble, team, opponent, home) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 		
 				cursor.execute(update_performance, inserts)	
 			
 					
-	
-		#date_counter+=1 
-	
+					
 			except:
 				pass
+	cursor.close()
+    	cnx.commit()
+    	cnx.close()
+
 if __name__ == "__main__":
-    cnx = mysql.connector.connect(user=constants.databaseUser,
+	cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
-    cursor = cnx.cursor(buffered=True)
+	cursor = cnx.cursor(buffered=True)
 
-    updateAndInsertPlayerRef(constants.startDayP, constants.startMonthP, constants.startYearP, constants.endDayP, constants.endMonthP, constants.endYearP, cursor )
+	updateAndInsertPlayerRef(constants.startDayP, constants.startMonthP, constants.startYearP, constants.endDayP, constants.endMonthP, constants.endYearP,cursor,cnx)
 
 
-    cursor.close()
-    cnx.commit()
-    cnx.close()
+
+  
