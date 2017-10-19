@@ -75,7 +75,7 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 	team_tables = [[tables[0],tables[1], teams[0],teams[1], 0],[tables[2],tables[3],teams[1],teams[0],1]]
 
 	for team in team_tables:
-		# set team 
+		# set team specific data
 		tea = team[2]
 		opp = team[3]
 		rows_1 = team[0].find_all('tr')
