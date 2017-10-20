@@ -145,15 +145,15 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 				DRtg = tds[14].text	
 
 				plus_tens = 0
-				if int(steals) > 10:
+				if int(steals) >= 10:
 					plus_tens += 1
-				if int(blocks) > 10:
+				if int(blocks) >= 10:
 					plus_tens += 1
-				if int(points) > 10:	
+				if int(points) >= 10:	
 					plus_tens += 1
-				if int(assists) > 10:
+				if int(assists) >= 10:
 					plus_tens += 1
-				if int(rebounds) > 10:
+				if int(rebounds) >= 10:
 					plus_tens += 1
 	
 				if plus_tens > 2:
