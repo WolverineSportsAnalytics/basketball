@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup, Comment
 import urllib2
 import requests
 import csv
+import traceback
 def fd_pos_convert(pos):
 	if pos == '1':
 		return 'PG'
@@ -40,31 +41,24 @@ def scrape_rotoguru(cursor, cnx):
 		for row in reader:
 			try:
 				name = row[3]
-				print name
                 	    	get_id = selec_id + name + "\""
                 	    	cursor.execute(get_id)
                 	    	player_id = cursor.fetchall()[0][0]
-				print player_id
 
 
 				date = row[4]
-				print date_convert(date)
 				get_date = selec_date_id + date + "\""
                 	    	cursor.execute(get_date)
                 	    	date_id = cursor.fetchall()[0][0]
-				print date_id	
 
 
 				dk_salary = row[25] 
-				print dk_salary
 				fd_salary = row[23]
-				print fd_salary
 				dk_pos = row[32]
 				dk_pos = dk_pos_convert(dk_pos)
 				fd_pos = row[31]
 				fd_pos = fd_pos_convert(fd_pos)
-				print fd_pos
-
+				
 				inserts = (
 						fd_salary,
 						dk_salary,
@@ -76,19 +70,34 @@ def scrape_rotoguru(cursor, cnx):
 				
 				cursor.execute(update_performance,inserts)	
 
-			except:
+			except: 
+				traceback.print_exc()
 				false.append(name)
+
+			cnx.commit()
 
 
 	cursor.close()
-        cnx.commit()
-        cnx.close()
+	cnx.commit()
+    	cnx.close()
+'''
+        # get what names don't match  
+	wrong_names= []
+    	with open('rotoguru20162017data.csv', 'rb') as csvfile:
+		reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+		for row in reader:	
+			try:
+				name = row[3]
+				get_id = selec_id + name + "\""
+				cursor.execute(get_id)
+				player_id = cursor.fetchall()[0][0]
+			except:
+				wrong_names.append(name)
 
-
-	for i in false:
-		print i
-
-
+	wrong_names = list(set(wrong_names))
+	for name in wrong_names:
+		print name
+'''
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
@@ -97,3 +106,5 @@ if __name__ == "__main__":
     cursor = cnx.cursor(buffered=True)
 
     scrape_rotoguru(cursor, cnx)
+
+    
