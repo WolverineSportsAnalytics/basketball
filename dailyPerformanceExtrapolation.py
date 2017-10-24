@@ -39,7 +39,7 @@ def player_daily_avg_extrapolate(cursor):
             
             cursor.execute(insertCheck, performanceData)
             if not cursor.rowcount:
-                cursor.execute(insertAvg, cumulativeP)Clellan 
+                cursor.execute(insertAvg, cumulativeP)
 
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
