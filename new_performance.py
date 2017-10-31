@@ -3,11 +3,6 @@ import mysql.connector
 from datetime import timedelta, date
 import constants
 from bs4 import BeautifulSoup, Comment
-  
-
-6@q
- 
-
 import urllib2
 import requests
 
@@ -75,8 +70,22 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
         teams_data[0].append(teams_data[1][0])
         teams_data[1].append(teams_data[0][0])
 
+        selec_id = "select teamID from team_reference where bbreff=\""
+        get_team = selec_id + teams_data[0][0] + "\""
+        cursor.execute(get_team)
+        h_team_id = cursor.fetchall()[0][0]
+        
+        get_team = selec_id + teams_data[1][0] + "\""
+        cursor.execute(get_team)
+        a_team_id = cursor.fetchall()[0][0]
+
+        teams_data[0][0] = h_team_id
+        teams_data[0][len(teams_data[0]) - 1] = a_team_id
+        teams_data[1][0] = a_team_id
+        teams_data[1][len(teams_data[0]) - 1] = h_team_id
         for team in teams_data:
             
+            print team
 
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
