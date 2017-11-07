@@ -124,7 +124,7 @@ def updateAndInsertPlayerRef(
                 q4 = box_scores[4]
                 score = box_scores[5]
                 opp_score = box_scores[11]
-                if score > opp_score:
+                if int(score) > int(opp_score):
                     win = 1
                     loss = 0
                 else:
@@ -137,13 +137,12 @@ def updateAndInsertPlayerRef(
                 q4 = box_scores[10]
                 score = box_scores[11]
                 opp_score = box_scores[5]
-                if score > opp_score:
+                if int(score) > int(opp_score):
                     win = 1
                     loss = 0
                 else:
                     win = 0
                     loss = 1
-
             team_insert = (team[0],
                            team[len(team) - 2],
                            (date_id),
