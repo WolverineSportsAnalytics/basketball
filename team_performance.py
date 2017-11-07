@@ -7,7 +7,7 @@ import urllib2
 import requests
 
 
-def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
+def updateAndInsertTeamRef(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
     # set range of dates
     # urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
     urls = ["https://www.basketball-reference.com/boxscores/201704070DAL.html"]
@@ -45,7 +45,6 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
             tds = tr.find_all('td')
             #       print tds[1].a.text
 
-
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
@@ -53,7 +52,7 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
 
-    updateAndInsertPlayerRef(constants.startDayP, constants.startMonthP, constants.startYearP, constants.endDayP,
+    updateAndInsertTeamRef(constants.startDayP, constants.startMonthP, constants.startYearP, constants.endDayP,
                              constants.endMonthP, constants.endYearP, cursor)
 
     cursor.close()
