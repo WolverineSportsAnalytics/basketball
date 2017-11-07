@@ -25,29 +25,31 @@ def team_daily_extrapolate_data(cursor):
         dates.append(row[0])
 
     # now loop, average, and insert
-    average = 'select sum(win), sum(loss), avg(offensiveRating), avg(defensiveRating), avg(pointsAllowed), avg(pointsScored), avg(pace), avg(effectiveFieldGoalPercent), avg(turnoverPercent), avg(offensiveReboundPercent), avg(FTperFGA), avg(FG), avg(FGA), avg(FGP), avg(3P), avg(3PA), avg(3PP), avg(FT), avg(FTA), avg(FTP), avg(offensiveRebounds), avg(defensiveRebounds), avg(totalRebounds), avg(assists), avg(steals), avg(blocks), avg(turnovers), avg(personalFouls), avg(trueShootingPercent), avg(3pointAttemptRate), avg(freeThrowAttemptRate), avg(defensiveReboundPercent), avg(totalReboundPercent), avg(assistPercent), avg(stealPercent), avg(blockPercent), avg(points1Q), avg(points2Q), avg(points3Q), avg(points4Q) from team_performance where dailyTeamID = %s and dateID <= %s'
+    average = 'select sum(win), sum(loss), avg(offensiveRating), avg(defensiveRating), avg(pointsAllowed), avg(pointsScored), avg(pace), avg(effectiveFieldGoalPercent), avg(turnoverPercent), avg(offensiveReboundPercent), avg(FTperFGA), avg(FG), avg(FGA), avg(FGP), avg(3P), avg(3PA), avg(3PP), avg(FT), avg(FTA), avg(FTP), avg(offensiveRebounds), avg(defensiveRebounds), avg(totalRebounds), avg(assists), avg(steals), avg(blocks), avg(turnovers), avg(personalFouls), avg(trueShootingPercent), avg(3pointAttemptRate), avg(freeThrowAttemptRate), avg(defensiveReboundPercent), avg(totalReboundPercent), avg(assistPercent), avg(stealPercent), avg(blockPercent), avg(points1Q), avg(points2Q), avg(points3Q), avg(points4Q) from team_performance where dailyTeamID = %s and dateID < %s'
 
     insertAvg = "INSERT INTO team_daily_avg_performance VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
     insertCheck = "SELECT dailyTeamID FROM team_performance WHERE dailyTeamID = %s AND dateID = %s"
 
     # give table id because you can't insert all without it
+    tableID = 1
     for date in dates:
         for team in teams:
             performanceData = (team, date)
-            cursor.execute(average, performanceData)
-
-            new_cumlative = []
-            cumulativeP = cursor.fetchall()
-            new_cumlative.append(team)
-            new_cumlative.append(date)
-            for item in cumulativeP[0]:
-                new_cumlative.append(item)
-
             cursor.execute(insertCheck, performanceData)
 
             if not cursor.rowcount:
+                cursor.execute(average, performanceData)
+
+                new_cumlative = []
+                cumulativeP = cursor.fetchall()
+                new_cumlative.append(tableID)
+                new_cumlative.append(team)
+                new_cumlative.append(date)
+                for item in cumulativeP[0]:
+                    new_cumlative.append(item)
                 cursor.execute(insertAvg, new_cumlative)
+                tableID = tableID + 1
 
             cnx.commit()
 

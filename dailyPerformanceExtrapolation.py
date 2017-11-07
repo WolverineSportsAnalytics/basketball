@@ -30,27 +30,29 @@ def player_daily_avg_extrapolate(cursor, cnx):
     insertCheck = "SELECT playerID FROM player_daily_avg WHERE playerID = %s AND dateID = %s"
 
     #give table id because you can't insert all without it 
-    table_id = 1 
+    tableID = 1
     for date in dates:
         for player in players:
             performanceData = (player, date)
-            cursor.execute(average, performanceData)
-            new_cumlative = []
-            cumulativeP = cursor.fetchall()
-            new_cumlative.append(table_id)
-            new_cumlative.append(player)
-            new_cumlative.append(date)
-            for item in cumulativeP[0]:
-                new_cumlative.append(item)
 
-            # if returns none just skip it
-            if new_cumlative[4] == None :
-                continue
             cursor.execute(insertCheck, performanceData)
 
-            table_id = table_id + 1
             if not cursor.rowcount:
+                cursor.execute(average, performanceData)
+                new_cumlative = []
+                cumulativeP = cursor.fetchall()
+                new_cumlative.append(tableID)
+                new_cumlative.append(player)
+                new_cumlative.append(date)
+                for item in cumulativeP[0]:
+                    new_cumlative.append(item)
+
+                # if returns none just skip it
+                if new_cumlative[4] == None:
+                    continue
                 cursor.execute(insertAvg, new_cumlative)
+                tableID = tableID + 1
+
             cnx.commit()
 
 
