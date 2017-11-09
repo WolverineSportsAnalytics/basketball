@@ -13,9 +13,13 @@ def player_daily_avg_extrapolate(cursor, cnx):
     sqlResults = cursor.fetchall()
     for row in sqlResults:
         players.append(row[0])
-     
-    getDates = "SELECT iddates FROM new_dates"
-    cursor.execute(getDates)
+
+    dateCutOff = 681
+    lastTableID = 1
+
+    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s"
+    getDatesD = (dateCutOff, )
+    cursor.execute(getDates, getDatesD)
     
     dates = []
     sqlResults = cursor.fetchall()
@@ -30,7 +34,7 @@ def player_daily_avg_extrapolate(cursor, cnx):
     insertCheck = "SELECT playerID FROM player_daily_avg WHERE playerID = %s AND dateID = %s"
 
     #give table id because you can't insert all without it 
-    tableID = 1
+    tableID = lastTableID
     for date in dates:
         for player in players:
             performanceData = (player, date)
