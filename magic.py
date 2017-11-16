@@ -199,7 +199,8 @@ if __name__ == "__main__":
         cursor.execute(getPerformanceDataForEachPlayer, dateD)
 
         results = cursor.fetchall()
-        playersPlaying.append(list(results))
+        for player in results:
+            playersPlaying.append(list(results))
 
     # get daily_player_avg
     # get opp_team stats
@@ -209,112 +210,114 @@ if __name__ == "__main__":
     team_ref_query = "SELECT teamID FROM team_daily_avg_performance WHERE bbreff = %s"
 
     allPlayerFeatures = []
-    for player in playersPlaying:
-        indvPlayerData = []
-        indvPlayerData.extend(player[2])
-        indvPlayerData.extend(player[3])
-        basicQueryData = (player[0], player[1])
-        playerDailyAvgResult = cursor.execute(getDailyPlayerAvg, basicQueryData)
-        # append playerDailyAvgResult to indvPlayerData
-        for item in playerDailyAvgResult[0]:
-            indvPlayerData.extend(item)
+    for players in playersPlaying:
+        for player in players:
+            indvPlayerData = []
+            indvPlayerData.append(player[2])
+            indvPlayerData.append(player[3])
+            basicQueryData = (player[1], player[0])
+            playerDailyAvgResult = cursor.execute(getDailyPlayerAvg, basicQueryData)
+            # append playerDailyAvgResult to indvPlayerData
+            for item in playerDailyAvgResult[0]:
+                indvPlayerData.append(item)
 
-        # teamID from player and use team reference table to get playerID
-        teamIDData = (player[6],)
-        oppTeamID = cursor.execute(team_ref_query, teamIDData)
+            # teamID from player and use team reference table to get playerID
+            teamIDData = (player[6],)
+            oppTeamID = cursor.execute(team_ref_query, teamIDData)
 
-        oppTeamIDData = (player[7],)
-        teamID = cursor.execute(team_ref_query, teamIDData)
+            oppTeamIDData = (player[7],)
+            teamID = cursor.execute(team_ref_query, teamIDData)
 
-        # use teamID + date ID to query the team data and opp team data for that date
-        # append to master array
-        idTeam = 0
-        for team in teamID:
-            idTeam = team[0]
+            # use teamID + date ID to query the team data and opp team data for that date
+            # append to master array
+            idTeam = 0
+            for team in teamID:
+                idTeam = team[0]
 
-        idOppTeam = 0
-        for oppTeam in oppTeamID:
-            idOppTeam = oppTeam[0]
+            idOppTeam = 0
+            for oppTeam in oppTeamID:
+                idOppTeam = oppTeam[0]
 
-        teamQuery = (player[1], idTeam)
-        teamResult = cursor.execute(getTeamData, teamQuery)
+            teamQuery = (player[1], idTeam)
+            teamResult = cursor.execute(getTeamData, teamQuery)
 
-        oppTeamQuery = (player[1], idOppTeam)
-        oppTeamResult = cursor.execute(getTeamData, oppTeamQuery)
+            oppTeamQuery = (player[1], idOppTeam)
+            oppTeamResult = cursor.execute(getTeamData, oppTeamQuery)
 
-        for item in teamResult[0]:
-            indvPlayerData.extend(item)
+            for item in teamResult[0]:
+                indvPlayerData.append(item)
 
-        for item in oppTeamResult[0]:
-            indvPlayerData.extend(item)
+            for item in oppTeamResult[0]:
+                indvPlayerData.append(item)
 
-        # use position + dateID + opp team ID to query team vs. defense for that position
-        # append to master array
-        # doubl'n it!
-        if player[4] == 'PG':
+            # use position + dateID + opp team ID to query team vs. defense for that position
+            # append to master array
+            # doubl'n it!
+            if player[4] == 'PG':
+                pos_data = (player[1], idOppTeam)
+            cursor.execute(get_ball_handlers, pos_data)
+            ball_handlers_results = cursor.fetchall()
+
+            for item in ball_handlers_results[0]:
+                indvPlayerData.append(item)
+            for item in ball_handlers_results[0]:
+                indvPlayerData.append(item)
+
+        if player[4] == 'SG':
             pos_data = (player[1], idOppTeam)
-        cursor.execute(get_ball_handlers, pos_data)
-        ball_handlers_results = cursor.fetchall()
+            cursor.execute(get_ball_handlers, pos_data)
+            ball_handlers_results = cursor.fetchall()
+            cursor.execute(get_wings, pos_data)
+            wings_results = cursor.fetchall()
 
-        for item in ball_handlers_results[0]:
-            indvPlayerData.extend(item)
-        for item in ball_handlers_results[0]:
-            indvPlayerData.extend(item)
+            for item in ball_handlers_results[0]:
+                indvPlayerData.append(item)
+            for item in wings_results[0]:
+                indvPlayerData.append(item)
 
-    if player[4] == 'SG':
-        pos_data = (player[1], idOppTeam)
-        cursor.execute(get_ball_handlers, pos_data)
-        ball_handlers_results = cursor.fetchall()
-        cursor.execute(get_wings, pos_data)
-        wings_results = cursor.fetchall()
+        if player[4] == 'SF':
+            pos_data = (player[1], idOppTeam)
+            cursor.execute(get_wings, pos_data)
+            wings_results = cursor.fetchall()
+            cursor.execute(get_bigs, pos_data)
+            bigs_results = cursor.fetchall()
 
-        for item in ball_handlers_results[0]:
-            indvPlayerData.extend(item)
-        for item in wings_results[0]:
-            indvPlayerData.extend(item)
+            for item in wings_results[0]:
+                indvPlayerData.append(item)
+            for item in bigs_results[0]:
+                indvPlayerData.append(item)
 
-    if player[4] == 'SF':
-        pos_data = (player[1], idOppTeam)
-        cursor.execute(get_wings, pos_data)
-        wings_results = cursor.fetchall()
-        cursor.execute(get_bigs, pos_data)
-        bigs_results = cursor.fetchall()
+        if player[4] == 'PF':
+            pos_data = (player[1], idOppTeam)
+            cursor.execute(get_bigs, pos_data)
+            bigs_results = cursor.fetchall()
 
-        for item in wings_results[0]:
-            indvPlayerData.extend(item)
-        for item in bigs_results[0]:
-            indvPlayerData.extend(item)
+            for item in bigs_results[0]:
+                indvPlayerData.append(item)
+            for item in bigs_results[0]:
+                indvPlayerData.append(item)
 
-    if player[4] == 'PF':
-        pos_data = (player[1], idOppTeam)
-        cursor.execute(get_bigs, pos_data)
-        bigs_results = cursor.fetchall()
+        if player[4] == 'C':
+            pos_data = (player[1], idOppTeam)
+            cursor.execute(get_centers, pos_data)
+            centers_results = cursor.fetchall()
 
-        for item in bigs_results[0]:
-            indvPlayerData.extend(item)
-        for item in bigs_results[0]:
-            indvPlayerData.extend(item)
+            for item in centers_results[0]:
+                indvPlayerData.append(item)
+            for item in centers_results[0]:
+                indvPlayerData.append(item)
 
-    if player[4] == 'C':
-        pos_data = (player[1], idOppTeam)
-        cursor.execute(get_centers, pos_data)
-        centers_results = cursor.fetchall()
-
-        for item in centers_results[0]:
-            indvPlayerData.extend(item)
-        for item in centers_results[0]:
-            indvPlayerData.extend(item)
-
-    allPlayerFeatures.append(indvPlayerData)
+        allPlayerFeatures.append(indvPlayerData)
 
     FDTargets = []
     DKTargets = []
-    for player in playersPlaying:
-        # last - append fanduel points + draftkings points
-        indvPlayerFDTarget = player[4]
-        FDTargets.append(indvPlayerFDTarget)
-        indvPlayerDKTarget = player[5]
-        DKTargets.append(indvPlayerDKTarget)
+    for players in playersPlaying:
+        for player in players:
+            # last - append fanduel points + draftkings points
+            indvPlayerFDTarget = player[4]
+            FDTargets.append(indvPlayerFDTarget)
+            indvPlayerDKTarget = player[5]
+            DKTargets.append(indvPlayerDKTarget)
 
     # turn into numpy arrays
     testX = np.asarray(allPlayerFeatures)
