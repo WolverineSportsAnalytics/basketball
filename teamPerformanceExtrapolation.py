@@ -36,20 +36,18 @@ def team_daily_extrapolate_data(cursor):
     for date in dates:
         for team in teams:
             performanceData = (team, date)
-            cursor.execute(insertCheck, performanceData)
+            cursor.execute(average, performanceData)
 
-            if not cursor.rowcount:
-                cursor.execute(average, performanceData)
-
-                new_cumlative = []
-                cumulativeP = cursor.fetchall()
-                new_cumlative.append(tableID)
-                new_cumlative.append(team)
-                new_cumlative.append(date)
-                for item in cumulativeP[0]:
-                    new_cumlative.append(item)
-                cursor.execute(insertAvg, new_cumlative)
-                tableID = tableID + 1
+            new_cumlative = []
+            cumulativeP = cursor.fetchall()
+            new_cumlative.append(tableID)
+            new_cumlative.append(team)
+            new_cumlative.append(date)
+            for item in cumulativeP[0]:
+                new_cumlative.append(item)
+            
+            cursor.execute(insertAvg, new_cumlative)
+            tableID = tableID + 1
 
             cnx.commit()
 

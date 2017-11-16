@@ -18,8 +18,8 @@ endYearP = 2017
 endMonthP = 4
 endDayP = 13
 
-gdStartYear = 2017
-gdStartMonth = 1
-gdStartDay = 25
+gdStartYear = 2016
+gdStartMonth = 11
+gdStartDay = 27
 
-numdaysGradientDescent = 40
+numdaysGradientDescent = 3
