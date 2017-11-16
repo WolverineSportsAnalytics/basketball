@@ -335,21 +335,21 @@ if __name__ == "__main__":
 
     theta, JHistory, iterHistory = gradientDescentMulti(testX, testY, theta, alpha, num_iters)
 
-    print "Batter Theta Values from Homemade Gradient Descent"
+    print "Player Theta Values from Homemade Gradient Descent"
     print theta
 
     reg = LinearRegression(fit_intercept=False, normalize=True)
     reg.fit(testX, testY)
     thetaSKLearn = reg.coef_
 
-    print "Batter Theta Values from Sklearn Linear Regression"
+    print "Player Theta Values from Sklearn Linear Regression"
     print thetaSKLearn
 
     ridge = Ridge(alpha=1, fit_intercept=False, normalize=True)
     ridge.fit(testX, testY)
     thetaSKLearnRidge = ridge.coef_
 
-    print "Batter Theta Values from Sklearn Ridge Regression"
+    print "Player Theta Values from Sklearn Ridge Regression"
     print thetaSKLearnRidge
 
     ridgeP = Ridge(alpha=150, fit_intercept=False, normalize=True)
@@ -357,4 +357,5 @@ if __name__ == "__main__":
     ridgeP.fit(newFeatures, testY)
     thetaSKLearnRidgeP = ridgeP.coef_
 
-    print "Batter Theta Values from Sklearn Ridge Regression w/ Polynomial Feature Mapping"
+    print "Player Theta Values from Sklearn Ridge Regression w/ Polynomial Feature Mapping"
+    print thetaSKLearnRidgeP

@@ -3,9 +3,9 @@ databaseUser='wsa@wsabasketball'
 databaseName='basketball'
 databasePassword='LeBron>MJ!'
 
-yearP=2017
-monthP=4
-dayP=12
+yearP = 2017
+monthP = 1
+dayP = 26
 
 BasketballRefPerGameData='https://www.basketball-reference.com/friv/dailyleaders.fcgi?month=04&day=13&year=2017'
 BasketballRefBoxScoreBase = 'https://www.basketball-reference.com/boxscores/'
@@ -17,3 +17,9 @@ startDayP = 25
 endYearP = 2017
 endMonthP = 4
 endDayP = 13
+
+gdStartYear = 2017
+gdStartMonth = 1
+gdStartDay = 25
+
+numdaysGradientDescent = 40
