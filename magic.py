@@ -211,7 +211,8 @@ if __name__ == "__main__":
     allPlayerFeatures = []
     for player in playersPlaying:
         indvPlayerData = []
-        indvPlayerData.extend(player[2], player[3])
+        indvPlayerData.extend(player[2])
+        indvPlayerData.extend(player[3])
         basicQueryData = (player[0], player[1])
         playerDailyAvgResult = cursor.execute(getDailyPlayerAvg, basicQueryData)
         # append playerDailyAvgResult to indvPlayerData
