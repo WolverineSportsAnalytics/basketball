@@ -7,7 +7,6 @@ import mysql.connector
 import os
 import datetime as dt
 from itertools import chain
-import matplotlib.pyplot as plt
 import constants
 import warnings
 
@@ -207,7 +206,7 @@ if __name__ == "__main__":
     # get self_team stats
     # get opp_vs_player position states
     # from perfromance get fanduel point for taraget
-    team_ref_query = "SELECT teamID FROM team_daily_avg_performance WHERE bbreff = %s"
+    team_ref_query = "SELECT teamID FROM team_reference WHERE bbreff = %s"
 
     allPlayerFeatures = []
     for players in playersPlaying:
@@ -216,7 +215,10 @@ if __name__ == "__main__":
             indvPlayerData.append(player[2])
             indvPlayerData.append(player[3])
             basicQueryData = (player[1], player[0])
-            playerDailyAvgResult = cursor.execute(getDailyPlayerAvg, basicQueryData)
+            cursor.execute(getDailyPlayerAvg, basicQueryData)
+
+            playerDailyAvgResult = cursor.fetchall()
+            
             # append playerDailyAvgResult to indvPlayerData
             for item in playerDailyAvgResult[0]:
                 indvPlayerData.append(item)
