@@ -192,7 +192,6 @@ def updateAndInsertPlayerRef(
             cnx.commit()
             times += 1
 
-
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
