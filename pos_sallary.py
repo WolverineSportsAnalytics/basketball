@@ -29,7 +29,7 @@ def date_convert(date):
 
 def alignPlayerIDs(cursor):
     selec_id = "select playerID from player_reference where firstName= %s and lastName = %s"
-    select_idTwo = "SELECT playerID from player_reference where nickName = %s"
+    select_idTwo = "SELECT playerID from player_reference where nickName=%s"
 
     insertRotoguruID = "UPDATE player_reference SET rotoguruID = %s WHERE playerID = %s"
 
@@ -67,6 +67,7 @@ def scrape_rotoguru(cursor, cnx):
     #empty will be used to scrape from rotoguru csv
     selec_id = "select playerID from player_reference where nickName=\""
     selec_date_id = "select iddates from new_dates where date=\""
+    select_idTwo = "SELECT playerID from player_reference where RotoguruID=\""
 
     update_performance = "Update performance set fanduel=%s, draftkings=%s, fanduelPosition=%s, draftkingsPosition=%s where playerID=%s and dateID=%s"
     false = []
@@ -76,8 +77,9 @@ def scrape_rotoguru(cursor, cnx):
         for row in reader:
             try:
                 name = row[3]
-                get_id = selec_id + name + "\""
-                cursor.execute(get_id)
+                rot_id = row[0]
+                select_idTwos = select_idTwo + rot_id + "\""
+                cursor.execute(select_idTwos)
                 player_id = cursor.fetchall()[0][0]
 
 
@@ -107,6 +109,7 @@ def scrape_rotoguru(cursor, cnx):
 
             except:
                 traceback.print_exc()
+                print name
                 false.append(name)
 
             cnx.commit()
@@ -139,7 +142,7 @@ if __name__ == "__main__":
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
-    scrape_rotoguru(cursor)
+    scrape_rotoguru(cursor, cnx)
 
     cursor.close()
     cnx.commit()

@@ -30,8 +30,10 @@ def player_daily_avg_extrapolate(cursor, cnx):
     insertCheck = "SELECT playerID FROM player_daily_avg WHERE playerID = %s AND dateID = %s"
 
     #give table id because you can't insert all without it 
-    table_id = 1 
+    table_id = 41790 
     for date in dates:
+	if date < 789:
+	    continue
         for player in players:
             cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
@@ -55,11 +57,9 @@ def player_daily_avg_extrapolate(cursor, cnx):
 	    if new_cumlative[4] == None :
 		    continue
             
-            cursor.execute(insertCheck, performanceData)
 	   
 	    table_id = table_id + 1;
-            if not cursor.rowcount:
-                cursor.execute(insertAvg, new_cumlative)
+            cursor.execute(insertAvg, new_cumlative)
     	    
 	    cursor.close()
 	    cnx.commit()

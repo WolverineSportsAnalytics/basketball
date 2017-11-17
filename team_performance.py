@@ -66,7 +66,7 @@ def updateAndInsertPlayerRef(
 
         for tr in soup1.find_all('tr')[2:]:
 
-                # team name
+            # team name
             team = tr.find_all('th')[0].text
 
             # table columns
