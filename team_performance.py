@@ -4,8 +4,20 @@ from datetime import timedelta, date
 import constants
 from bs4 import BeautifulSoup, Comment
 import urllib2
+import datetime as dt
 import requests
 
+def getDate(day, month, year, cursor):
+    gameIDP = 0
+
+    findGame = "SELECT iddates FROM new_dates WHERE date = %s"
+    findGameData = (dt.date(year, month, day),)
+    cursor.execute(findGame, findGameData)
+
+    for game in cursor:
+        gameIDP = game[0]
+
+    return gameIDP
 
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
@@ -26,8 +38,12 @@ def updateAndInsertPlayerRef(
 
     insert_team_data = "INSERT INTO basketball.team_performance (dailyTeamID, dailyTeamOpponentID, dateID, pointsAllowed, pointsScored, pace, effectiveFieldGoalPercent, turnoverPercent, FTperFGA, offensiveRating, defensiveRating, FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP, offensiveRebounds, defensiveRebounds, totalRebounds, assists, steals, blocks, turnovers, personalFouls, trueShootingPercent, 3pointAttemptRate, freeThrowAttemptRate, defensiveReboundPercent, offensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, win, loss, points1Q, points2Q, points3Q, points4Q) VALUES( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-    select_dates = "Select * from box_score_urls;"
-    cursor.execute(select_dates)
+    start_date_id = getDate(startDay, startMonth, startYear, cursor)
+    end_date_id = getDate(endDay, endMonth, endYear, cursor)
+
+    select_dates = "Select * from box_score_urls WHERE dateID >= %s AND dateID <= %s"
+    boxScoreDatesD = (start_date_id, end_date_id)
+    cursor.execute(select_dates, boxScoreDatesD)
     box_url = cursor.fetchall()
     url = []
 

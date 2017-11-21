@@ -4,7 +4,19 @@ import constants
 from bs4 import BeautifulSoup, Comment
 import urllib2
 import requests
+import datetime as dt
 
+def getDate(day, month, year, cursor):
+    gameIDP = 0
+
+    findGame = "SELECT iddates FROM new_dates WHERE date = %s"
+    findGameData = (dt.date(year, month, day),)
+    cursor.execute(findGame, findGameData)
+
+    for game in cursor:
+        gameIDP = game[0]
+
+    return gameIDP
 
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
@@ -34,8 +46,12 @@ def updateAndInsertPlayerRef(
     # set range of dates
     # urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
 
-    select_dates = "Select * from box_score_urls;"
-    cursor.execute(select_dates)
+    start_date_id = getDate(startDay, startMonth, startYear, cursor)
+    end_date_id = getDate(endDay, endMonth, endYear, cursor)
+
+    select_dates = "Select * from box_score_urls WHERE dateID >= %s AND dateID <= %s"
+    boxScoreDatesD = (start_date_id, end_date_id)
+    cursor.execute(select_dates, boxScoreDatesD)
     box_url = cursor.fetchall()
     url = []
 
