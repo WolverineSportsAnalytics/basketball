@@ -84,7 +84,11 @@ def team_vs_defense_extrapolation(cursor):
     insertTeamVsDefenseBigs = "INSERT INTO team_vs_bigs VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     insertTeamVsDefenseCenters = "INSERT INTO team_vs_centers VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-    tableID = 1
+    getLastID = "Select MAX(teamID) from team_vs_centers"
+    cursor.execute(getLastID)
+    tableID = int(cursor.fetchall()[0][0])
+    tableID += 1
+
     for team in teams:
         for date in dates:
             # get all players who played vs that team before that day
