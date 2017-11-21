@@ -22,17 +22,23 @@ def optimize(day, month, year, cursor):
 
     # get players
     playas = []
+    dkPointsDict = {}
+    dkPlayersPoints = {}
 
-    getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.fdPointsSKLinPredRidge, p.team, p.fanduel, p.opponent FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 10"
+    getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.fdPointsSKLinPredRidge, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 10 AND p.fanduel > 0"
     getBPlayersData = (gameID,)
     cursor.execute(getPlayersQuery, getBPlayersData)
 
-    numBatters = float(cursor.rowcount)
     print ("Number of players being considered: " + str(cursor.rowcount))
     players = cursor.fetchall()
 
     for baller in players:
-        newPlaya = Player(baller[1], baller[0], "", baller[2], baller[4], int(baller[5]), float(baller[3]))
+        positions = []
+        positions.append(str(baller[2]))
+        dkPointsDict[baller[1]] = float(baller[7])
+        dkPlayersPoints[baller[1]] = baller[0]
+
+        newPlaya = Player(baller[1], baller[0], "", positions, baller[4], int(baller[5]), float(baller[3]))
         playas.append(newPlaya)
 
     #instantiate optimizer + run
@@ -46,9 +52,20 @@ def optimize(day, month, year, cursor):
     lineups = optimizer.optimize(n=numLineups)
 
     for lineup in lineups:
-        print ("Lineup #: " + str(lineupCounter))
         print(lineup)
-        lineupCounter = lineupCounter + 1
+        print(lineup.fantasy_points_projection)
+        print(lineup.salary_costs)
+        playerIDList = []
+        dkpoints = 0
+        for player in lineup.lineup:
+            playerIDList.append(player.id)
+
+        for player in playerIDList:
+            dkpoints = dkpoints + dkPointsDict[player]
+            playerName = dkPlayersPoints[player]
+            print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(dkPointsDict[player]))
+
+        print("Total Points: " + str(dkpoints))
         print ("\n")
 
 if __name__ == "__main__":
