@@ -5,7 +5,7 @@ databasePassword='LeBron>MJ!'
 
 yearP = 2017
 monthP = 1
-dayP = 26
+dayP = 27
 
 BasketballRefPerGameData='https://www.basketball-reference.com/friv/dailyleaders.fcgi?month=04&day=13&year=2017'
 BasketballRefBoxScoreBase = 'https://www.basketball-reference.com/boxscores/'
