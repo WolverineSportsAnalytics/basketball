@@ -78,7 +78,7 @@ def team_vs_defense_extrapolation(cursor):
         dates.append(row[0])
 
     # iterate through all teams and all dates
-    getPlayersVsOpponents = "SELECT blocks, points, steals, assists, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, 3PA, offensiveRebounds, defensiveRebounds, minutesPlayed, fieldGoals, fieldGoalsAttempted, FT, FTA, usagePercent, offensiveRating, defensiveRating, trueShootingPercent, effectiveFieldGoalPercent FROM performance WHERE opponent = %s AND dateID < %s AND fanduelPosition = %s"
+    getPlayersVsOpponents = "SELECT blocks, points, steals, assists, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, 3PA, offensiveRebounds, defensiveRebounds, minutesPlayed, fieldGoals, fieldGoalsAttempted, FT, FTA, usagePercent, offensiveRating, defensiveRating, trueShootingPercent, effectiveFieldGoalPercent FROM performance WHERE opponent = %s AND dateID > 850 AND dateID < %s AND fanduelPosition = %s"
     insertTeamVsDefenseBallHandlers = "INSERT INTO team_vs_ball_handlers VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     insertTeamVsDefenseWings = "INSERT INTO team_vs_wings VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     insertTeamVsDefenseBigs = "INSERT INTO team_vs_bigs VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
