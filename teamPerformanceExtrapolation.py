@@ -31,6 +31,7 @@ def team_daily_extrapolate_data(cursor):
 
     insertCheck = "SELECT dailyTeamID FROM team_performance WHERE dailyTeamID = %s AND dateID = %s"
 
+    daily_id = 0
     # give table id because you can't insert all without it
     tableID = 1
     for date in dates:
@@ -40,14 +41,22 @@ def team_daily_extrapolate_data(cursor):
 
             new_cumlative = []
             cumulativeP = cursor.fetchall()
+            
+            if cumulativeP[0][5] == None:
+                    continue # when there is no results don't insert
+           
+            new_cumlative.append(daily_id)
             new_cumlative.append(tableID)
             new_cumlative.append(team)
             new_cumlative.append(date)
             for item in cumulativeP[0]:
                 new_cumlative.append(item)
+
+            
             
             cursor.execute(insertAvg, new_cumlative)
             tableID = tableID + 1
+
 
             cnx.commit()
 
