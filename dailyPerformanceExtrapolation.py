@@ -14,8 +14,8 @@ def player_daily_avg_extrapolate(cursor, cnx):
     for row in sqlResults:
         players.append(row[0])
 
-    dateCutOff = 681
-    lastTableID = 1
+    dateCutOff = constants.dailyPerformanceExtrapolationDateCutOff
+    lastTableID = constants.dailyPerformanceLastTableID
 
     getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s"
     getDatesD = (dateCutOff, )
