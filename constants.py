@@ -22,4 +22,4 @@ gdStartYear = 2016
 gdStartMonth = 11
 gdStartDay = 27
 
-numdaysGradientDescent = 3
+numdaysGradientDescent = 10
