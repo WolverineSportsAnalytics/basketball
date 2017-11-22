@@ -33,35 +33,38 @@ def alignPlayerIDs(cursor):
 
     insertRotoguruID = "UPDATE player_reference SET rotoguruID = %s WHERE playerID = %s"
 
-    with open('rotoguru20162017data.csv', 'rb') as csvfile:
+    with open(constants.rotoguruFileLocation, 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         i = 0
         for row in reader:
-            firstName = row[2]
-            firstName = firstName.strip()
-            lastName = row[1]
-            lastName = lastName.strip()
-            selectData = (firstName, lastName)
-            cursor.execute(selec_id, selectData)
-            if not cursor.rowcount:
-                name =""
-                name = firstName + " " + lastName
-                nameData = (name,)
-                cursor.execute(select_idTwo, nameData)
-                if cursor.rowcount:
+            # if they don't play don't consider them
+            if row[13] != 0:
+                firstName = row[2]
+                firstName = firstName.strip()
+                lastName = row[1]
+                lastName = lastName.strip()
+                selectData = (firstName, lastName)
+                cursor.execute(selec_id, selectData)
+                if not cursor.rowcount:
+                    name = firstName + " " + lastName
+                    nameData = (name,)
+                    cursor.execute(select_idTwo, nameData)
+                    if cursor.rowcount:
+                        playerID = 0
+                        for id in cursor:
+                            playerID = id[0]
+                        insertData = (row[0].strip(), playerID)
+                        cursor.execute(insertRotoguruID, insertData)
+                        cnx.commit()
+                    else:
+                        print "Must manual insert rotoguru id for: " + name
+                else:
                     playerID = 0
                     for id in cursor:
                         playerID = id[0]
                     insertData = (row[0].strip(), playerID)
                     cursor.execute(insertRotoguruID, insertData)
                     cnx.commit()
-            else:
-                playerID = 0
-                for id in cursor:
-                    playerID = id[0]
-                insertData = (row[0].strip(), playerID)
-                cursor.execute(insertRotoguruID, insertData)
-                cnx.commit()
 
 def scrape_rotoguru(cursor, cnx):
     #empty will be used to scrape from rotoguru csv
@@ -71,49 +74,49 @@ def scrape_rotoguru(cursor, cnx):
 
     update_performance = "Update performance set fanduel=%s, draftkings=%s, fanduelPosition=%s, draftkingsPosition=%s where playerID=%s and dateID=%s"
     false = []
-    with open('rotoguru20162017data.csv', 'rb') as csvfile:
+    with open(constants.rotoguruFileLocation, 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         i = 0
         for row in reader:
-            try:
-                name = row[3]
-                rot_id = row[0]
-                select_idTwos = select_idTwo + rot_id + "\""
-                cursor.execute(select_idTwos)
-                player_id = cursor.fetchall()[0][0]
+            if row[13] != 0:
+                try:
+                    name = row[3]
+                    rot_id = row[0]
+                    select_idTwos = select_idTwo + rot_id + "\""
+                    cursor.execute(select_idTwos)
+                    player_id = cursor.fetchall()[0][0]
 
 
-                date = row[4]
-                get_date = selec_date_id + date + "\""
-                cursor.execute(get_date)
-                date_id = cursor.fetchall()[0][0]
+                    date = row[4]
+                    get_date = selec_date_id + date + "\""
+                    cursor.execute(get_date)
+                    date_id = cursor.fetchall()[0][0]
 
 
-                dk_salary = row[25]
-                fd_salary = row[23]
-                dk_pos = row[32]
-                dk_pos = dk_pos_convert(dk_pos)
-                fd_pos = row[31]
-                fd_pos = fd_pos_convert(fd_pos)
+                    dk_salary = row[25]
+                    fd_salary = row[23]
+                    dk_pos = row[32]
+                    dk_pos = dk_pos_convert(dk_pos)
+                    fd_pos = row[31]
+                    fd_pos = fd_pos_convert(fd_pos)
 
-                inserts = (
-                    fd_salary,
-                    dk_salary,
-                    fd_pos,
-                    dk_pos,
-                    player_id,
-                    date_id)
+                    inserts = (
+                        fd_salary,
+                        dk_salary,
+                        fd_pos,
+                        dk_pos,
+                        player_id,
+                        date_id)
 
 
-                cursor.execute(update_performance,inserts)
+                    cursor.execute(update_performance,inserts)
 
-            except:
-                traceback.print_exc()
-                print name
-                false.append(name)
+                except:
+                    traceback.print_exc()
+                    print name
+                    false.append(name)
 
-            cnx.commit()
-
+                cnx.commit()
 
     cursor.close()
     cnx.commit()
@@ -142,6 +145,7 @@ if __name__ == "__main__":
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
+    #alignPlayerIDs(cursor)
     scrape_rotoguru(cursor, cnx)
 
     cursor.close()
