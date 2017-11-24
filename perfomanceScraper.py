@@ -149,7 +149,9 @@ def updateAndInsertPlayerRef(
                         ft_percent = tds1[9].text
 
                     pf = tds1[17].text
-                    plus_minus = tds1[19].text
+                    
+                    #plus_minus = tds1[19].text
+                    plus_minus = '0' 
 
                     # advanced statistics
                     tds = rows_2[number].find_all('td')
@@ -227,13 +229,74 @@ def updateAndInsertPlayerRef(
                         tea,
                         opp,
                         home)
+                    new_insert = (
+                        points,
+                        minutes,
+                        fgs,
+                        fga,
+                        fgpercent,
+                        tpm,
+                        tpa,
+                        tp_percent,
+                        free_throws,
+                        fta,
+                        ft_percent,
+                        o_rebs,
+                        d_rebs,
+                        rebounds,
+                        assists,
+                        steals,
+                        blocks,
+                        to,
+                        pf,
+                        plus_minus,
+                        TS,
+                        eFG,
+                        TPAR,
+                        FTR,
+                        ORBR,
+                        DRBR,
+                        TRBR,
+                        ASTR,
+                        STLR,
+                        BLKR,
+                        TOVR,
+                        USGR,
+                        ORtg,
+                        DRtg,
+                        triple_double,
+                        double_double,
+                        tea,
+                        opp,
+                        home,
+                        player_id,
+                        date_id
 
+                        )
                     update_performance = "INSERT INTO performance (playerID, dateID, points, minutesPlayed, fieldGoals, fieldGoalsAttempted, fieldGoalPercent, 3PM, 3PA, 3PPercent, FT, FTA, FTPercent, offensiveRebounds, defensiveRebounds, totalRebounds, assists,  steals, blocks, turnovers, personalFouls, plusMinus, trueShootingPercent, effectiveFieldGoalPercent, 3pointAttemptRate, freeThrowAttemptRate, offensiveReboundPercent, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, turnoverPercent, usagePercent, offensiveRating, defensiveRating,  tripleDouble, doubleDouble, team, opponent, home) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-                    cursor.execute(update_performance, inserts)
+                    true_update_perf = "UPDATE performance set points=%s, minutesPlayed=%s, fieldGoals=%s, fieldGoalsAttempted=%s, fieldGoalPercent=%s, 3PM=%s, 3PA=%s, 3PPercent=%s, FT=%s, FTA=%s, FTPercent=%s, offensiveRebounds=%s, defensiveRebounds=%s, totalRebounds=%s, assists=%s,  steals=%s, blocks=%s, turnovers=%s, personalFouls=%s, plusMinus=%s, trueShootingPercent=%s, effectiveFieldGoalPercent=%s, 3pointAttemptRate=%s, freeThrowAttemptRate=%s, offensiveReboundPercent=%s, defensiveReboundPercent=%s, totalReboundPercent=%s, assistPercent=%s, stealPercent=%s, blockPercent=%s, turnoverPercent=%s, usagePercent=%s, offensiveRating=%s, defensiveRating=%s,  tripleDouble=%s, doubleDouble=%s, team=%s, opponent=%s, home=%s where playerID= %s and dateID = %s"
+    
+                    check = "SELECT * from performance where dateID = %s and playerID = %s"
+                    cursor.execute(check,(date_id,player_id))
+                    checks = cursor.fetchall()
+                    if len(checks) > 0:
+                        print "updates"
+                        cursor.execute(true_update_perf, new_insert)
+                        cnx.commit()
+                        print true_update_perf
+                        print new_insert
 
-                except BaseException:
+
+                    else:
+                        cursor.execute(update_performance, inserts)
+
+                    cnx.commit()
+                except:
                     pass
+
+
+
         cursor.close()
         cnx.commit()
         cnx.close()
