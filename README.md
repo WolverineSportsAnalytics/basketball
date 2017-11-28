@@ -1,10 +1,10 @@
 # Contributors:
-    #### - Evan Ciancio
-    #### - Jake Becker
-    #### - Phillip Mathew
-    #### - Justin Liss
-    #### - Sri Garlapati
-    #### - Brendan Hart
+    - Jake Becker
+    - Evan Ciancio
+    - Phillip Mathew
+    - Justin Liss
+    - Sri Garlapati
+    - Brendan Hart
 
 # Trust the Process:
 
@@ -50,6 +50,9 @@
 	- Job: align the rotoguru player ID with the basketball reference id
 	- Job: put the fanduel and draftkings position and salary into the performance table
 
+### Run sumPoints.sql
+    - Job: creates fanduel and draftkings pts based off performance
+
 ### Scrape FanDuel
     - Job: put current players playing in the performance table
     - Pull in the FanDuel file that you are scraping from the competition you are entering
@@ -57,15 +60,16 @@
     - Save and specify the location of the file in constants.py
     - Run fanduelScraper.py
 
+### Run projMinutues.sql
+	- Job: projects the minutes for the people playing
+
 ### Run projMagic.py
 	- Job: predict player performances using past data and ridge regression
     - Must specify YearP, MonthP, and DayP for the day you are predicting
     - Note the regression coefficents are stored in a file
 
-### Run ProjMinutues.sql
-	- Job: projects the minutes for the people playing
-
 ### Run optimizer.py
+    - Job: generate FanDuel lineups
 
 
 ## Regression Management
@@ -74,6 +78,6 @@
         - Must train over entire data set (leaving out first two weeks of seasons and last week of seasons)
         - Currently evaluating different methods of cross validation....
     - File Data:
-        - coef_2017_DEC: 189 Features, coefficents for Decemeber of 2017
+        - coef_DEC_2017: 189 Features, coefficents for Decemeber of 2017
 
 
