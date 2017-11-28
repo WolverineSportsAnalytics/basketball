@@ -39,19 +39,6 @@ def player_daily_avg_extrapolate(cursor, cnx):
         for player in players:
             performanceData = (player, date)
 
-	    # if returns none just skip it 
-	    if new_cumlative[4] == None :
-		    continue
-            
-	   
-	    table_id = table_id + 1;
-            cursor.execute(insertAvg, new_cumlative)
-    	    
-	    cursor.close()
-	    cnx.commit()
-	    cnx.close()
-            cursor.execute(insertCheck, performanceData)
-
             if not cursor.rowcount:
                 cursor.execute(average, performanceData)
                 new_cumlative = []
