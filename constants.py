@@ -1,36 +1,42 @@
+# database data
+
 databaseHost='wsabasketball.mysql.database.azure.com'
 databaseUser='wsa@wsabasketball'
 databaseName='basketball'
 databasePassword='LeBron>MJ!'
 
-yearP = 2017
-monthP = 11
-dayP = 22
-
+# scraping data
 BasketballRefPerGameData='https://www.basketball-reference.com/friv/dailyleaders.fcgi?month=04&day=13&year=2017'
 BasketballRefBoxScoreBase = 'https://www.basketball-reference.com/boxscores/'
 
+rotoguruFileLocation = '/Users/Brendan/Google Drive/Wolverine Sports Analytics/Algorithms/Data/rotoguru20172018data.csv'
+
+fanduelFileLocation = '/Users/Brendan/Downloads/FanDuel-NBA-2017-11-27-22146-players-list.csv'
+
+# predicting data
+yearP = 2017
+monthP = 11
+dayP = 27
+
 startYearP = 2017
 startMonthP = 11
-startDayP = 22
+startDayP = 23
 
 endYearP = 2017
 endMonthP = 11
-endDayP = 20
+endDayP = 27
 
 gdStartYear = 2017
-gdStartMonth = 2
-gdStartDay = 10
+gdStartMonth = 1
+gdStartDay = 23
 
-dailyPerformanceExtrapolationDateCutOff = 883
-dailyPerformanceLastTableID = 1
+numdaysGradientDescent = 10
 
-teamPerformanceExtrapolationDateCutOff = 883
+# extrapolation constraints
+dailyPerformanceExtrapolationDateCutOff = 920
 
-teamVsDefenseExtrapolationDateCutOff = 883
+teamPerformanceExtrapolationDateCutOff = 920
 
-numdaysGradientDescent = 1
+teamVsDefenseExtrapolationDateCutOff = 920
 
-rotoguruFileLocation = '/Users/Brendan/Google Drive/Wolverine Sports Analytics/Algorithms/Data/rotoguru20172018data.csv'
-
-fanduelFileLocation = '/Users/Brendan/Downloads/FanDuel-NBA-2017-11-22-22082-players-list (2).csv'
+extapolatorUpperBound = 924
