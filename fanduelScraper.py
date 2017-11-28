@@ -15,6 +15,25 @@ def getDate(day, month, year, cursor):
 
     return dateID
 
+def fixFanduelIDs(cursor):
+    getFDIds = "select playerID, fanduelID FROM player_reference WHERE fanduelID IS NOT NULL"
+    cursor.execute(getFDIds)
+
+    insertFDIds = "UPDATE player_reference SET fanduelID = %s WHERE playerID = %s"
+
+    results = cursor.fetchall()
+
+    for player in results:
+        fdID = player[1]
+        pID = player[0]
+        if fdID.find("-") != -1:
+            fdDate, actualFDID = fdID.split("-")
+
+            insertFDIdsD = (actualFDID, pID)
+            cursor.execute(insertFDIds, insertFDIdsD)
+
+            cnx.commit()
+
 def alignPlayerIDs(cursor):
     selec_id = "select playerID from player_reference where firstName= %s and lastName = %s"
     select_idTwo = "SELECT playerID from player_reference where nickName=%s"
@@ -70,39 +89,39 @@ def insert_into_performance(cursor, cnx):
     with open(constants.fanduelFileLocation, 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in reader:
-            if row[11] != 'O':
+            if row[12] != "O":
                 try:
-                    fanduelTempID = row[0]
+                    fanduelTempID = row[1]
                     getPlayerIDD = (fanduelTempID, )
                     cursor.execute(getPlayerID, getPlayerIDD)
 
                     if not cursor.rowcount:
-                        print ("Did not insert into performance table for " + str(row[3]))
+                        print ("Did not insert into performance table for " + str(row[4]))
 
                     else:
                         player_id = cursor.fetchall()[0][0]
 
-                        teamHomeAbbrevData = (row[9], )
+                        teamHomeAbbrevData = (row[10], )
                         cursor.execute(getTeamAbbrev, teamHomeAbbrevData)
                         homeTeam = cursor.fetchall()[0][0]
 
-                        teamAwayAbbrevData = (row[10], )
+                        teamAwayAbbrevData = (row[11], )
                         cursor.execute(getTeamAbbrev, teamAwayAbbrevData)
                         awayTeam = cursor.fetchall()[0][0]
 
                         inserts = (
                             player_id,
                             dateID,
-                            int(row[7]),
+                            int(row[8]),
                             homeTeam,
                             awayTeam,
-                            row[1])
+                            row[2])
 
                         cursor.execute(update_performance, inserts)
 
                 except:
                     traceback.print_exc()
-                    print row[3]
+                    print row[4]
 
                 cnx.commit()
 
@@ -117,5 +136,6 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
     # alignPlayerIDs(cursor)
+    # fixFanduelIDs(cursor)
     insert_into_performance(cursor, cnx)
 
