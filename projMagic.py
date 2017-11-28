@@ -9,6 +9,8 @@ import datetime as dt
 from itertools import chain
 import constants
 import warnings
+from tempfile import TemporaryFile
+
 
 def getDate(day, month, year, cursor):
     gameIDP = 0
@@ -35,7 +37,7 @@ def projMagic(cursor):
     # add minutes constraint
     get_players = "Select playerID from performance where dateID = %s"
     getDailyPlayerAvg = "SELECT blocks, points, steals, AST, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, oRebound, dRebound, minutes, FG, FGA, FGP, 3PA, 3PP, FTM, FTA, FTP, personalFouls, plusMinus, trueShootingP, eFG, freeThrowAttemptRate, 3PointAttemptRate, oReboundP, dReboundP, totalReboundP, ASTP, STP, BLKP, turnoverP, USG, oRating, dRating FROM player_daily_avg WHERE dateID = %s AND playerID = %s"
-    getPerformanceDataForEachPlayer = "SELECT playerID, dateID, fanduel, draftkings, fanduelPosition, draftkingsPosition, team, opponent, fanduelPts, draftkingsPts FROM performance WHERE dateID = %s AND projMinutes IS NOT NULL AND projMinutes > 5"
+    getPerformanceDataForEachPlayer = "SELECT playerID, dateID, fanduel, draftkings, fanduelPosition, draftkingsPosition, team, opponent, fanduelPts, draftkingsPts FROM performance WHERE dateID = %s AND projMinutes IS NOT NULL"
     getTeamData = "SELECT wins, losses, ORT, DRT, avgPointsAllowed, avgPointsScored, pace, effectiveFieldGoalPercent, turnoverPercent, offensiveReboundPercent, FT/FGA, FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP, offensiveRebounds, defensiveRebounds, totalRebounds, assists, steals, blocks, turnovers, personalFouls, trueShootingPercent, 3pointAttemptRate, freeThrowAttemptRate, freeThrowAttemptRate, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, points1Q, points2Q, points3Q, points4Q FROM team_daily_avg_performance WHERE dateID = %s AND dailyTeamID = %s"
 
     get_ball_handlers = "Select blocks, points, steals, assists, turnovers, tRebounds, DDD, DD, 3PM, 3PA, oRebounds, dRebounds, minutes, FG, FGA, FT, FTA, BPM, PPM, SPM, APM, TPM, DDDPG, DDPG, 3PP, ORPM, DRPM, FGP, FTP, usg, ORT, DRT, TS, eFG from team_vs_ball_handlers WHERE dateID = %s and dailyTeamID = %s"
@@ -176,6 +178,10 @@ def projMagic(cursor):
     ones = np.ones((np.shape(targetX)[0], 1), dtype=float)
     targetX = np.hstack((ones, targetX))
 
+    outfile = open('coef.npz', 'r')
+    thetaSKLearnRidge = np.load(outfile)
+
+
     # predict
     targetYSKLearnRidge = targetX.dot(np.transpose(thetaSKLearnRidge))
 
@@ -198,8 +204,8 @@ def projMagic(cursor):
 
         updateBattersDKPoints = "UPDATE performance SET fdPointsPredSKLin = %s, fdPointsPredSKLinP = %s, fdPointsSKLinPredRidge = %s, fdPointsSKLinPredRidgeP = %s WHERE dateID = %s AND playerID = %s"
         updateBatterDKPointsData = (
-        playerProjectionSKLearn, playerProjectionSKLearnP, playerProjectionSKLearnRidge, playerProjectionSKLearnRidgeP,
-        projDate, playerID)
+            playerProjectionSKLearn, playerProjectionSKLearnP, playerProjectionSKLearnRidge, playerProjectionSKLearnRidgeP,
+            projDate, playerID)
         cursor.execute(updateBattersDKPoints, updateBatterDKPointsData)
 
         pID = pID + 1
@@ -210,7 +216,6 @@ def projMagic(cursor):
     cnx.commit()
     cnx.close()
 
-
 if __name__ == "__main__":
     print "Loading data..."
 
@@ -220,4 +225,4 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor()
 
-    projDate(cursor)
+    projMagic(cursor)
