@@ -38,7 +38,8 @@ def getDates(day, month, year, numdays, cursor):
 
         for game in cursor:
             # remove beginning 2 weeks of season + last week of season
-            if ((game[0] >= 695 and game[0] <= 843) or (game[0] >= 897 and game[0] <= 1052)):
+            if ((((game[0] >= 695 and game[0] <= 795) or (game[0] >= 802 and game[0] <= 843)) or (game[0] >= 897 and game[0] <= 1052))
+                and game[0] != 920 and game[0] != 711 and game[0] != 741):
                 gameIDs.append(game[0])
 
     return gameIDs
@@ -186,7 +187,7 @@ if __name__ == "__main__":
     # add minutes constraint
     get_players = "Select playerID from performance where dateID = %s"
     getDailyPlayerAvg = "SELECT blocks, points, steals, AST, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, oRebound, dRebound, minutes, FG, FGA, FGP, 3PA, 3PP, FTM, FTA, FTP, personalFouls, plusMinus, trueShootingP, eFG, freeThrowAttemptRate, 3PointAttemptRate, oReboundP, dReboundP, totalReboundP, ASTP, STP, BLKP, turnoverP, USG, oRating, dRating FROM player_daily_avg WHERE dateID = %s AND playerID = %s"
-    getPerformanceDataForEachPlayer = "SELECT playerID, dateID, fanduel, draftkings, fanduelPosition, draftkingsPosition, team, opponent, fanduelPts, draftkingsPts FROM performance WHERE dateID = %s AND minutesPlayed IS NOT NULL and minutesPlayed >= 10 and projMinutes IS NOT NULL"
+    getPerformanceDataForEachPlayer = "SELECT playerID, dateID, fanduel, draftkings, fanduelPosition, draftkingsPosition, team, opponent, fanduelPts, draftkingsPts FROM performance WHERE dateID = %s AND minutesPlayed IS NOT NULL and minutesPlayed >= 8 and projMinutes IS NOT NULL AND fanduel IS NOT NULL"
     getTeamData = "SELECT wins, losses, ORT, DRT, avgPointsAllowed, avgPointsScored, pace, effectiveFieldGoalPercent, turnoverPercent, offensiveReboundPercent, FT/FGA, FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP, offensiveRebounds, defensiveRebounds, totalRebounds, assists, steals, blocks, turnovers, personalFouls, trueShootingPercent, 3pointAttemptRate, freeThrowAttemptRate, freeThrowAttemptRate, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, points1Q, points2Q, points3Q, points4Q FROM team_daily_avg_performance WHERE dateID = %s AND dailyTeamID = %s"
 
     get_ball_handlers = "Select blocks, points, steals, assists, turnovers, tRebounds, DDD, DD, 3PM, 3PA, oRebounds, dRebounds, minutes, FG, FGA, FT, FTA, BPM, PPM, SPM, APM, TPM, DDDPG, DDPG, 3PP, ORPM, DRPM, FGP, FTP, usg, ORT, DRT, TS, eFG from team_vs_ball_handlers WHERE dateID = %s and dailyTeamID = %s"
@@ -216,6 +217,9 @@ if __name__ == "__main__":
     allPlayerFeatures = []
     print len(playersPlaying)
     for player in playersPlaying:
+        print "Player ID: " + str(player[0])
+        print "Date ID: " + str(player[1])
+
         indvPlayerData = []
         indvPlayerData.append(player[2])
         basicQueryData = (player[1], player[0])
