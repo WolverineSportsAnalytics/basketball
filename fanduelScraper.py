@@ -45,21 +45,21 @@ def alignPlayerIDs(cursor):
         i = 0
         for row in reader:
             # if they don't play don't consider them
-            firstName = row[2]
+            firstName = row[3]
             firstName = firstName.strip()
-            lastName = row[4]
+            lastName = row[5]
             lastName = lastName.strip()
             selectData = (firstName, lastName)
             cursor.execute(selec_id, selectData)
             if not cursor.rowcount:
-                name = row[3]
+                name = row[4]
                 nameData = (name,)
                 cursor.execute(select_idTwo, nameData)
                 if cursor.rowcount:
                     playerID = 0
                     for id in cursor:
                         playerID = id[0]
-                    insertData = (row[0].strip(), playerID)
+                    insertData = (row[1].strip(), playerID)
                     cursor.execute(insertRotoguruID, insertData)
                     cnx.commit()
                 else:
@@ -68,7 +68,7 @@ def alignPlayerIDs(cursor):
                 playerID = 0
                 for id in cursor:
                     playerID = id[0]
-                insertData = (row[0].strip(), playerID)
+                insertData = (row[1].strip(), playerID)
                 cursor.execute(insertRotoguruID, insertData)
                 cnx.commit()
 
@@ -135,7 +135,7 @@ if __name__ == "__main__":
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
-    # alignPlayerIDs(cursor)
+    alignPlayerIDs(cursor)
     # fixFanduelIDs(cursor)
     insert_into_performance(cursor, cnx)
 
