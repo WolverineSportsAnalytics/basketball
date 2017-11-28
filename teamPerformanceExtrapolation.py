@@ -17,9 +17,10 @@ def team_daily_extrapolate_data(cursor):
         teams.append(row[0])
 
     dateCutOff = constants.teamPerformanceExtrapolationDateCutOff
+    upperBoundCutOff = constants.extapolatorUpperBound
 
-    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s"
-    getDatesD = (dateCutOff, )
+    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
+    getDatesD = (dateCutOff, upperBoundCutOff)
     cursor.execute(getDates, getDatesD)
 
     dates = []

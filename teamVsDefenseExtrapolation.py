@@ -66,9 +66,10 @@ def team_vs_defense_extrapolation(cursor):
         teams.append(row[0])
 
     dateCutOff = constants.teamVsDefenseExtrapolationDateCutOff
+    upperBoundCutOff = constants.extapolatorUpperBound
 
-    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s"
-    getDatesD = (dateCutOff, )
+    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
+    getDatesD = (dateCutOff, upperBoundCutOff)
     cursor.execute(getDates, getDatesD)
 
     dates = []
