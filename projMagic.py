@@ -68,7 +68,6 @@ def projMagic(cursor):
     for player in playersPlaying:
         indvPlayerData = []
         indvPlayerData.append(player[2])
-        indvPlayerData.append(player[3])
         basicQueryData = (str(int(player[1])), player[0])
         cursor.execute(getDailyPlayerAvg, basicQueryData)
 
