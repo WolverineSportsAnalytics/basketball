@@ -1,3 +1,11 @@
+# Contributors:
+    #### - Evan Ciancio
+    #### - Jake Becker
+    #### - Phillip Mathew
+    #### - Justin Liss
+    #### - Sri Garlapati
+    #### - Brendan Hart
+
 # Trust the Process:
 
 ### Run the generate_dates.py
@@ -26,12 +34,11 @@
 	- Job: Extrapolate the data scraped from the performance tables to the average tables to get a player's average for a season on that day, a team's average for a season on that day, and a team's result vs a defense on that day
 	- How:
 		○ Run dailyPreformanceExtrapolation.py
-			§ Specify the date id for which you want to extrapolate the data according to the last date id in the new_dates table for which you have previously extrapolated up till in constants.py
-			§ Specify the last table id in player_daily_avg in constants.py (add 1)
+			§ Specify the date id for which you want to extrapolate the data according to the first day for which you have not scraped data all the way till the day you are predicting in constants.py (specify date id)
 		○ Run teamPerformanceExtrapolation.py
-			§ Specify the date id for which you want to extrapolate the data according to the last date id in the new_dates table for which you have previously extrapolated up till in constants.py
+			§ Specify the date id for which you want to extrapolate the data according to the first day for which you have not scraped data all the way till the day you are predicting in constants.py (specify date id)
 		○ Run teamVsDefenseExtrapolation.py
-			§ Specify the date id for which you want to extrapolate the data according to the last date id in the new_dates table for which you have previously extrapolated up till in constants.py
+			§ Specify the date id for which you want to extrapolate the data according to the first day for which you have not scraped data all the way till the day you are predicting in constants.py (specify date id)
 
 ### Download new rotoguru file
 	- Move into rotoguru20172018data.csv
@@ -43,14 +50,30 @@
 	- Job: align the rotoguru player ID with the basketball reference id
 	- Job: put the fanduel and draftkings position and salary into the performance table
 
-### Run magic.py
+### Scrape FanDuel
+    - Job: put current players playing in the performance table
+    - Pull in the FanDuel file that you are scraping from the competition you are entering
+    - Split the first column into two columns and delimit by the dash (-)
+    - Save and specify the location of the file in constants.py
+    - Run fanduelScraper.py
+
+### Run projMagic.py
 	- Job: predict player performances using past data and ridge regression
-	- Configure: Specify how many days you want to go back/train your data on (DO NOT INCLUDE THE DATE YOU ARE PREDICTING IN YOUR TRAINING DATA)
-		○ Set gdStartYear, gdStartMonth, gdStartDay in constants.py to specify the date that you want to train the data on
-		○ Set numdaysGradientDescent to the number of days you want to go back
+    - Must specify YearP, MonthP, and DayP for the day you are predicting
+    - Note the regression coefficents are stored in a file
 
 ### Run ProjMinutues.sql
 	- Job: projects the minutes for the people playing
 
 ### Run optimizer.py
+
+
+## Regression Management
+    - Goal: To efficently calculate the regregression coefficents on our training set so that variance and bias is balanced
+    - How: Run magic.py once a month, and save the regression coefficents to coef.npz
+        - Must train over entire data set (leaving out first two weeks of seasons and last week of seasons)
+        - Currently evaluating different methods of cross validation....
+    - File Data:
+        - coef_2017_DEC: 189 Features, coefficents for Decemeber of 2017
+
 

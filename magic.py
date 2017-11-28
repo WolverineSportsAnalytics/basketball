@@ -37,7 +37,9 @@ def getDates(day, month, year, numdays, cursor):
         cursor.execute(findGame, findGameData)
 
         for game in cursor:
-            gameIDs.append(game[0])
+            # remove beginning 2 weeks of season + last week of season
+            if ((game[0] >= 695 and game[0] <= 843) or (game[0] >= 897 and game[0] <= 1052)):
+                gameIDs.append(game[0])
 
     return gameIDs
 
