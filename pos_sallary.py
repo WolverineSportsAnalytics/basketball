@@ -118,27 +118,6 @@ def scrape_rotoguru(cursor, cnx):
 
                 cnx.commit()
 
-    cursor.close()
-    cnx.commit()
-    cnx.close()
-'''
-        # get what names don't match  
-	wrong_names= []
-    	with open('rotoguru20162017data.csv', 'rb') as csvfile:
-		reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-		for row in reader:	
-			try:
-				name = row[3]
-				get_id = selec_id + name + "\""
-				cursor.execute(get_id)
-				player_id = cursor.fetchall()[0][0]
-			except:
-				wrong_names.append(name)
-
-	wrong_names = list(set(wrong_names))
-	for name in wrong_names:
-		print name
-'''
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
@@ -146,7 +125,7 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
 
-    # alignPlayerIDs(cursor)
+    alignPlayerIDs(cursor)
     scrape_rotoguru(cursor, cnx)
 
     cursor.close()
