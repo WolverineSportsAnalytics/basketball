@@ -16,15 +16,15 @@ fanduelFileLocation = '/Users/Brendan/Downloads/FanDuel-NBA-2017-12-04-22260-pla
 # predicting data
 yearP = 2017
 monthP = 12
-dayP = 4
+dayP = 5
 
 startYearP = 2017
 startMonthP = 12
-startDayP = 3
+startDayP = 4
 
 endYearP = 2017
 endMonthP = 12
-endDayP = 4
+endDayP = 5
 
 gdStartYear = 2017
 gdStartMonth = 11
@@ -33,10 +33,10 @@ gdStartDay = 26
 numdaysGradientDescent = 700
 
 # extrapolation constraints
-dailyPerformanceExtrapolationDateCutOff = 931
+dailyPerformanceExtrapolationDateCutOff = 932
 
-teamPerformanceExtrapolationDateCutOff = 931
+teamPerformanceExtrapolationDateCutOff = 932
 
-teamVsDefenseExtrapolationDateCutOff = 931
+teamVsDefenseExtrapolationDateCutOff = 932
 
-extapolatorUpperBound = 931
+extapolatorUpperBound = 932
