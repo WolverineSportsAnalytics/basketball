@@ -46,8 +46,10 @@
 	- Filter only the days you need
 		○ Note: only need to run when didn't pull FanDuel information from FanDuel competition
 
+### If need to run rotoguru file, Run rotoguruIDManagement.py
+    - Job: align the rotoguru player ID with the basketball reference id
+
 ### If need to run rotoguru file, Run pos_sallary.py
-	- Job: align the rotoguru player ID with the basketball reference id
 	- Job: put the fanduel and draftkings position and salary into the performance table
 
 ### Run sumPoints.sql
@@ -58,7 +60,13 @@
     - Pull in the FanDuel file that you are scraping from the competition you are entering
     - Split the first column into two columns and delimit by the dash (-)
     - Save and specify the location of the file in constants.py
-    - Run fanduelScraper.py
+
+### Run fanduelIDManagement.py
+    - Job: put fanduel ID's in their place
+    - Will tell if you do not have an id for a player
+
+### Run fanduelScraper.py
+    - Job: put players in their place like Roger Godell would want to
 
 ### Run projMinutues.sql
 	- Job: projects the minutes for the people playing
