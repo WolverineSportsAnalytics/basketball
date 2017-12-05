@@ -25,7 +25,7 @@ def optimize(day, month, year, cursor):
     dkPointsDict = {}
     dkPlayersPoints = {}
 
-    getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.fdPointsSKLinPredRidge, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0"
+    getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.fdPointsSKLinPredRidge, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.fdPointsSKLinPredRidge IS NOT NULL"
     getBPlayersData = (gameID,)
     cursor.execute(getPlayersQuery, getBPlayersData)
 
@@ -48,7 +48,40 @@ def optimize(day, month, year, cursor):
 
     # if duplicate player, increase n + generate next lineup,
     # next lineup will generate lineup with next highest amount of points
-    numLineups = 10
+    numLineups = 5
+
+    # made for creating a second completely different lineup
+    '''
+
+    lil = optimizer.get_player_by_name('LeBron James')
+    lil.max_exposure = 0
+
+    cov = optimizer.get_player_by_name('Aldridge')
+    cov.max_exposure = 0
+
+    Wade = optimizer.get_player_by_name('Beal')
+    Wade.max_exposure = 0
+
+    brad = optimizer.get_player_by_name('Booker')
+    brad.max_exposure = 0
+
+    am = optimizer.get_player_by_name('Teague')
+    am.max_exposure = 0
+
+    em = optimizer.get_player_by_name('Rubio')
+    em.max_exposure = 0
+
+    turn = optimizer.get_player_by_name('Marcus Morris')
+    turn.max_exposure = 0
+
+    ed = optimizer.get_player_by_name('Len')
+    ed.max_exposure = 0
+
+    jack = optimizer.get_player_by_name('Josh Jackson')
+    jack.max_exposure = 0
+
+    '''
+
     lineups = optimizer.optimize(n=numLineups)
 
     for lineup in lineups:

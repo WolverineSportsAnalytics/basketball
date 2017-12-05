@@ -11,20 +11,20 @@ BasketballRefBoxScoreBase = 'https://www.basketball-reference.com/boxscores/'
 
 rotoguruFileLocation = '/Users/Brendan/Google Drive/Wolverine Sports Analytics/Algorithms/Data/rotoguru20172018data.csv'
 
-fanduelFileLocation = '/Users/Brendan/Downloads/FanDuel-NBA-2017-11-29-22188-players-list.csv'
+fanduelFileLocation = '/Users/Brendan/Downloads/FanDuel-NBA-2017-12-04-22260-players-list.csv'
 
 # predicting data
 yearP = 2017
-monthP = 11
-dayP = 29
+monthP = 12
+dayP = 4
 
 startYearP = 2017
-startMonthP = 11
-startDayP = 28
+startMonthP = 12
+startDayP = 3
 
 endYearP = 2017
-endMonthP = 11
-endDayP = 29
+endMonthP = 12
+endDayP = 4
 
 gdStartYear = 2017
 gdStartMonth = 11
@@ -33,10 +33,10 @@ gdStartDay = 26
 numdaysGradientDescent = 700
 
 # extrapolation constraints
-dailyPerformanceExtrapolationDateCutOff = 926
+dailyPerformanceExtrapolationDateCutOff = 931
 
-teamPerformanceExtrapolationDateCutOff = 926
+teamPerformanceExtrapolationDateCutOff = 931
 
-teamVsDefenseExtrapolationDateCutOff = 926
+teamVsDefenseExtrapolationDateCutOff = 931
 
-extapolatorUpperBound = 926
+extapolatorUpperBound = 931

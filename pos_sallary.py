@@ -125,7 +125,6 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
 
-    alignPlayerIDs(cursor)
     scrape_rotoguru(cursor, cnx)
 
     cursor.close()
