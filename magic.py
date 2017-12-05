@@ -38,7 +38,9 @@ def getDates(day, month, year, numdays, cursor):
 
         for game in cursor:
             # remove beginning 2 weeks of season + last week of season
-            if ((((game[0] >= 695 and game[0] <= 795) or (game[0] >= 802 and game[0] <= 843)) or (game[0] >= 897 and game[0] <= 1052))
+            # for some reason team_seven_avg performance won't fill up all the way for dateID 801, 802, 803 - ahh b/c of all-star break
+            # + 7 day period
+            if ((((game[0] >= 695 and game[0] <= 795) or (game[0] >= 804 and game[0] <= 843)) or (game[0] >= 897 and game[0] <= 1052))
                 and game[0] != 920 and game[0] != 711 and game[0] != 741):
                 gameIDs.append(game[0])
 

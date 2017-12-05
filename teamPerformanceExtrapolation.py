@@ -70,7 +70,7 @@ def team_daily_extrapolate_two_one_data(cursor, dates, teams):
     # give table id because you can't insert all without it
     getLastID = "Select MAX(dailyAvgPerformanceID) from team_two_one_daily_avg_performance"
     cursor.execute(getLastID)
-    tableID = 0
+    tableID = int(cursor.fetchall()[0][0])
     tableID += 1
 
     cursorL.release()
@@ -103,7 +103,7 @@ def team_daily_extrapolate_seven_data(cursor, dates, teams):
     # give table id because you can't insert all without it
     getLastID = "Select MAX(dailyAvgPerformanceID) from team_seven_daily_avg_performance"
     cursor.execute(getLastID)
-    tableID = 0
+    tableID = int(cursor.fetchall()[0][0])
     tableID += 1
 
     cursorL.release()
@@ -164,8 +164,6 @@ if __name__ == "__main__":
     a.join()
     s.join()
     t.join()
-
-    team_daily_extrapolate_data(cursor)
 
     cursor.close()
     cnx.commit()

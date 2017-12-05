@@ -313,15 +313,15 @@ if __name__ == "__main__":
     for row in sqlResults:
         dates.append(row[0])
 
-    #a = threading.Thread(target=team_vs_defense_extrapolation, args=(cursor, dates, teams))
+    a = threading.Thread(target=team_vs_defense_extrapolation, args=(cursor, dates, teams))
     s = threading.Thread(target=team_vs_defense_two_one_extrapolation, args=(cursor, dates, teams))
     t = threading.Thread(target=team_vs_defense_seven_extrapolation, args=(cursor, dates, teams))
 
-    #a.start()
+    a.start()
     s.start()
     t.start()
 
-    #a.join()
+    a.join()
     s.join()
     t.join()
 
