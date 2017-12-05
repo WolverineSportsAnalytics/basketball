@@ -48,7 +48,7 @@ def optimize(day, month, year, cursor):
 
     # if duplicate player, increase n + generate next lineup,
     # next lineup will generate lineup with next highest amount of points
-    numLineups = 5
+    numLineups = 20
 
     # made for creating a second completely different lineup
     '''
@@ -113,7 +113,6 @@ if __name__ == "__main__":
     month = constants.monthP
     day = constants.dayP
 
-    # percentageOwnedandVarianceNormalization(day, month, year, cursor)
     optimize(day, month, year, cursor)
 
     cursor.close()
