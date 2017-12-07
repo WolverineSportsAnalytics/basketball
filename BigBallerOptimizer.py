@@ -48,26 +48,23 @@ def optimize(day, month, year, cursor):
 
     # if duplicate player, increase n + generate next lineup,
     # next lineup will generate lineup with next highest amount of points
-    numLineups = 20
+    numLineups = 5
 
     # made for creating a second completely different lineup
+
+    cov = optimizer.get_player_by_name('Len')
+    cov.max_exposure = 1.0
+
+    Wade = optimizer.get_player_by_name('Ed Davis')
+    Wade.max_exposure = 1.0
+
+    brad = optimizer.get_player_by_name('Russell Westbrook')
+    brad.max_exposure = 1.0
+
+    am = optimizer.get_player_by_name('Devin Booker')
+    am.max_exposure = 1.0
+
     '''
-
-    lil = optimizer.get_player_by_name('LeBron James')
-    lil.max_exposure = 0
-
-    cov = optimizer.get_player_by_name('Aldridge')
-    cov.max_exposure = 0
-
-    Wade = optimizer.get_player_by_name('Beal')
-    Wade.max_exposure = 0
-
-    brad = optimizer.get_player_by_name('Booker')
-    brad.max_exposure = 0
-
-    am = optimizer.get_player_by_name('Teague')
-    am.max_exposure = 0
-
     em = optimizer.get_player_by_name('Rubio')
     em.max_exposure = 0
 
