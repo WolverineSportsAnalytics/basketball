@@ -2,6 +2,14 @@ from bs4 import BeautifulSoup
 import urllib2
 import csv
 import demjson
+import json
+import requests
+import mysql.connector
+from datetime import timedelta, date
+import constants
+import urllib2
+import datetime as dt
+
 
 def rotogrinders_season_scraper():
 	url = "https://rotogrinders.com/game-stats/nba-player?site=fanduel&range=season"
@@ -44,13 +52,37 @@ def rotogrindersBasketball(url, csv_filename, stats):
 
 #	jsonData = jsonData[:-1]
 
+        cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+        cursor = cnx.cursor(buffered=True)
+
+
 	basketballData = demjson.decode(jsonData)
 
-	for playerData in basketballData:
-		print playerData
-		name = playerData['player']['first_name']
-		print name
-		print playerData['minutes']
+        selec_id = "select playerID from player_reference where nickName=\""
+
+        # this is date id for today
+        date = constants.minutesDateID  
+        update = "UPDATE performance SET projMinutes = %s where dateID = %s and playerID = %s"
+        for playerData in basketballData:
+		nickName = playerData['player']['first_name'] + " " + playerData['player']['last_name']
+                
+                get_id = selec_id + nickName + "\""
+                try:
+                    cursor.execute(get_id)
+                    player_id = cursor.fetchall()[0][0]
+                    inserts = (playerData['minutes'],date, player_id)
+                    cursor.execute(update, inserts)
+                    cnx.commit()
+                except:
+                    player_id = nickName + "Failed"
+
+
+		print nickName, playerData['minutes'], player_id
+
+                '''
 		team = playerData['team']
 		pos = playerData['pos']
 		salary = playerData['salary']
@@ -66,11 +98,15 @@ def rotogrindersBasketball(url, csv_filename, stats):
 		fpts = playerData['fpts']
 		fpts = float(fpts) / float(gp)
 		fpts = round(fpts, 2)
+                '''
+        
 
-		data = (player, team, pos, salary, gp, mins, reb, ast, stl, blk, to, pts, usg, fpts)
-		file.write('%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s \n' % data)
+        cursor.close()
+        cnx.commit()
+        cnx.close()
 
-	file.close()
+
+
 
 
 if __name__ == "__main__":
