@@ -276,8 +276,6 @@ if __name__ == "__main__":
 
             for item in ball_handlers_results[0]:
                 indvPlayerData.append(item)
-            for item in ball_handlers_results[0]:
-                indvPlayerData.append(item)
 
         if player[4] == 'SG':
             pos_data = (player[1], idOppTeam)
@@ -286,9 +284,8 @@ if __name__ == "__main__":
             cursor.execute(get_wings, pos_data)
             wings_results = cursor.fetchall()
 
-            for item in ball_handlers_results[0]:
-                indvPlayerData.append(item)
-            for item in wings_results[0]:
+            for w, b in zip(wings_results[0], ball_handlers_results[0]):
+            	item = (w + b)/2
                 indvPlayerData.append(item)
 
         if player[4] == 'SF':
@@ -298,9 +295,8 @@ if __name__ == "__main__":
             cursor.execute(get_bigs, pos_data)
             bigs_results = cursor.fetchall()
 
-            for item in wings_results[0]:
-                indvPlayerData.append(item)
-            for item in bigs_results[0]:
+            for w, b in zip(wings_results[0], bigs_results[0]):
+            	item = (w + b)/2
                 indvPlayerData.append(item)
 
         if player[4] == 'PF':
@@ -310,16 +306,12 @@ if __name__ == "__main__":
 
             for item in bigs_results[0]:
                 indvPlayerData.append(item)
-            for item in bigs_results[0]:
-                indvPlayerData.append(item)
 
         if player[4] == 'C':
             pos_data = (player[1], idOppTeam)
             cursor.execute(get_centers, pos_data)
             centers_results = cursor.fetchall()
 
-            for item in centers_results[0]:
-                indvPlayerData.append(item)
             for item in centers_results[0]:
                 indvPlayerData.append(item)
 
