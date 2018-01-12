@@ -66,8 +66,8 @@ def updateAndInsertPlayerRef(
 
         soup.findAll(text=lambda text: isinstance(text, Comment))
         comments = soup.findAll(text=lambda text: isinstance(text, Comment))
-        comment = comments[len(comments) - 23]
-        box_score = comments[len(comments) - 24]
+        comment = comments[len(comments) - 24]
+        box_score = comments[len(comments) - 25]
 
         soup2 = BeautifulSoup(box_score, "html.parser")
         box_scores = []
