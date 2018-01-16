@@ -451,17 +451,16 @@ if __name__ == "__main__":
 
         allPlayerFeatures.append(indvPlayerData)
 
-        allPlayerFeatures.append(indvPlayerData)
         playersActuallyPlaying.append(player)
 
-        FDTargets = []
-        DKTargets = []
-        for player in playersActuallyPlaying:
-            # last - append fanduel points + draftkings points
-            indvPlayerFDTarget = player[8]
-            FDTargets.append(indvPlayerFDTarget)
-            indvPlayerDKTarget = player[9]
-            DKTargets.append(indvPlayerDKTarget)
+    FDTargets = []
+    DKTargets = []
+    for player in playersActuallyPlaying:
+        # last - append fanduel points + draftkings points
+        indvPlayerFDTarget = player[8]
+        FDTargets.append(indvPlayerFDTarget)
+        indvPlayerDKTarget = player[9]
+        DKTargets.append(indvPlayerDKTarget)
 
     # turn into numpy arrays
     numFeatures = len(allPlayerFeatures[0])
