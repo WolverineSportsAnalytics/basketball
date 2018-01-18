@@ -40,8 +40,11 @@ def getDates(day, month, year, numdays, cursor):
             # remove beginning 2 weeks of season + last week of season
             # for some reason team_seven_avg performance won't fill up all the way for dateID 801, 802, 803 - ahh b/c of all-star break
             # + 7 day period
-            if ((((game[0] >= 695 and game[0] <= 795) or (game[0] >= 804 and game[0] <= 843)) or (game[0] >= 897 and game[0] <= 1052))
-                and game[0] != 920 and game[0] != 711 and game[0] != 741):
+            # or (game[0] >= 897 and game[0] <= 1052)) -> should have this!
+            # (game[0] >= 695 and game[0] <= 795) -> should have this
+            # (game[0] >= 804 and game[0] <= 843) -> should have this
+            if ((((game[0] >= 695 and game[0] <= 793))
+                and game[0] != 920 and game[0] != 711 and game[0] != 741)):
                 gameIDs.append(game[0])
 
     return gameIDs
@@ -179,6 +182,7 @@ if __name__ == "__main__":
 
     dateIDs = getDates(day, month, year, numdays, cursor)
 
+    # example of what this is doing
     # week 2 lonzo ball data - feature, target - score
     # ..........
     # .......
@@ -209,6 +213,7 @@ if __name__ == "__main__":
     get_centers_seven = "Select blocks, points, steals, assists, turnovers, tRebounds, DDD, DD, 3PM, 3PA, oRebounds, dRebounds, minutes, FG, FGA, FT, FTA, BPM, PPM, SPM, APM, TPM, DDDPG, DDPG, 3PP, ORPM, DRPM, FGP, FTP, usg, ORT, DRT, TS, eFG from team_seven_vs_centers WHERE dateID = %s and dailyTeamID = %s"
     get_centers_two_one = "Select blocks, points, steals, assists, turnovers, tRebounds, DDD, DD, 3PM, 3PA, oRebounds, dRebounds, minutes, FG, FGA, FT, FTA, BPM, PPM, SPM, APM, TPM, DDDPG, DDPG, 3PP, ORPM, DRPM, FGP, FTP, usg, ORT, DRT, TS, eFG from team_two_one_vs_centers WHERE dateID = %s and dailyTeamID = %s"
 
+    insert_features = "INSERT INTO futures VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     # execute command + load into numpy array
     playersPlaying = []
     for date in dateIDs:
@@ -230,7 +235,12 @@ if __name__ == "__main__":
 
     allPlayerFeatures = []
     playersActuallyPlaying = []
+    features = ()
     print len(playersPlaying)
+    getLastID = "Select MAX(idfeatures) from futures"
+    cursor.execute(getLastID)
+    feaID = int(cursor.fetchall()[0][0])
+    feaID += 1
     for player in playersPlaying:
         print "Player ID: " + str(player[0])
         print "Date ID: " + str(player[1])
@@ -238,31 +248,43 @@ if __name__ == "__main__":
         checkPlayerDailyAvgData = (player[1], player[0])
         cursor.execute(getDailyPlayerAvgSeven, checkPlayerDailyAvgData)
 
-        # check to see
-        if cursor.rowcount == 0:
+        # check to see + skip to next player if not in set
+        check = cursor.fetchall()
+        if len(check) == 0:
             continue
 
-            indvPlayerData = []
-            indvPlayerData.append(player[2])
-            basicQueryData = (player[1], player[0])
-            cursor.execute(getDailyPlayerAvg, basicQueryData)
+        # player and date id for reference
+        features = features + (feaID,)
+        features = features + (player[0], player[1])
 
-            playerDailyAvgResult = cursor.fetchall()
+        # fanduel + dk salaries to features
+        features = features + (player[2], 0)
 
-            # append playerDailyAvgResult to indvPlayerData
-            for item in playerDailyAvgResult[0]:
-                indvPlayerData.append(item)
+        indvPlayerData = []
+        indvPlayerData.append(player[2])
+        basicQueryData = (player[1], player[0])
+        cursor.execute(getDailyPlayerAvg, basicQueryData)
 
-            # append playerDailyAvgSevenResult to indvPlayerData
-            cursor.execute(getDailyPlayerAvgSeven, basicQueryData)
-            playerDailyAvgSevenResult = cursor.fetchall()
+        playerDailyAvgResult = cursor.fetchall()
+
+        # append playerDailyAvgResult to indvPlayerData
+        for item in playerDailyAvgResult[0]:
+            features = features + (item,)
+            indvPlayerData.append(item)
+
+        # append playerDailyAvgSevenResult to indvPlayerData
+        cursor.execute(getDailyPlayerAvgSeven, basicQueryData)
+        playerDailyAvgSevenResult = cursor.fetchall()
+
         for item in playerDailyAvgSevenResult[0]:
+            features = features + (item,)
             indvPlayerData.append(item)
 
         # append playerDailyAvgTwoOneResult to indvPlayerData
         cursor.execute(getDailyPlayerAvgTwoOne, basicQueryData)
         playerDailyAvgTwoOneResult = cursor.fetchall()
         for item in playerDailyAvgTwoOneResult[0]:
+            features = features + (item,)
             indvPlayerData.append(item)
 
         # teamID from player and use team reference table to get playerID
@@ -309,6 +331,9 @@ if __name__ == "__main__":
         for item in teamDataTwoOne[0]:
             indvPlayerData.append(item)
 
+        for n, s, t in zip(teamResult[0], teamResultSeven[0], teamDataTwoOne[0]):
+            features = features + (n,s,t)
+
         # get opp team data
         for item in oppTeamResult[0]:
             indvPlayerData.append(item)
@@ -327,6 +352,9 @@ if __name__ == "__main__":
         for item in oppTeamDataTwoOne[0]:
             indvPlayerData.append(item)
 
+        for n, s, t in zip(teamResult[0], teamResultSeven[0], teamDataTwoOne[0]):
+            features = features + (n,s,t)
+
         # use position + dateID + opp team ID to query team vs. defense for that position
         # append to master array
         # doubl'n it!
@@ -336,18 +364,21 @@ if __name__ == "__main__":
             ball_handlers_results = cursor.fetchall()
 
             for item in ball_handlers_results[0]:
+                features = features + (item,)
                 indvPlayerData.append(item)
 
             cursor.execute(get_ball_handlers_seven, pos_data)
             ball_handlers_seven_results = cursor.fetchall()
 
             for item in ball_handlers_seven_results[0]:
+                features = features + (item,)
                 indvPlayerData.append(item)
 
             cursor.execute(get_ball_handlers_two_one, pos_data)
             ball_handlers_two_one_results = cursor.fetchall()
 
             for item in ball_handlers_two_one_results[0]:
+                features = features + (item,)
                 indvPlayerData.append(item)
 
         if player[4] == 'SG':
@@ -359,8 +390,9 @@ if __name__ == "__main__":
             wings_results = cursor.fetchall()
 
             for w, b in zip(ball_handlers_results[0], wings_results[0]):
-                item = (w + b) / 2
-            indvPlayerData.append(item)
+                item = ((w + b) / 2)
+                features = features + (item,)
+                indvPlayerData.append(item)
 
             cursor.execute(get_ball_handlers_seven, pos_data)
             ball_handlers_seven_results = cursor.fetchall()
@@ -368,8 +400,9 @@ if __name__ == "__main__":
             wings_seven_results = cursor.fetchall()
 
             for w, b in zip(wings_seven_results[0], ball_handlers_seven_results[0]):
-                item = (w + b) / 2
-            indvPlayerData.append(item)
+                item = ((w + b) / 2)
+                features = features + (item,)
+                indvPlayerData.append(item)
 
             cursor.execute(get_ball_handlers_two_one, pos_data)
             ball_handlers_two_one_results = cursor.fetchall()
@@ -378,7 +411,8 @@ if __name__ == "__main__":
 
             for w, b in zip(wings_two_one_results[0], ball_handlers_two_one_results[0]):
                 item = (w + b) / 2
-            indvPlayerData.append(item)
+                features = features + (item,)
+                indvPlayerData.append(item)
 
         if player[4] == 'SF':
             pos_data = (str(int(player[1])), idOppTeam)
@@ -389,7 +423,8 @@ if __name__ == "__main__":
 
             for w, b in zip(wings_results[0], bigs_results[0]):
                 item = (w + b) / 2
-            indvPlayerData.append(item)
+                features = features + (item,)
+                indvPlayerData.append(item)
 
             cursor.execute(get_wings_seven, pos_data)
             wings_seven_results = cursor.fetchall()
@@ -398,7 +433,8 @@ if __name__ == "__main__":
 
             for w, b in zip(wings_seven_results[0], bigs_seven_results[0]):
                 item = (w + b) / 2
-            indvPlayerData.append(item)
+                features = features + (item,)
+                indvPlayerData.append(item)
 
             cursor.execute(get_wings_two_one, pos_data)
             wings_two_one_results = cursor.fetchall()
@@ -407,7 +443,8 @@ if __name__ == "__main__":
 
             for w, b in zip(wings_two_one_results[0], bigs_two_one_results[0]):
                 item = (w + b) / 2
-            indvPlayerData.append(item)
+                features = features + (item,)
+                indvPlayerData.append(item)
 
         if player[4] == 'PF':
             pos_data = (player[1], idOppTeam)
@@ -415,18 +452,21 @@ if __name__ == "__main__":
             bigs_results = cursor.fetchall()
 
             for item in bigs_results[0]:
+                features = features + (item,)
                 indvPlayerData.append(item)
 
             cursor.execute(get_bigs_seven, pos_data)
             bigs_seven_results = cursor.fetchall()
 
             for item in bigs_seven_results[0]:
+                features = features + (item,)
                 indvPlayerData.append(item)
 
             cursor.execute(get_bigs_two_one, pos_data)
             bigs_two_one_results = cursor.fetchall()
 
             for item in bigs_two_one_results[0]:
+                features = features + (item,)
                 indvPlayerData.append(item)
 
         if player[4] == 'C':
@@ -435,22 +475,30 @@ if __name__ == "__main__":
             centers_results = cursor.fetchall()
 
             for item in centers_results[0]:
+                features = features + (item,)
                 indvPlayerData.append(item)
 
             cursor.execute(get_centers_seven, pos_data)
             centers_seven_results = cursor.fetchall()
 
             for item in centers_seven_results[0]:
+                features = features + (item,)
                 indvPlayerData.append(item)
 
             cursor.execute(get_centers_two_one, pos_data)
             centers_two_one_results = cursor.fetchall()
 
             for item in centers_two_one_results[0]:
+                features = features + (item,)
                 indvPlayerData.append(item)
 
         allPlayerFeatures.append(indvPlayerData)
 
+        # insert all features into database
+        cursor.execute(insert_features, features)
+        cnx.commit()
+        feaID += 1
+        features = ()
         playersActuallyPlaying.append(player)
 
     FDTargets = []
