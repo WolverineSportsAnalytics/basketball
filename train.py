@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     coefficents = TemporaryFile()
 
-    ridge = Ridge(alpha=1, fit_intercept=False, normalize=True)
+    ridge = Ridge(alpha=10, fit_intercept=True, normalize=True)
     ridge.fit(testX, testY)
     thetaSKLearnRidge = ridge.coef_
 

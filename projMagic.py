@@ -306,8 +306,7 @@ def projMagic(cursor):
     # populate
     for i in range(len(actualPlayersPlaying)):
         for j in range(len(allPlayerFeatures[0])):
-            try:
-                targetX[i][j] = allPlayerFeatures[i][j]
+            targetX[i][j] = allPlayerFeatures[i][j]
 
     print "Number of targets: " + str(np.shape(targetX)[0])
 
