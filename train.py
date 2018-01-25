@@ -1,7 +1,7 @@
 import numpy as np
 import scipy as sp
 from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import Ridge, LinearRegression
+from sklearn.linear_model import Ridge, Lasso, LinearRegression
 import pandas as pd
 import mysql.connector
 import os
@@ -47,22 +47,29 @@ if __name__ == "__main__":
     ones = np.ones((np.shape(testX)[0], 1), dtype=float)
     testX = np.hstack((ones, testX))
 
-    # learning rate + iterations
-    alpha = 0.01
-    num_iters = 1000
-
-    # theta initialization
-    theta = np.zeros(((numFeatures + 1), 1))
-    theta = np.transpose(theta)
-
     coefficents = TemporaryFile()
+    startAlpha = 1
+    iterStep = .1
+    for x in range(100):
+        alphaa = startAlpha + iterStep
+        ridge = Ridge(alpha=alphaa, fit_intercept=True, normalize=True)
+        ridge.fit(testX, testY)
+        thetaSKLearnRidge = ridge.coef_
+        fileName = 'coef' + str(x) + '.npz'
+        outfile = open(fileName, 'w')
+        np.save(outfile, thetaSKLearnRidge)
+        startAlpha = alphaa
 
-    ridge = Ridge(alpha=6.5, fit_intercept=True, normalize=True)
-    ridge.fit(testX, testY)
-    thetaSKLearnRidge = ridge.coef_
+    startAlpha = 1
+    for x in range(100):
+        alphaa = startAlpha + iterStep
+        lasso = Lasso(alpha=alphaa, fit_intercept=True, normalize=True)
+        lasso.fit(testX, testY)
+        thetaSKLearnLasso = lasso.coef_
+        fileName = 'coefL' + str(x) + '.npz'
+        outfile = open(fileName, 'w')
+        np.save(outfile, thetaSKLearnLasso)
+        startAlpha = alphaa
 
-    outfile = open('coef.npz', 'w')
-    np.save(outfile, thetaSKLearnRidge)
-
-    print "Player Theta Values from Sklearn Ridge Regression"
+    print "Player Theta Values from Sklearn Ridge + Lasso Regression"
     print thetaSKLearnRidge
