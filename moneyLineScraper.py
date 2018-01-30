@@ -1,8 +1,7 @@
-import mysql.connector
+import mysql.connector as ms
 from datetime import timedelta, date
 import constants
 from bs4 import BeautifulSoup
-import urllib
 import requests
 
 def daterange(start_date, end_date):
@@ -26,7 +25,7 @@ def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
 
 def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
     urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
-    cnx = mysql.connector.connect(user=constants.databaseUser,
+    cnx = ms.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
@@ -40,25 +39,32 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
         soup = BeautifulSoup(page.text, 'html.parser')
 
         #addGame = "INSERT INTO game_odds (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine) VALUES(%s, %s, %s, %s, %s, %s)"
-        addTeamID = "INSERT INTO game_odds (homeID, awayID) VALUES(%s, %s)"
+        #addTeamID = "INSERT INTO game_odds (homeID, awayID) VALUES(%s, %s)"
 
-        for team in soup.find_all('span', attrs={'class': 'team-name'})[:]:
-            # first find, then update
-            print(team.text)l
+        teams = soup.find_all('span', attrs={'class': 'team-name'})
+        odds = soup.find_all('div', attrs={'class': 'eventLine-book-value'})
 
+        for i in range(0, len(teams)//2):
+            homeID = ("SELECT teamID FROM team_reference WHERE bovada = %s", teams[i * 2].text)
+            cursor.execute(homeID)
+            #print(teams[i * 2].text)
+            #print(odds[i * 27 + 5].text)
+            awayID = ("SELECT teamID FROM team_reference WHERE bovada = %s", teams[i * 2 + 1].text)
+            cursor.execute(awayID)
+            #print(odds[i * 27 + 6].text)
+            addGame = ("INSERT INTO game_odds (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine) VALUES(%s, %s, %s, %s, %s, %s)", homeID, awayID)
+            cursor.execute(addGame)
 
-        for odds in soup.find_all('div', attrs={'class': 'eventLine-book-value'})[:]:
-            print(odds.text)
+        """
+        try:
+            allDivs = game.find_all("div")[1:]       #FIX THIS STUFF
+            print(allDivs[0].text)
+            #names = (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine)
+            #cursor.execute(addGame, names)
 
-            """
-            try:
-                allDivs = game.find_all("div")[1:]       #FIX THIS STUFF
-                print(allDivs[0].text)
-                #names = (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine)
-                #cursor.execute(addGame, names)
-
-            except:
-                pass"""
+        except:
+            pass 
+        """
 
         cnx.commit()
 
