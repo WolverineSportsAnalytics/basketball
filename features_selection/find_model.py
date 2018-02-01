@@ -124,8 +124,8 @@ values = model.length_features()
 top_r = -1
 current_adding = -1 
 importance = []
-for i in range(1): 
-#for i in range(values -1): 
+#for i in range(1): 
+for i in range(values -1): 
   for j in range(values -1):
     mods = model.get_current_feat() 
     if j not in mods: # if its already in our model skip it
@@ -143,23 +143,26 @@ for i in range(1):
     ridge = Ridge(alpha=4, fit_intercept=False, normalize=True)                                                                                                                                                                                                                 
     ridge.fit(testX, testY)
     r_value  = ridge.score(testX, testY) 
+
+    adjusted_r_value = 1 - (((1 - (r_value))*(len(testY) -1))/(len(testY) - len(labels) - 1) )
+    print adjusted_r_value, r_value
     importance.append((labels[0], r_value))
     sorted_importance = sorted(importance, key=lambda tup: tup[1])
-    if r_value > top_r:
+    if adjusted_r_value > top_r:
 	current_adding = j
-	top_r = r_value
+	top_r = adjusted_r_value
 	new_labels = labels
 
 
   
-  for i in range(len(sorted_importance)):
-    cat, points = sorted_importance[len(sorted_importance) -1 -i ]
-    print cat, points 
+#  for i in range(len(sorted_importance)):
+ #   cat, points = sorted_importance[len(sorted_importance) -1 -i ]
+  #  print cat, points 
 
   model.add_feature_num(current_adding)
   model.set_features()
   model.add_labels(current_adding)
-#  print "Choice", model.get_current_labels(), top_r
+  print "Choice", model.get_current_labels(), top_r
 
 
   #print new_labels, top_r
