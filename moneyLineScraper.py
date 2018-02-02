@@ -45,15 +45,27 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
         odds = soup.find_all('div', attrs={'class': 'eventLine-book-value'})
 
         for i in range(0, len(teams)//2):
-            homeID = ("SELECT teamID FROM team_reference WHERE bovada = %s", teams[i * 2].text)
-            cursor.execute(homeID)
-            #print(teams[i * 2].text)
-            #print(odds[i * 27 + 5].text)
-            awayID = ("SELECT teamID FROM team_reference WHERE bovada = %s", teams[i * 2 + 1].text)
-            cursor.execute(awayID)
-            #print(odds[i * 27 + 6].text)
-            addGame = ("INSERT INTO game_odds (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine) VALUES(%s, %s, %s, %s, %s, %s)", homeID, awayID)
-            cursor.execute(addGame)
+            homeIDStatement = ("SELECT teamID FROM basketball.team_reference WHERE bovada = %s")
+            cursor.execute(homeIDStatement, (teams[i * 2].text,))
+            homeID = cursor.fetchall()
+
+            homeOdds = odds[i * 27 + 5].text.split()
+
+            homeSpread = float(''.join(homeOdds[0][1:].replace("½",".5")))
+            homeMoneyLine = float(''.join(homeOdds[1][1:].replace("½", ".5")))
+
+            awayIDStatement = ("SELECT teamID FROM basketball.team_reference WHERE bovada = %s")
+            cursor.execute(awayIDStatement, (teams[i * 2 + 1].text,))
+            awayID = cursor.fetchall()
+
+            awayOdds = odds[i * 27 + 6].text.split()
+
+            awaySpread = float(''.join(awayOdds[0][1:].replace("½", ".5")))
+            awayMoneyLine = float(''.join(awayOdds[1][1:].replace("½", ".5")))
+
+            addGame = ("INSERT INTO game_odds (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine) VALUES(%s, %s, %s, %s, %s, %s)")
+            addGameD = (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine)
+            cursor.execute(addGame, addGameD)
 
         """
         try:
