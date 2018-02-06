@@ -5,6 +5,12 @@ from decimal import *
 import numpy as np
 import constants
 
+'''
+Pulls in our projections and the sallarys of current players and optimizing for the night
+
+Optimizes using pydfs_lineup_optimizer 
+'''
+
 def getDate(day, month, year, cursor):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
     findGameData = (date(year, month, day),)
@@ -64,6 +70,8 @@ def optimize(day, month, year, cursor):
         for player in playerIDList:
             dkpoints = dkpoints + dkPointsDict[player]
             playerName = dkPlayersPoints[player]
+
+            # print optimized lineups
             print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(dkPointsDict[player]))
 
         print("Total Points: " + str(dkpoints))

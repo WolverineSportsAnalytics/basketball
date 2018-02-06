@@ -4,6 +4,10 @@ import csv
 import traceback
 from datetime import date
 
+'''
+Fanduel scraper scrapes the fanduel csv and inserts into the performance table
+'''
+
 def getDate(day, month, year, cursor):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
     findGameData = (date(year, month, day),)
@@ -108,7 +112,9 @@ def insert_into_performance(cursor, cnx):
                         teamAwayAbbrevData = (row[11], )
                         cursor.execute(getTeamAbbrev, teamAwayAbbrevData)
                         awayTeam = cursor.fetchall()[0][0]
+                        
 
+                        # insert into the performance table
                         inserts = (
                             player_id,
                             dateID,
