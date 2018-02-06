@@ -64,19 +64,8 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
             awayMoneyLine = float(''.join(awayOdds[1][1:].replace("½", ".5")))
 
             addGame = ("INSERT INTO game_odds (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine) VALUES(%s, %s, %s, %s, %s, %s)")
-            addGameD = (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine)
+            addGameD = (homeID[0][0], awayID[0][0], homeSpread, awaySpread, homeMoneyLine, awayMoneyLine)
             cursor.execute(addGame, addGameD)
-
-        """
-        try:
-            allDivs = game.find_all("div")[1:]       #FIX THIS STUFF
-            print(allDivs[0].text)
-            #names = (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine)
-            #cursor.execute(addGame, names)
-
-        except:
-            pass 
-        """
 
         cnx.commit()
 
