@@ -11,6 +11,9 @@ import constants
 import warnings
 from tempfile import TemporaryFile
 
+'''
+Pull in all features and insert into the futures 
+'''
 
 # goal is to populate the database with all the features
 

@@ -13,6 +13,10 @@ import warnings
 from tempfile import TemporaryFile
 import matplotlib.pyplot as plt
 
+'''
+Used to find features for model
+'''
+
 def getDate(day, month, year, cursor):
     gameIDP = 0
 

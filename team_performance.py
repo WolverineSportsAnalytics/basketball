@@ -7,6 +7,12 @@ import urllib2
 import datetime as dt
 import requests
 
+'''
+Pulls in data from basketball reference for team performance and insers ts in the team_performance table
+'''
+
+
+# Gets the date specified in new_dates
 def getDate(day, month, year, cursor):
     gameIDP = 0
 
@@ -19,11 +25,13 @@ def getDate(day, month, year, cursor):
 
     return gameIDP
 
+
+# find the daterange to update 
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
 
-
+# update and insert stats into the team_performance table
 def updateAndInsertPlayerRef(
         startDay,
         startMonth,
@@ -33,9 +41,7 @@ def updateAndInsertPlayerRef(
         endYear,
         cursor):
 
-    # set range of dates
-    #urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
-
+    # sql statement to insert into our database
     insert_team_data = "INSERT INTO basketball.team_performance (dailyTeamID, dailyTeamOpponentID, dateID, pointsAllowed, pointsScored, pace, effectiveFieldGoalPercent, turnoverPercent, FTperFGA, offensiveRating, defensiveRating, FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP, offensiveRebounds, defensiveRebounds, totalRebounds, assists, steals, blocks, turnovers, personalFouls, trueShootingPercent, 3pointAttemptRate, freeThrowAttemptRate, defensiveReboundPercent, offensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, win, loss, points1Q, points2Q, points3Q, points4Q) VALUES( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
     start_date_id = getDate(startDay, startMonth, startYear, cursor)
@@ -57,7 +63,7 @@ def updateAndInsertPlayerRef(
 
     date_counter = 0
 
-    # loop through all url's
+    # loop through all url's for all of the games
     for urls in box_url:
         url = urls[1]
         date_id = urls[2]
@@ -159,6 +165,8 @@ def updateAndInsertPlayerRef(
                 else:
                     win = 0
                     loss = 1
+
+            # insert statement that gets all the features we want to insert into the table        
             team_insert = (team[0],
                            team[len(team) - 2],
                            (date_id),
@@ -204,6 +212,7 @@ def updateAndInsertPlayerRef(
                            q4
                            )
 
+            # execute the insert statement
             cursor.execute(insert_team_data, team_insert)
             cnx.commit()
             times += 1
