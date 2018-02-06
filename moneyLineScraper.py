@@ -38,9 +38,6 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
         page = requests.get(url)
         soup = BeautifulSoup(page.text, 'html.parser')
 
-        #addGame = "INSERT INTO game_odds (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine) VALUES(%s, %s, %s, %s, %s, %s)"
-        #addTeamID = "INSERT INTO game_odds (homeID, awayID) VALUES(%s, %s)"
-
         teams = soup.find_all('span', attrs={'class': 'team-name'})
         odds = soup.find_all('div', attrs={'class': 'eventLine-book-value'})
 
