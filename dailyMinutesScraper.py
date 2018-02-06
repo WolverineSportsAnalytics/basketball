@@ -10,6 +10,10 @@ import constants
 import urllib2
 import datetime as dt
 
+'''
+This scrapes rotogrinders for daily Minutes projections in order to insert and use in our regression model
+
+'''
 
 def rotogrinders_season_scraper():
 	url = "https://rotogrinders.com/game-stats/nba-player?site=fanduel&range=season"
@@ -29,6 +33,7 @@ def rotogrinders_minutes_scraper():
 	csv_filename = 'rotogrinders_minutes_basketball.csv'
 	rotogrindersBasketball(url, csv_filename, stats)
 
+# use rotogrinders to find the projected minutes for individuals 
 def rotogrindersBasketball(url, csv_filename, stats):
 	page = urllib2.urlopen(url).read()
 	soup = BeautifulSoup(page, "html.parser")
@@ -50,7 +55,6 @@ def rotogrindersBasketball(url, csv_filename, stats):
 	jsonData = jsonData.split(";")
 	jsonData = jsonData[0]
 
-#	jsonData = jsonData[:-1]
 
         cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
@@ -71,42 +75,24 @@ def rotogrindersBasketball(url, csv_filename, stats):
                 
                 get_id = selec_id + nickName + "\""
                 try:
+                    # attempt to insert into performance table
                     cursor.execute(get_id)
                     player_id = cursor.fetchall()[0][0]
                     inserts = (playerData['minutes'],date, player_id)
+                    # execute insert
                     cursor.execute(update, inserts)
                     cnx.commit()
                 except:
+                    # if it fails print out who failed
                     player_id = nickName + "Failed"
 
 
 		print nickName, playerData['minutes'], player_id
-
-                '''
-		team = playerData['team']
-		pos = playerData['pos']
-		salary = playerData['salary']
-		gp = playerData['gp']
-		mins = float(playerData['min']) / float(gp)
-		reb = float(playerData['reb']) / float(gp)
-		ast = float(playerData['ast']) / float(gp)
-		stl = float(playerData['stl']) / float(gp)
-		blk = float(playerData['blk']) / float(gp)
-		to = float(playerData['to']) / float(gp)
-		pts = float(playerData['pts']) / float(gp)
-		usg = playerData['usg']
-		fpts = playerData['fpts']
-		fpts = float(fpts) / float(gp)
-		fpts = round(fpts, 2)
-                '''
-        
+      
 
         cursor.close()
         cnx.commit()
         cnx.close()
-
-
-
 
 
 if __name__ == "__main__":

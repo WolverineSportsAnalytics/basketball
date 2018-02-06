@@ -3,6 +3,9 @@ import urllib2
 import csv
 import demjson
 
+'''
+currently unfished
+'''
 
 def getDate(day, month, year, cursor):
     gameIDP = 0
