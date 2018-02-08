@@ -29,21 +29,21 @@
 ### Run generateBoxScoreURLs.py
 	- Job: Loads potential Box Score URLs into the database from the specified date range in constants.py so that the
 	performance scraper can pull in all of data from the box score
-	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to coorespond to the dates from
+	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to correspond to the dates from
 	which you want to pull new potential box score URLS from basketball reference
 		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
 			- inclusive of start date, exclusive of end date
 			
 ### Run performanceScraper.py
 	- Job: Scrape the box score data and put it into player performance table
-	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to coorespond to the dates 
+	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to correspond to the dates 
 	from which you want to pull the box scores URLS from the database to scrape the data
 		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
 			- inclusive of start date, exclusive of end date
 
 ### Run team_performance.py
 	- Job: Scrape the box score data and put it into team performance table
-	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to coorespond to the dates 
+	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to correspond to the dates 
 	from which you want to pull the box scores URLS from the database to scrape the data
 		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
 			- inclusive of start date, exclusive of end date
@@ -91,9 +91,9 @@
     - Will tell if you do not have an id for a player
 
 ### Run fanduelScraper.py
-    - Job: put players in their place like Roger Godell would want to
+    - Job: put players in their place like Roger Goodell would want to
 
-### Run projMinutues.sql
+### Run projMinutes.sql
 	- Job: projects the minutes for the people playing
 
 ### Run projMagic.py
