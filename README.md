@@ -100,7 +100,8 @@
 
 
 ## Regression Management
-    - Goal: To efficently calculate the regregression coefficents on our training set so that variance and bias is balanced
+    - Goal: To efficently calculate the regregression coefficents on our training set so that variance and bias is
+    balanced
     - How: Run magic.py once a month, and save the regression coefficents to coef.npz
         - Must train over entire data set (leaving out first two weeks of seasons and last week of seasons)
         - Currently evaluating different methods of cross validation....
