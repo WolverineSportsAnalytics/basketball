@@ -51,6 +51,7 @@
 ### Run the extrapolators!
 	- Job: Extrapolate the data scraped from the performance tables to the average tables to get a player's average
 	for a season on that day, a team's average for a season on that day, and a team's result vs a defense on that day
+	- For all extrapolators, the upper and lower bounds for the dateID's are inclusive
 	- How:
 		○ Run dailyPerformanceExtrapolation.py
 			§ Specify the date id for which you want to extrapolate the data according to the first day for
