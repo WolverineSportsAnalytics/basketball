@@ -52,7 +52,7 @@
 	- Job: Extrapolate the data scraped from the performance tables to the average tables to get a player's average
 	for a season on that day, a team's average for a season on that day, and a team's result vs a defense on that day
 	- How:
-		○ Run dailyPreformanceExtrapolation.py
+		○ Run dailyPerformanceExtrapolation.py
 			§ Specify the date id for which you want to extrapolate the data according to the first day for
 			which you have not scraped data all the way till the day you are predicting in constants.py 
 			(specify date id)
