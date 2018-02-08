@@ -10,37 +10,43 @@
 
 ### Run the generate_dates.py
 	- Job: Loads any new dates into the new_dates table from the range that was specified
-	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to coorespond to the dates from
-	which you want to pull new dates (set startYearP, startMonthP, startDayP, endYearP, endMonthP, and endDayP to the
-	same date if you just want to pull in one date)
+	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to correspond to the dates from
+	which you want to pull new dates
+		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
+			- inclusive of start date, exclusive of end date
+	- To run generate_dates.py for one day, the endDate should be one day ahead of the startDate
 	- Could probably just run this once and generate all the dates for a basketball season
 	- Note: only run if date is not in table!
 
 ### Run the playerRefScraper.py
 	- Job: Loads any new players into the player reference table that have played the night or season or whenever 
 	before
-	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to coorespond to the dates from
-	which you want to pull new players from basketball reference (set startYearP, startMonthP, startDayP, endYearP, 
-	endMonthP, and endDayP to the same date if you just want to pull in one date)
+	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to correspond to the dates from
+	which you want to pull new players from basketball reference 
+		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
+			- inclusive of start date, exclusive of end date
 
 ### Run generateBoxScoreURLs.py
 	- Job: Loads potential Box Score URLs into the database from the specified date range in constants.py so that the
 	performance scraper can pull in all of data from the box score
 	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to coorespond to the dates from
-	which you want to pull new potential box score URLS from basketball reference (set startYearP, startMonthP, 
-	startDayP, endYearP, endMonthP, and endDayP to the same date if you just want to pull in one date)
-
+	which you want to pull new potential box score URLS from basketball reference
+		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
+			- inclusive of start date, exclusive of end date
+			
 ### Run performanceScraper.py
 	- Job: Scrape the box score data and put it into player performance table
 	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to coorespond to the dates 
-	from which you want to pull the box scores URLS from the database to scrape the data (set startYearP, 
-	startMonthP, startDayP, endYearP, endMonthP, and endDayP to the same date if you just want to pull in one date)
+	from which you want to pull the box scores URLS from the database to scrape the data
+		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
+			- inclusive of start date, exclusive of end date
 
 ### Run team_performance.py
 	- Job: Scrape the box score data and put it into team performance table
 	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to coorespond to the dates 
-	from which you want to pull the box scores URLS from the database to scrape the data (set startYearP, 
-	startMonthP, startDayP, endYearP, endMonthP, and endDayP to the same date if you just want to pull in one date)
+	from which you want to pull the box scores URLS from the database to scrape the data
+		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
+			- inclusive of start date, exclusive of end date
 
 ### Run the extrapolators!
 	- Job: Extrapolate the data scraped from the performance tables to the average tables to get a player's average
