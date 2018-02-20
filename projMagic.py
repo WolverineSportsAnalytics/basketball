@@ -11,6 +11,74 @@ import constants
 import warnings
 from tempfile import TemporaryFile
 
+def actualProjMagic(cursor, model, day, month, year, file):
+
+    dateID = getDate(day, month, year, cursor)
+
+    statement = "SELECT "
+    for m in (model):
+        statement += m
+        statement += ", "
+    statement = statement[:-2]
+    statement += " FROM futures"    # turn into numpy arrays
+    statement += " WHERE dateID = "
+    statement += str(dateID)
+
+    allPlayerFeatures = []
+
+    cursor.execute(statement)
+
+    features = cursor.fetchall()
+    for feat in features:
+        allPlayerFeatures.append(feat)
+
+    FDTargets = []
+
+    getTargets = "SELECT fanduelPts FROM futures"
+    cursor.execute(getTargets)
+    targets = cursor.fetchall()
+
+    for tar in targets:
+        FDTargets.append(tar)
+
+    numFeatures = len(allPlayerFeatures[0])
+    targetX = np.asarray(allPlayerFeatures)
+
+    print "Number of target examples: " + str(np.shape(targetX)[0])
+
+    # add bias term
+    ones = np.ones((np.shape(targetX)[0], 1), dtype=float)
+    targetX = np.hstack((ones, targetX))
+
+    outfile = open(file, 'r')
+    thetaSKLearnRidge = np.load(outfile)
+    # predict
+    targetBenSimmons = targetX.dot(np.transpose(thetaSKLearnRidge))
+
+    statement = "SELECT playerID"
+    statement += " FROM futures"    # turn into numpy arrays
+    statement += " WHERE dateID = "
+    statement += str(dateID)
+
+    cursor.execute(statement)
+
+    playerIDs = cursor.fetchall()
+
+    for counter, x in enumerate(playerIDs):
+        playerID = playerIDs[counter]
+        playerProjectionSKLearn = 0
+        playerProjectionSKLearnP = 0
+        playerProjectionSKLearnRidge = float(targetBenSimmons[counter])
+        playerProjectionSKLearnRidgeP = 0
+
+        updateBattersDKPoints = "UPDATE performance SET fdPointsPredSKLin = %s, fdPointsPredSKLinP = %s, fdPointsSKLinPredRidge = %s, fdPointsSKLinPredRidgeP = %s WHERE dateID = %s AND playerID = %s"
+        updateBatterDKPointsData = (
+            playerProjectionSKLearn, playerProjectionSKLearnP, playerProjectionSKLearnRidge, playerProjectionSKLearnRidgeP,
+            dateID, playerID)
+        cursor.execute(updateBattersDKPoints, updateBatterDKPointsData)
+
+    print "Predicted FD Points for Players"
+
 
 def getDate(day, month, year, cursor):
     gameIDP = 0
@@ -312,7 +380,7 @@ def projMagic(cursor):
 
     print "Number of targets: " + str(np.shape(targetX)[0])
 
-    outfile = open('coef.npz', 'r')
+    outfile = open('coef_DEC_2017.npz', 'r')
     thetaSKLearnRidge = np.load(outfile)
 
 
@@ -353,4 +421,104 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor()
 
+    benSimmonsModel = ["projMinutes",
+                   "fanduel",
+                   "FG_DPA",
+                   "pointsDPA",
+                   "FGA_DPA",
+                   "minutesDPA",
+                   "turnoversDPA",
+                   "dReboundDPA",
+                   "USG_DPA",
+                   "FTA_DPA",
+                   "FTP_DPA",
+                   "totalReboundsDPA",
+                   "FTM_DPA",
+                   "AST_DPA",
+                   "stealsDPA",
+                   "personalFoulsDPA",
+                   "doubleDoubleDPA",
+                   "ASTP_DPA",
+                   "blocksDPA",
+                   "oReboundDPA",
+                   "dReboundP_DPA",
+                   "oRatingDPA",
+                   "trueShootingP_DPA",
+                   "FGP_DPA",
+                   "tripleDoubleDPA",
+                   "dRatingDPA",
+                   "3PA_DPA",
+                   "totalReboundP_DPA",
+                   "3PM_DPA",
+                   "3PointAttemptRateDPA",
+                   "plusMinusDPA",
+                   "BLKP_DPA",
+                   "freeThrowAttemptRateDPA",
+                   "STP_DPA",
+                   "ortTvP",
+                   "fgOppTeam",
+                   "oReboundP_DPA",
+                   "eFG_DPA",
+                   "drtTvP",
+                   "ftpTvP",
+                   "astpOppTeam",
+                   "fgTeam",
+                   "orpmTvP",
+                   "usgTvP",
+                   "astpTeam",
+                   "astOppTeam",
+                   "tpmTvP",
+                   "fgpTvP",
+                   "astTeam"]
+    lonzoBallModel = ["projMinutes",
+                        "FTA_DPA",
+                        "usgTvP",
+                        "fanduel",
+                        "minutesDPA",
+                        "AST_DPA",
+                        "dReboundDPA",
+                        "FG_DPA",
+                        "blocksDPA",
+                        "stealsDPA",
+                        "FGA_DPA",
+                        "oReboundDPA",
+                        "apmTvP",
+                        "pointsDPA",
+                        "3PP_DPA",
+                        "ftarTeam",
+                        "FGP_DPA",
+                        "tRebTeam",
+                        "astTeam",
+                        "trueShootingP_DPA",
+                        "STP_DPA",
+                        "pfTeam",
+                        "fgaTeam",
+                        "drtTeam",
+                        "dRatingDPA",
+                        "3pmTvP",
+                        "fgaTvP",
+                        "ftaTvP",
+                        "paceTeam",
+                        "freeThrowAttemptRateDPA",
+                        "oRatingDPA",
+                        "oReboundP_DPA",
+                        "FTM_DPA",
+                        "3PA_DPA",
+                        "drtTvP",
+                        "dReboundsTvP",
+                        "blocksTvP",
+                        "ftaTeam",
+                        "orpTeam",
+                        "ftpTvP",
+                        "drpTeam",
+                        "oRebTeam",
+                        "astpTeam",
+                        "ASTP_DPA",
+                        "tripleDoubleDPA",
+                        "orpmTvP",
+                        "efgTvP",
+                        "trpTeam"]
+
+    #actualProjMagic(cursor, benSimmonsModel, constants.dayP, constants.monthP, constants.yearP, "benSimmonsModel.npz")
+    #actualProjMagic(cursor, lonzoBallModel, constants.dayP, constants.monthP, constants.yearP, "lonzoBallModel.npz")
     projMagic(cursor)
