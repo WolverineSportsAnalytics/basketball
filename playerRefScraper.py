@@ -5,10 +5,16 @@ from bs4 import BeautifulSoup
 import urllib2
 import requests
 
+"""
+This scraper scrapes the player names and basketball reference IDs from the daily leaders URLs.
+"""
+
+# function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
 
+# generates the urls for all daily leaders for each day
 def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
     start_date = date(startYear, startMonth, startDay)
     end_date = date(endYear, endMonth, endDay)
@@ -18,6 +24,7 @@ def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
                     '&day=' + str(single_date.day) + '&year=' + str(single_date.year))
     return urls
 
+# insert references in sql to basketball reference, the player's name, and the player's team
 def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, endYear):
     urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
     cnx = mysql.connector.connect(user=constants.databaseUser,

@@ -5,7 +5,9 @@ from bs4 import BeautifulSoup
 import urllib2
 import requests
 
-def findDate(year, month, day, cursor):
+
+# returns the dateID for a date in order to load data in for that dateID
+def findDate(year, month, day):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
     findGameData = (date(year, month, day),)
     cursor.execute(findGame, findGameData)
@@ -16,10 +18,12 @@ def findDate(year, month, day, cursor):
 
     return dateID
 
+# function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
 
+# Generates dates from a range and loads them into the new_dates table in sql to create dateIDs
 def generateDates(startDay, startMonth, startYear, endDay, endMonth, endYear):
     start_date = date(startYear, startMonth, startDay)
     end_date = date(endYear, endMonth, endDay)
@@ -28,6 +32,7 @@ def generateDates(startDay, startMonth, startYear, endDay, endMonth, endYear):
         dates.append(single_date)
     return dates
 
+# returns an array of all NBA teams
 def getTeams(cursor):
     teamQuery = "SELECT bbreff FROM team_reference"
     cursor.execute(teamQuery)
@@ -38,6 +43,7 @@ def getTeams(cursor):
 
     return teams
 
+# function that generates all valid basketball reference urls
 def generateBasketballReferenceURLs(cursor):
     #year month day 0 team
     # if pipe is broken, must delete all the values from the first day, then restart the boxscore url from

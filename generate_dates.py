@@ -5,6 +5,12 @@ from bs4 import BeautifulSoup
 import urllib2
 import requests
 
+"""
+This script generates a range of dates given the start and end date to loop through. This is used in our scrapers to scrape daily historical data from different 
+sites like basketball reference and bovada.
+"""
+
+# Generates dates from a range and loads them into the new_dates table in sql to create dateIDs
 def generatedates(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
     date_statement = 'DECLARE @date date = '	
     insert = "INSERT into new_dates(date) VALUES(%s)"
@@ -17,6 +23,7 @@ def generatedates(startDay, startMonth, startYear, endDay, endMonth, endYear, cu
 	    cursor.execute(insert, date_stat)
 	    print new_date
 
+# function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)

@@ -4,10 +4,16 @@ import constants
 from bs4 import BeautifulSoup
 import requests
 
+"""
+This file scrapes in spread and moneyline numbers from sportsbookreview for each game every day in any daterange.
+"""
+
+# function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)):
         yield start_date + timedelta(n)
 
+# function that generates all sportsbookreview urls within the daterange
 def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
     start_date = date(startYear, startMonth, startDay)
     end_date = date(endYear, endMonth, endDay)
@@ -23,6 +29,8 @@ def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
                     single_date.month) + '0' + str(single_date.day))
     return urls
 
+# inserts the odds into sql
+# inserts teamID, spread, moneyline
 def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
     urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
     cnx = ms.connect(user=constants.databaseUser,
