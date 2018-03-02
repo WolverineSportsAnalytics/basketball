@@ -77,6 +77,42 @@ def optimize(day, month, year, cursor):
         print("Total Points: " + str(dkpoints))
         print ("\n")
 
+def automotae():
+     cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    
+    cursor = cnx.cursor(buffered=True)
+
+    year = constants.yearP
+    month = constants.monthP
+    day = constants.dayP
+
+    optimize(day, month, year, cursor)
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+
+def auto():
+   cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+
+    cursor = cnx.cursor(buffered=True)
+
+    year = constants.yearP
+    month = constants.monthP
+    day = constants.dayP
+
+    optimize(day, month, year, cursor)
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,

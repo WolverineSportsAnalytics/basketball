@@ -344,6 +344,17 @@ def projMagic(cursor):
     cnx.commit()
     cnx.close()
 
+def auto():
+   print "Loading data..."
+
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor()
+
+    projMagic(cursor)
+
 if __name__ == "__main__":
     print "Loading data..."
 

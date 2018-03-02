@@ -300,7 +300,22 @@ def updateAndInsertPlayerRef(
         cursor.close()
         cnx.commit()
         cnx.close()
+def auto():
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
 
+    updateAndInsertPlayerRef(
+        constants.startDayP,
+        constants.startMonthP,
+        constants.startYearP,
+        constants.endDayP,
+        constants.endMonthP,
+        constants.endYearP,
+        cursor,
+        cnx)
 
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,

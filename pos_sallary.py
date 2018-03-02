@@ -118,6 +118,19 @@ def scrape_rotoguru(cursor, cnx):
 
                 cnx.commit()
 
+def auto():
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
+
+    scrape_rotoguru(cursor, cnx)
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,

@@ -135,6 +135,15 @@ def insert_into_performance(cursor, cnx):
     cnx.commit()
     cnx.close()
 
+def auto():
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
+
+    insert_into_performance(cursor, cnx)
+
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,

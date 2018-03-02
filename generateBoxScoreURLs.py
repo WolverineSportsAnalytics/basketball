@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import urllib2
 import requests
 
-def findDate(year, month, day):
+def findDate(year, month, day, cursor):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
     findGameData = (date(year, month, day),)
     cursor.execute(findGame, findGameData)
@@ -77,12 +77,26 @@ def generateBasketballReferenceURLs(cursor):
             newURL = baseURL + str(date.year) + month + day + str(0) + team + ".html"
             try:
                 urllib2.urlopen(newURL)
-                boxScoreID = findDate(date.year, date.month, date.day)
+                boxScoreID = findDate(date.year, date.month, date.day, cursor)
 
                 urlTuple = (newURL, boxScoreID)
                 urls.append(urlTuple)
             except urllib2.HTTPError, e:
                 badURLs.append(newURL)
+
+def auto():
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
+
+    generateBasketballReferenceURLs(cursor)
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+
 
 
 if __name__ == "__main__":
