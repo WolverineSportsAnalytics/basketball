@@ -48,117 +48,13 @@ def getDates(day, month, year, numdays, cursor):
             # or (game[0] >= 897 and game[0] <= 1052)) -> should have this!
             # (game[0] >= 695 and game[0] <= 795) -> should have this
             # (game[0] >= 804 and game[0] <= 843) -> should have this
-            if ((((game[0] >= 695 and game[0] <= 738))
-                and game[0] != 920 and game[0] != 711 and game[0] != 741)):
+            if (((game[0] >= 695 and game[0] <= 795))
+                and game[0] != 920 and game[0] != 711 and game[0] != 741
+                or (game[0] >= 897 and game[0] <= 1052)
+                or (game[0] >= 804 and game[0] <= 843)):
                 gameIDs.append(game[0])
 
     return gameIDs
-
-
-def mapFeatures(X):
-    '''
-    MAPFEATURE Feature mapping function to polynomial features
-    MAPFEATURE(X1, X2) maps the two input features
-    to quadratic features used in the regularization exercise.
-    Returns a new feature array with more features, comprising of
-    X1, X2, X1.^2, X2.^2, X1*X2, X1*X2.^2, etc..
-    Inputs X1, X2 must be the same size
-    :param X:
-    :return: XTransform
-    '''
-
-    degree = 3
-
-    poly = PolynomialFeatures(degree)
-    XTransform = poly.fit_transform(X)
-
-    return XTransform
-
-
-def computCostMulti(X, y, theta):
-    '''
-    COMPUTECOSTMULTI Compute cost for linear regression with multiple variables
-    J = COMPUTECOSTMULTI(X, y, theta) computes the cost of using theta as the
-    parameter for linear regression to fit the data points in X and y
-    '''
-
-    # Initialize some useful values
-    m = np.shape(y)[0]
-
-    # Cost
-    h = X.dot(np.transpose(theta))
-    error = (h - y)
-    J = ((np.transpose(error).dot(error)) / (2 * m))
-
-    return J
-
-
-def featureNormalize(X):
-    '''
-    FEATURENORMALIZE Normalizes the features in X FEATURENORMALIZE(X) returns a normalized version of X where
-    the mean value of each feature is 0 and the standard deviation is 1. This is often a good preprocessing step
-    to do when working with learning algorithms. Ignores the bias feature
-    '''
-
-    X_norm = X
-    mu = np.zeros((1, np.shape(X)[1]), dtype=float)
-    sigma = np.zeros((1, np.shape(X)[1]), dtype=float)
-
-    numFeatures = np.shape(X)[1]
-
-    i = 0
-    while i < numFeatures:
-        feature = X[:, i]
-        mu[1, i] = np.mean(feature)
-        sigma[1, i] = np.std(feature)
-        feature = (feature - (mu[1, i])) / (sigma[1, i])
-        X_norm[:, i] = feature
-
-        i = i + 1
-
-    return X_norm, mu, sigma
-
-
-def gradientDescentMulti(X, y, theta, alpha, numIters):
-    # Initializ some useful values
-    m = np.shape(y)[0]
-
-    # number of training examples
-    thetaz = np.shape(theta)[1]
-
-    i = 0
-    costHistory = []
-    iterHistory = []
-
-    previousJ = 1000000000
-    optimialIteration = False
-    optimalIterNumber = 0
-    while i < numIters:
-        h = X.dot(np.transpose(theta))
-        error = (h - y)
-
-        j = 0
-        while j < thetaz:
-            xColumn = X[:, j]
-            partialD = np.transpose(error).dot(xColumn)
-            valueSet = ((theta[0, j]) - (alpha * partialD) / m)
-            theta[0, j] = valueSet
-            j = j + 1
-
-        J = computCostMulti(X, y, theta)
-        if ((previousJ - J[0, 0]) <= 0.001) and (not optimialIteration):
-            optimalIterNumber = (i + 1)
-            optimialIteration = True
-            print "Optimal # of Iterations: " + str(optimalIterNumber)
-
-        previousJ = J[0, 0]
-        costHistory.append(J[0, 0])
-        iterHistory.append(i)
-
-        i = i + 1
-
-    return theta, costHistory, iterHistory
-
 
 if __name__ == "__main__":
     print "Loading data..."
@@ -168,12 +64,6 @@ if __name__ == "__main__":
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor()
-
-    # predict data
-    # date to predict
-    yearP = constants.yearP
-    monthP = constants.monthP
-    dayP = constants.dayP
 
     # dates to retrieve data for batter test data
     # start date
@@ -192,6 +82,9 @@ if __name__ == "__main__":
     # ..........
     # .......
     # week 4 day - lonzo ball's data - feature, target - ?
+
+    # TODO: train only on players that aren't playing in garbage time
+    # TODO: [932 , 1022)
 
     numpyDataArrays = []
 
@@ -500,7 +393,7 @@ if __name__ == "__main__":
         allPlayerFeatures.append(indvPlayerData)
 
         # insert all features into database
-        features = features + (player[10])
+        features = features + (player[10],)
         features = features + (player[8], player[9])
         cursor.execute(insert_features, features)
         cnx.commit()
