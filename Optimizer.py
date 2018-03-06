@@ -78,12 +78,12 @@ def optimize(day, month, year, cursor):
         print ("\n")
 
 def automotae():
-     cnx = mysql.connector.connect(user=constants.databaseUser,
+    cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
-    
-    cursor = cnx.cursor(buffered=True)
+
+    cursor = cnx.cursor()
 
     year = constants.yearP
     month = constants.monthP
@@ -96,7 +96,7 @@ def automotae():
     cnx.close()
 
 def auto():
-   cnx = mysql.connector.connect(user=constants.databaseUser,
+    cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
                                   password=constants.databasePassword)

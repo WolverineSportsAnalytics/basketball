@@ -11,15 +11,37 @@ import constants
 import warnings
 from tempfile import TemporaryFile
 
+
+def getDate(day, month, year, cursor):
+    gameIDP = 0
+
+    findGame = "SELECT iddates FROM new_dates WHERE date = %s"
+    findGameData = (dt.date(year, month, day),)
+    cursor.execute(findGame, findGameData)
+
+    for game in cursor:
+        gameIDP = game[0]
+
+    return gameIDP
+
 if __name__ == "__main__":
 
-    print "Training Ben Simmons Model..."
+    # dates to retrieve data for batter test data
+    # start date
+    year = constants.yearP
+    month = constants.monthP
+    day = constants.dayP
 
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor()
+
+    dateID = getDate(day, month, year, cursor)
+
+    print "Training Ben Simmons Model..."
+
 
     benSimmonsModel = ["projMinutes",
                        "fanduel",
@@ -127,6 +149,8 @@ if __name__ == "__main__":
         getFeaturesB += ", "
     getFeaturesB = getFeaturesB[:-2]
     getFeaturesB += " FROM futures"    # turn into numpy arrays
+    getFeaturesB += " WHERE dateID < "
+    getFeaturesB += str(dateID)
 
     getFeaturesL = "SELECT "
 
@@ -135,6 +159,8 @@ if __name__ == "__main__":
         getFeaturesL += ", "
     getFeaturesL = getFeaturesL[:-2]
     getFeaturesL += " FROM futures"  # turn into numpy arrays
+    getFeaturesL += " WHERE dateID < "
+    getFeaturesL += str(dateID)
 
     allPlayerFeatures = []
 
@@ -146,8 +172,9 @@ if __name__ == "__main__":
 
     FDTargets = []
 
-    getTargets = "SELECT fanduelPts FROM futures"
-    cursor.execute(getTargets)
+    getTargets = "SELECT fanduelPts FROM futures WHERE dateID < %s"
+    getTargetsData = (dateID,)
+    cursor.execute(getTargets, getTargetsData)
     targets = cursor.fetchall()
 
     for tar in targets:
