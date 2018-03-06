@@ -8,7 +8,7 @@ import constants
 '''
 Pulls in our projections and the sallarys of current players and optimizing for the night
 
-Optimizes using pydfs_lineup_optimizer 
+Optimizes using pydfs_lineup_optimizer
 '''
 
 def getDate(day, month, year, cursor):
