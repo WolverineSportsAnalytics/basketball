@@ -48,6 +48,22 @@
 		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
 			- inclusive of start date, exclusive of end date
 
+### Download new rotoguru file
+	- Download from rotoguru.com, go to Daily Hoops Data under Basketball on the left toolbar, then go to Other Tools, then click on 2017-18 Master File
+	- Copy all the data and move into rotoguru20172018data.csv
+	- Delimite by comma (,) and colon (:)
+		- Highlight the first column
+		- Data > Text to Columns > Delimited > Comma, ":" > Finish
+		- Save it as a Windows CSV
+	- Filter only the days you need
+		○ Note: only need to run when didn't pull FanDuel information from FanDuel competition
+
+### If need to run rotoguru file, Run rotoguruIDManagement.py
+    - Job: align the rotoguru player ID with the basketball reference id
+
+### If need to run rotoguru file, Run pos_sallary.py
+	- Job: put the fanduel and draftkings position and salary into the performance table
+
 ### Run the extrapolators!
 	- Job: Extrapolate the data scraped from the performance tables to the average tables to get a player's average
 	for a season on that day, a team's average for a season on that day, and a team's result vs a defense on that day
@@ -65,22 +81,12 @@
 			§ Specify the date id for which you want to extrapolate the data according to the first day for
 			which you have not scraped data all the way till the day you are predicting in constants.py
 			(specify date id)
-
-### Download new rotoguru file
-	- Move into rotoguru20172018data.csv
-	- Delimite by comma (,) and colon (:)
-	- Filter only the days you need
-		○ Note: only need to run when didn't pull FanDuel information from FanDuel competition
-
-### If need to run rotoguru file, Run rotoguruIDManagement.py
-    - Job: align the rotoguru player ID with the basketball reference id
-
-### If need to run rotoguru file, Run pos_sallary.py
-	- Job: put the fanduel and draftkings position and salary into the performance table
-
-### Run sumPoints.sql
+		
+### Run sumPoints.py
     - Job: creates fanduel and draftkings pts based off performance
 
+### Run magic.py before scraping
+    - Job: aggregates data from all tables and stores in "futures" table as features
 ### Scrape FanDuel
     - Job: put current players playing in the performance table
     - Pull in the FanDuel file that you are scraping from the competition you are entering
@@ -104,7 +110,6 @@
 
 ### Run optimizer.py
     - Job: generate FanDuel lineups
-
 
 ## Regression Management
     - Goal: To efficently calculate the regregression coefficents on our training set so that variance and bias is
