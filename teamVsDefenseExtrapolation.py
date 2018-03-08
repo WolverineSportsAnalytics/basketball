@@ -34,7 +34,7 @@ eFGIdx = 21
 cursorL = threading.RLock()
 
 def averaging(cursor, team, dateLower, dateUpper, tableID, playasVsOpponentsScript, teamVsBallHandlersScript,
-              teamVsWingsScript, teamVsBigsScript, teamVsCentersScript):
+              teamVsWingsScript, teamVsBigsScript, teamVsCentersScript, cnx):
     # get all players who played vs that team before that day
     # separate players into the buckets aboved based on their position
 
@@ -172,7 +172,7 @@ def averaging(cursor, team, dateLower, dateUpper, tableID, playasVsOpponentsScri
 
         cnx.commit()
 
-def team_vs_defense_seven_extrapolation(cursor, dates, teams):
+def team_vs_defense_seven_extrapolation(cursor, dates, teams, cnx):
     performanceAvgScript = "SELECT blocks, points, steals, assists, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, 3PA, offensiveRebounds, defensiveRebounds, minutesPlayed, fieldGoals, fieldGoalsAttempted, FT, FTA, usagePercent, offensiveRating, defensiveRating, trueShootingPercent, effectiveFieldGoalPercent FROM performance WHERE opponent = %s AND dateID > %s AND dateID < %s AND fanduelPosition = %s"
     insertTeamVsDefenseBallHandlers = "INSERT INTO team_seven_vs_ball_handlers VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
     insertTeamVsDefenseWings = "INSERT INTO team_seven_vs_wings VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -193,13 +193,13 @@ def team_vs_defense_seven_extrapolation(cursor, dates, teams):
             cursorL.acquire()
 
             averaging(cursor, team, (date - 7), date, tableID, performanceAvgScript, insertTeamVsDefenseBallHandlers,
-                      insertTeamVsDefenseWings, insertTeamVsDefenseBigs, insertTeamVsDefenseCenters)
+                      insertTeamVsDefenseWings, insertTeamVsDefenseBigs, insertTeamVsDefenseCenters, cnx)
 
             tableID = tableID + 1
 
             cursorL.release()
 
-def team_vs_defense_two_one_extrapolation(cursor, dates, teams):
+def team_vs_defense_two_one_extrapolation(cursor, dates, teams, cnx):
     # iterate through all teams and all dates
     performanceAvgScript = "SELECT blocks, points, steals, assists, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, 3PA, offensiveRebounds, defensiveRebounds, minutesPlayed, fieldGoals, fieldGoalsAttempted, FT, FTA, usagePercent, offensiveRating, defensiveRating, trueShootingPercent, effectiveFieldGoalPercent FROM performance WHERE opponent = %s AND dateID > %s AND dateID < %s AND fanduelPosition = %s"
     insertTeamVsDefenseBallHandlers = "INSERT INTO team_two_one_vs_ball_handlers VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -221,13 +221,13 @@ def team_vs_defense_two_one_extrapolation(cursor, dates, teams):
             cursorL.acquire()
 
             averaging(cursor, team, (date - 21), date, tableID, performanceAvgScript, insertTeamVsDefenseBallHandlers,
-                      insertTeamVsDefenseWings, insertTeamVsDefenseBigs, insertTeamVsDefenseCenters)
+                      insertTeamVsDefenseWings, insertTeamVsDefenseBigs, insertTeamVsDefenseCenters, cnx)
 
             tableID = tableID + 1
 
             cursorL.release()
 
-def team_vs_defense_extrapolation(cursor, dates, teams):
+def team_vs_defense_extrapolation(cursor, dates, teams, cnx):
     # iterate through all teams and all dates
 
     performanceAvgScript = "SELECT blocks, points, steals, assists, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, 3PA, offensiveRebounds, defensiveRebounds, minutesPlayed, fieldGoals, fieldGoalsAttempted, FT, FTA, usagePercent, offensiveRating, defensiveRating, trueShootingPercent, effectiveFieldGoalPercent FROM performance WHERE opponent = %s AND dateID > %s AND dateID < %s AND fanduelPosition = %s"
@@ -252,12 +252,81 @@ def team_vs_defense_extrapolation(cursor, dates, teams):
             cursorL.acquire()
 
             averaging(cursor, team, beginningSeasonID, date, tableID, performanceAvgScript, insertTeamVsDefenseBallHandlers,
-                      insertTeamVsDefenseWings, insertTeamVsDefenseBigs, insertTeamVsDefenseCenters)
+                      insertTeamVsDefenseWings, insertTeamVsDefenseBigs, insertTeamVsDefenseCenters, cnx)
 
             tableID = tableID + 1
 
             cursorL.release()
+def auto():
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
 
+    # team vs. position
+
+    # ball handlers
+    # PG, SG
+
+    # wings
+    # SG, SF
+
+    # bigs
+    # SF, PF
+
+    # centers
+    # C
+
+    '''
+    for ball_handlers
+    avg pts, rebounds, offensive stats defensive stats etc....
+    for every player that has played vs that team before or on that date
+
+    for all teams:
+        get all players who played pg, sg, sf vs that team
+            average their performances noe
+
+    '''
+
+    # get all teams
+    getBbreffs = "SELECT bbreff FROM team_reference"
+    cursor.execute(getBbreffs)
+
+    teams = []
+
+    sqlResults = cursor.fetchall()
+    for row in sqlResults:
+        teams.append(row[0])
+
+    dateCutOff = constants.teamVsDefenseExtrapolationDateCutOff
+    upperBoundCutOff = constants.extapolatorUpperBound
+
+    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
+    getDatesD = (dateCutOff, upperBoundCutOff)
+    cursor.execute(getDates, getDatesD)
+
+    dates = []
+
+    sqlResults = cursor.fetchall()
+    for row in sqlResults:
+        dates.append(row[0])
+
+    a = threading.Thread(target=team_vs_defense_extrapolation, args=(cursor, dates, teams, cnx))
+    s = threading.Thread(target=team_vs_defense_two_one_extrapolation, args=(cursor, dates, teams,cnx))
+    t = threading.Thread(target=team_vs_defense_seven_extrapolation, args=(cursor, dates, teams, cnx))
+
+    a.start()
+    s.start()
+    t.start()
+
+    a.join()
+    s.join()
+    t.join()
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,

@@ -72,8 +72,10 @@ def updateAndInsertPlayerRef(
 
         soup.findAll(text=lambda text: isinstance(text, Comment))
         comments = soup.findAll(text=lambda text: isinstance(text, Comment))
-        comment = comments[len(comments) - 24]
-        box_score = comments[len(comments) - 25]
+        comment = comments[16]
+        box_score = comments[15]
+        print '\n'
+        print box_score
 
         soup2 = BeautifulSoup(box_score, "html.parser")
         box_scores = []
@@ -85,6 +87,7 @@ def updateAndInsertPlayerRef(
         teams_data = [[], []]
         soup1 = BeautifulSoup(comment, "html.parser")
         team_num = 0
+        print soup1
 
         for tr in soup1.find_all('tr')[2:]:
 

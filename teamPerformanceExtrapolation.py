@@ -26,7 +26,7 @@ def averaging(cursor, performanceData, averageStatement, insertAvgStatement, tab
     cursor.execute(insertAvgStatement, new_cumlative)
 
 # extrapolate daily team performance
-def team_daily_extrapolate_data(cursor, dates, teams):
+def team_daily_extrapolate_data(cursor, dates, teams, cnx):
     # now loop, average, and insert
     average = 'select sum(win), sum(loss), avg(offensiveRating), avg(defensiveRating), avg(pointsAllowed), avg(pointsScored), avg(pace), avg(effectiveFieldGoalPercent), avg(turnoverPercent), avg(offensiveReboundPercent), avg(FTperFGA), avg(FG), avg(FGA), avg(FGP), avg(3P), avg(3PA), avg(3PP), avg(FT), avg(FTA), avg(FTP), avg(offensiveRebounds), avg(defensiveRebounds), avg(totalRebounds), avg(assists), avg(steals), avg(blocks), avg(turnovers), avg(personalFouls), avg(trueShootingPercent), avg(3pointAttemptRate), avg(freeThrowAttemptRate), avg(defensiveReboundPercent), avg(totalReboundPercent), avg(assistPercent), avg(stealPercent), avg(blockPercent), avg(points1Q), avg(points2Q), avg(points3Q), avg(points4Q) from team_performance where dailyTeamID = %s and dateID > 850 and dateID < %s'
 
@@ -58,7 +58,7 @@ def team_daily_extrapolate_data(cursor, dates, teams):
             cursorL.release()
 
 
-def team_daily_extrapolate_two_one_data(cursor, dates, teams):
+def team_daily_extrapolate_two_one_data(cursor, dates, teams, cnx):
     # now loop, average, and insert
     average = 'select sum(win), sum(loss), avg(offensiveRating), avg(defensiveRating), avg(pointsAllowed), avg(pointsScored), avg(pace), avg(effectiveFieldGoalPercent), avg(turnoverPercent), avg(offensiveReboundPercent), avg(FTperFGA), avg(FG), avg(FGA), avg(FGP), avg(3P), avg(3PA), avg(3PP), avg(FT), avg(FTA), avg(FTP), avg(offensiveRebounds), avg(defensiveRebounds), avg(totalRebounds), avg(assists), avg(steals), avg(blocks), avg(turnovers), avg(personalFouls), avg(trueShootingPercent), avg(3pointAttemptRate), avg(freeThrowAttemptRate), avg(defensiveReboundPercent), avg(totalReboundPercent), avg(assistPercent), avg(stealPercent), avg(blockPercent), avg(points1Q), avg(points2Q), avg(points3Q), avg(points4Q) from team_performance where dailyTeamID = %s and dateID > %s and dateID < %s'
 
@@ -91,7 +91,7 @@ def team_daily_extrapolate_two_one_data(cursor, dates, teams):
 
             cursorL.release()
 
-def team_daily_extrapolate_seven_data(cursor, dates, teams):
+def team_daily_extrapolate_seven_data(cursor, dates, teams, cnx):
     # now loop, average, and insert
     average = 'select sum(win), sum(loss), avg(offensiveRating), avg(defensiveRating), avg(pointsAllowed), avg(pointsScored), avg(pace), avg(effectiveFieldGoalPercent), avg(turnoverPercent), avg(offensiveReboundPercent), avg(FTperFGA), avg(FG), avg(FGA), avg(FGP), avg(3P), avg(3PA), avg(3PP), avg(FT), avg(FTA), avg(FTP), avg(offensiveRebounds), avg(defensiveRebounds), avg(totalRebounds), avg(assists), avg(steals), avg(blocks), avg(turnovers), avg(personalFouls), avg(trueShootingPercent), avg(3pointAttemptRate), avg(freeThrowAttemptRate), avg(defensiveReboundPercent), avg(totalReboundPercent), avg(assistPercent), avg(stealPercent), avg(blockPercent), avg(points1Q), avg(points2Q), avg(points3Q), avg(points4Q) from team_performance where dailyTeamID = %s and dateID > %s and dateID < %s'
 
@@ -123,6 +123,50 @@ def team_daily_extrapolate_seven_data(cursor, dates, teams):
             cnx.commit()
 
             cursorL.release()
+def auto():
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
+
+    # get teams
+    getTeamIDs = "SELECT teamID FROM team_reference"
+    cursor.execute(getTeamIDs)
+
+    teams = []
+    sqlResults = cursor.fetchall()
+    for row in sqlResults:
+        teams.append(row[0])
+
+    dateCutOff = constants.teamPerformanceExtrapolationDateCutOff
+    upperBoundCutOff = constants.extapolatorUpperBound
+
+    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
+    getDatesD = (dateCutOff, upperBoundCutOff)
+    cursor.execute(getDates, getDatesD)
+
+    dates = []
+    sqlResults = cursor.fetchall()
+    for row in sqlResults:
+        dates.append(row[0])
+
+
+    a = threading.Thread(target=team_daily_extrapolate_data, args=(cursor, dates, teams, cnx))
+    s = threading.Thread(target=team_daily_extrapolate_seven_data, args=(cursor, dates, teams, cnx))
+    t = threading.Thread(target=team_daily_extrapolate_two_one_data, args=(cursor, dates, teams, cnx))
+
+    a.start()
+    s.start()
+    t.start()
+
+    a.join()
+    s.join()
+    t.join()
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
 
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
@@ -153,9 +197,9 @@ if __name__ == "__main__":
         dates.append(row[0])
 
 
-    a = threading.Thread(target=team_daily_extrapolate_data, args=(cursor, dates, teams))
-    s = threading.Thread(target=team_daily_extrapolate_seven_data, args=(cursor, dates, teams))
-    t = threading.Thread(target=team_daily_extrapolate_two_one_data, args=(cursor, dates, teams))
+    a = threading.Thread(target=team_daily_extrapolate_data, args=(cursor, dates, teams, cnx))
+    s = threading.Thread(target=team_daily_extrapolate_seven_data, args=(cursor, dates, teams, cnx))
+    t = threading.Thread(target=team_daily_extrapolate_two_one_data, args=(cursor, dates, teams, cnx))
 
     a.start()
     s.start()

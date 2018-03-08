@@ -25,7 +25,7 @@ def averaging(cursor, performanceData, averageStatement, insertAvgStatement, tab
     else:
         cursor.execute(insertAvgStatement, new_cumlative)
 
-def player_total_avg(cursor, dates, players):
+def player_total_avg(cursor, dates, players, cnx):
     # now loop, average, and insert
     average = 'select avg(blocks), avg(points), avg(steals), avg(assists), avg(turnovers), avg(totalRebounds), avg(tripleDouble), avg(doubleDouble), avg(3PM), avg(offensiveRebounds), avg(defensiveRebounds), avg(minutesPlayed), avg(fieldGoals), avg(fieldGoalsAttempted), avg(fieldGoalPercent), avg(3PA), avg(3PPercent), avg(FT), avg(FTA), avg(FTPercent), avg(personalFouls), avg(plusMinus), avg(trueShootingPercent), avg(effectiveFieldGoalPercent), avg(freeThrowAttemptRate), avg(3pointAttemptRate), avg(offensiveReboundPercent), avg(defensiveReboundPercent), avg(totalReboundPercent), avg(assistPercent), avg(stealPercent), avg(blockPercent), avg(turnoverPercent), avg(usagePercent), avg(offensiveRating), avg(defensiveRating) from performance where playerID=%s and dateID>850 and dateID < %s'
 
@@ -54,7 +54,7 @@ def player_total_avg(cursor, dates, players):
 
             cursorL.release()
 
-def player_seven_avg(cursor, dates, players):
+def player_seven_avg(cursor, dates, players, cnx):
     averageSeven = 'select avg(blocks), avg(points), avg(steals), avg(assists), avg(turnovers), avg(totalRebounds), avg(tripleDouble), avg(doubleDouble), avg(3PM), avg(offensiveRebounds), avg(defensiveRebounds), avg(minutesPlayed), avg(fieldGoals), avg(fieldGoalsAttempted), avg(fieldGoalPercent), avg(3PA), avg(3PPercent), avg(FT), avg(FTA), avg(FTPercent), avg(personalFouls), avg(plusMinus), avg(trueShootingPercent), avg(effectiveFieldGoalPercent), avg(freeThrowAttemptRate), avg(3pointAttemptRate), avg(offensiveReboundPercent), avg(defensiveReboundPercent), avg(totalReboundPercent), avg(assistPercent), avg(stealPercent), avg(blockPercent), avg(turnoverPercent), avg(usagePercent), avg(offensiveRating), avg(defensiveRating) from performance where playerID=%s and dateID > %s and dateID < %s'
 
     insertAvgSeven = "INSERT INTO player_seven_daily_avg VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -83,7 +83,7 @@ def player_seven_avg(cursor, dates, players):
 
             cursorL.release()
 
-def player_two_one_avg(cursor, dates, players):
+def player_two_one_avg(cursor, dates, players, cnx):
     averageTwoOne = 'select avg(blocks), avg(points), avg(steals), avg(assists), avg(turnovers), avg(totalRebounds), avg(tripleDouble), avg(doubleDouble), avg(3PM), avg(offensiveRebounds), avg(defensiveRebounds), avg(minutesPlayed), avg(fieldGoals), avg(fieldGoalsAttempted), avg(fieldGoalPercent), avg(3PA), avg(3PPercent), avg(FT), avg(FTA), avg(FTPercent), avg(personalFouls), avg(plusMinus), avg(trueShootingPercent), avg(effectiveFieldGoalPercent), avg(freeThrowAttemptRate), avg(3pointAttemptRate), avg(offensiveReboundPercent), avg(defensiveReboundPercent), avg(totalReboundPercent), avg(assistPercent), avg(stealPercent), avg(blockPercent), avg(turnoverPercent), avg(usagePercent), avg(offensiveRating), avg(defensiveRating) from performance where playerID=%s and dateID > %s and dateID < %s'
 
     insertAvgTwoOne = "INSERT INTO player_two_one_daily_avg VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -142,9 +142,9 @@ def auto():
     for row in sqlResults:
         dates.append(row[0])
 
-    t = threading.Thread(target=player_total_avg, args=(cursor, dates, players))
-    s = threading.Thread(target=player_seven_avg, args=(cursor, dates, players))
-    o = threading.Thread(target=player_two_one_avg, args=(cursor, dates, players))
+    t = threading.Thread(target=player_total_avg, args=(cursor, dates, players, cnx))
+    s = threading.Thread(target=player_seven_avg, args=(cursor, dates, players, cnx))
+    o = threading.Thread(target=player_two_one_avg, args=(cursor, dates, players, cnx))
 
     t.start()
     s.start()
@@ -188,9 +188,9 @@ if __name__ == "__main__":
     for row in sqlResults:
         dates.append(row[0])
 
-    t = threading.Thread(target=player_total_avg, args=(cursor, dates, players))
-    s = threading.Thread(target=player_seven_avg, args=(cursor, dates, players))
-    o = threading.Thread(target=player_two_one_avg, args=(cursor, dates, players))
+    t = threading.Thread(target=player_total_avg, args=(cursor, dates, players, cnx))
+    s = threading.Thread(target=player_seven_avg, args=(cursor, dates, players, cnx))
+    o = threading.Thread(target=player_two_one_avg, args=(cursor, dates, players, cnx))
 
     t.start()
     s.start()
