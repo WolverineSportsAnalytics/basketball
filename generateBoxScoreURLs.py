@@ -7,7 +7,7 @@ import requests
 
 
 # returns the dateID for a date in order to load data in for that dateID
-def findDate(year, month, day):
+def findDate(year, month, day, cursor):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
     findGameData = (date(year, month, day),)
     cursor.execute(findGame, findGameData)
