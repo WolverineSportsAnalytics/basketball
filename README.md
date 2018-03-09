@@ -81,7 +81,8 @@
 			§ Specify the date id for which you want to extrapolate the data according to the first day for
 			which you have not scraped data all the way till the day you are predicting in constants.py
 			(specify date id)
-        ○ When setting the date ids, know that it is inclusive (ie: [924 930] will scrape from dates 924 to 930)
+        ○ When setting the date ids, know that it is inclusive (ie: [924 930] will scrape from dates 924 to 930) (day 930 is the day you are predicting)
+   
         
 ### Run sumPoints.py
     - Job: creates fanduel and draftkings pts based off performance
