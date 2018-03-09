@@ -47,7 +47,9 @@ def updateAndInsertPlayerRef(
     # urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
 
     start_date_id = getDate(startDay, startMonth, startYear, cursor)
+    print start_date_id
     end_date_id = getDate(endDay, endMonth, endYear, cursor)
+    print end_date_id
 
     select_dates = "Select * from box_score_urls WHERE dateID >= %s AND dateID <= %s"
     boxScoreDatesD = (start_date_id, end_date_id)
@@ -282,6 +284,7 @@ def updateAndInsertPlayerRef(
                     checks = cursor.fetchall()
                     if len(checks) > 0:
                         print "updates"
+                        print new_insert
                         cursor.execute(true_update_perf, new_insert)
                         cnx.commit()
                         print true_update_perf
