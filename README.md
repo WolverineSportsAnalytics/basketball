@@ -23,23 +23,23 @@
 	before
 	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to correspond to the dates from
 	which you want to pull new players from basketball reference 
-		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
-			- inclusive of start date, exclusive of end date
+		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP)]
+			- inclusive of start date, inclusive of end date
 
 ### Run generateBoxScoreURLs.py
 	- Job: Loads potential Box Score URLs into the database from the specified date range in constants.py so that the
 	performance scraper can pull in all of data from the box score
 	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to correspond to the dates from
 	which you want to pull new potential box score URLS from basketball reference
-		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
-			- inclusive of start date, exclusive of end date
+		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP)]
+			- inclusive of start date, inclusive of end date
 			
 ### Run performanceScraper.py
 	- Job: Scrape the box score data and put it into player performance table
 	- Configure startYearP, startMonthP, startDayP or endYearP, endMonthP, or endDayP to correspond to the dates 
 	from which you want to pull the box scores URLS from the database to scrape the data
-		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP))
-			- inclusive of start date, exclusive of end date
+		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP)]
+			- inclusive of start date, inclusive of end date
 
 ### Run team_performance.py
 	- Job: Scrape the box score data and put it into team performance table
@@ -81,7 +81,7 @@
 			§ Specify the date id for which you want to extrapolate the data according to the first day for
 			which you have not scraped data all the way till the day you are predicting in constants.py
 			(specify date id)
-        ○ When setting the date ids, know that it is exclusive (ie: [924 930] will scrape from dates 924 to 930)
+        ○ When setting the date ids, know that it is inclusive (ie: [924 930] will scrape from dates 924 to 930)
         
 ### Run sumPoints.py
     - Job: creates fanduel and draftkings pts based off performance
