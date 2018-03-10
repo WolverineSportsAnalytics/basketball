@@ -83,7 +83,7 @@ def generateBasketballReferenceURLs(cursor):
             newURL = baseURL + str(date.year) + month + day + str(0) + team + ".html"
             try:
                 urllib2.urlopen(newURL)
-                boxScoreID = findDate(date.year, date.month, date.day, cursor)
+                boxScoreID = findDate(date.year, date.month, date.day)
 
                 urlTuple = (newURL, boxScoreID)
                 urls.append(urlTuple)
