@@ -7,7 +7,7 @@ import requests
 
 
 # returns the dateID for a date in order to load data in for that dateID
-def findDate(year, month, day):
+def findDate(year, month, day, cursor):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
     findGameData = (date(year, month, day),)
     cursor.execute(findGame, findGameData)
@@ -20,7 +20,7 @@ def findDate(year, month, day):
 
 # function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
-    for n in range(int((end_date - start_date).days)):
+    for n in range(int((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
 
 # Generates dates from a range and loads them into the new_dates table in sql to create dateIDs
