@@ -152,6 +152,7 @@ def averaging(cursor, team, dateLower, dateUpper, tableID, playasVsOpponentsScri
         for id in cursor.fetchall():
             teamID = id[0]
 
+    
         teamVsPlayerData = (tableID, teamID, dateUpper, blocks, points, steals, assists, turnovers, totalRebounds,
                             tripleDouble, doubleDouble,
                             threePM, threePA, offensiveRebounds, defensiveRebounds, minutesPlayed, fieldGoals,
@@ -184,11 +185,12 @@ def team_vs_defense_seven_extrapolation(cursor, dates, teams, cnx):
     getLastID = "Select MAX(teamID) from team_seven_vs_centers"
     cursor.execute(getLastID)
     tableID = int(cursor.fetchall()[0][0])
-    tableID += 1
+    tableID += 100
 
     cursorL.release()
 
     for date in dates:
+        print date
         for team in teams:
             cursorL.acquire()
 
@@ -212,11 +214,12 @@ def team_vs_defense_two_one_extrapolation(cursor, dates, teams, cnx):
     getLastID = "Select MAX(teamID) from team_two_one_vs_centers"
     cursor.execute(getLastID)
     tableID = int(cursor.fetchall()[0][0])
-    tableID += 1
+    tableID += 100
 
     cursorL.release()
 
     for date in dates:
+        print date
         for team in teams:
             cursorL.acquire()
 
@@ -241,13 +244,14 @@ def team_vs_defense_extrapolation(cursor, dates, teams, cnx):
     getLastID = "Select MAX(teamID) from team_vs_centers"
     cursor.execute(getLastID)
     tableID = int(cursor.fetchall()[0][0])
-    tableID += 1
+    tableID += 100
 
     cursorL.release()
 
     beginningSeasonID = 850
 
     for date in dates:
+        print date
         for team in teams:
             cursorL.acquire()
 
@@ -381,18 +385,23 @@ if __name__ == "__main__":
     sqlResults = cursor.fetchall()
     for row in sqlResults:
         dates.append(row[0])
+    
+    team_vs_defense_extrapolation(cursor, dates, teams, cnx)
+    team_vs_defense_two_one_extrapolation(cursor, dates, teams, cnx)
+    team_vs_defense_seven_extrapolation(cursor, dates, teams, cnx)
+#    a = threading.Thread(target=team_vs_defense_extrapolation, args=(cursor, dates, teams, cnx))
+ #   s = threading.Thread(target=team_vs_defense_two_one_extrapolation, args=(cursor, dates, teams,cnx))
+  #  t = threading.Thread(target=team_vs_defense_seven_extrapolation, args=(cursor, dates, teams, cnx))
 
-    a = threading.Thread(target=team_vs_defense_extrapolation, args=(cursor, dates, teams))
-    s = threading.Thread(target=team_vs_defense_two_one_extrapolation, args=(cursor, dates, teams))
-    t = threading.Thread(target=team_vs_defense_seven_extrapolation, args=(cursor, dates, teams))
 
-    a.start()
-    s.start()
-    t.start()
 
-    a.join()
-    s.join()
-    t.join()
+   # a.start()
+    #s.start()
+   # t.start()
+
+    #a.join()
+   # s.join()
+   # t.join()
 
     cursor.close()
     cnx.commit()
