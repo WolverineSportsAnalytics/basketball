@@ -114,7 +114,7 @@
     - Job: aggregates data from all tables and stores in "futures" table as features including everything just scraped
     - Configure gdStartYear, gdStartMonth, gdStartDay to the date you want to pull features in up till  
     - set numdaysGradientDescent to how many days back you want to pull features till
-    - these numbers are inclusive 
+    - these numbers are inclusive...
 
 ## Run train.py 
     - Must specify YearP, MonthP, and DayP for the day you are predicting
