@@ -40,6 +40,7 @@
 	from which you want to pull the box scores URLS from the database to scrape the data
 		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP)]
 			- inclusive of start date, inclusive of end date
+    - Cleans up any players who did not play
 
 ### Run team_performance.py
 	- Job: Scrape the box score data and put it into team performance table
@@ -86,14 +87,9 @@
         
 ### Run sumPoints.py
     - Job: creates fanduel and draftkings pts based off performance
+    - Updates futures to include fandue and draftkings points for previous day
 
-### Run magic.py before scraping
-    - Job: aggregates data from all tables and stores in "futures" table as features
-    - Configure gdStartYear, gdStartMonth, gdStartDay to the date you want to pull features in up till  
-    - set numdaysGradientDescent to how many days back you want to pull features till
-    - these numbers are inclusive 
-
-### Scrape FanDuel
+### Scrape FanDuel -> generate features for current people
     - Job: put current players playing in the performance table
     - Pull in the FanDuel file that you are scraping from the competition you are entering
     - Split the first column into two columns and delimit by the dash (-)
@@ -106,8 +102,19 @@
 ### Run fanduelScraper.py
     - Job: put players in their place like Roger Goodell would want to
 
-### Run projMinutes.sql - might switch in place for projMinutes
-    - Job: projects the minutes for the people playing
+### Run dailyMinutesScraper.py
+    - Job: get minutes from rotogrinders and insert into performance table 
+    - How: set minutesDateID to the dateID where you are projecting in constants.py
+
+### Run projMinutes.sql
+    - Job: projects the minutes for the people playing and don't have projMinutes
+    - Gets the average minutes for a player over the last 7 days 
+
+### Run currentMagic.py
+    - Job: aggregates data from all tables and stores in "futures" table as features including everything just scraped
+    - Configure gdStartYear, gdStartMonth, gdStartDay to the date you want to pull features in up till  
+    - set numdaysGradientDescent to how many days back you want to pull features till
+    - these numbers are inclusive 
 
 ## Run train.py 
     - Must specify YearP, MonthP, and DayP for the day you are predicting
