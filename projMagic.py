@@ -1,15 +1,7 @@
 import numpy as np
-from scipy import sparse
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import Ridge, LinearRegression
-import pandas as pd
 import mysql.connector
-import os
 import datetime as dt
-from itertools import chain
 import constants
-import warnings
-from tempfile import TemporaryFile
 
 def actualProjMagic():
 

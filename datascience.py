@@ -1,15 +1,8 @@
 import numpy as np
-import scipy as sp
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import Ridge, Lasso, LinearRegression
-import pandas as pd
+from sklearn.linear_model import Ridge
 import mysql.connector
-import os
 import datetime as dt
-from itertools import chain
 import constants
-import warnings
-from tempfile import TemporaryFile
 
 
 def getDate(day, month, year, cursor):

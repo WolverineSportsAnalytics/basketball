@@ -1,15 +1,7 @@
-import numpy as np
-import scipy as sp
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import Ridge, LinearRegression
-import pandas as pd
 import mysql.connector
-import os
 import datetime as dt
-from itertools import chain
 import constants
 import warnings
-from tempfile import TemporaryFile
 
 '''
 Pull in all features and insert into the futures 

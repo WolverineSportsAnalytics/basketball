@@ -1,15 +1,8 @@
 from bs4 import BeautifulSoup
-import urllib2
-import csv
 import demjson
-import json
-import requests
 import mysql.connector
-from datetime import timedelta, date
 import constants
 import urllib2
-import datetime as dt
-
 '''
 This scrapes rotogrinders for daily Minutes projections in order to insert and use in our regression model
 

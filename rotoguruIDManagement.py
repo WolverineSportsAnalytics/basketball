@@ -1,11 +1,6 @@
 import mysql.connector
-from datetime import timedelta, date
 import constants
-from bs4 import BeautifulSoup, Comment
-import urllib2
-import requests
 import csv
-import traceback
 
 def alignPlayerIDs(cursor):
     selec_id = "select playerID from player_reference where firstName= %s and lastName = %s"

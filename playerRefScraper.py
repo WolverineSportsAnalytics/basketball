@@ -2,7 +2,6 @@ import mysql.connector
 from datetime import timedelta, date
 import constants
 from bs4 import BeautifulSoup
-import urllib2
 import requests
 
 """

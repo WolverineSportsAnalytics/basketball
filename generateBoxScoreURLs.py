@@ -1,9 +1,7 @@
 import mysql.connector
 from datetime import timedelta, date
 import constants
-from bs4 import BeautifulSoup
 import urllib2
-import requests
 
 
 # returns the dateID for a date in order to load data in for that dateID
