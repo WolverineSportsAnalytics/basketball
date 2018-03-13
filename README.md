@@ -115,6 +115,7 @@
     	- only adds data of players whose projected minutes is not null for that day
     - Configure gdStartYear, gdStartMonth, gdStartDay to the date you want to pull features in up till  
     - set numdaysGradientDescent to how many days back you want to pull features till
+    - make sure to run this AFTER dailyMinutesScraper.py
     - these numbers are inclusive...
 
 ## Run train.py 
