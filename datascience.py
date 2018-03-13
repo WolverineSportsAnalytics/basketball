@@ -190,6 +190,11 @@ if __name__ == "__main__":
     ones = np.ones((np.shape(testXB)[0], 1), dtype=float)
     testXB = np.hstack((ones, testXB))
 
+    kf = KFold(n_splits= 5)
+    kf.get_n_splits(testXB)
+    KFold(n_splits=5, random_state=None, shuffle=False)
+
+
     ridge = Ridge(alpha=9, fit_intercept=True, normalize=True)
     ridge.fit(testXB, testY)
     thetaSKLearnRidge = ridge.coef_
