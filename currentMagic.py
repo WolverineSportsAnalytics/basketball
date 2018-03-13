@@ -26,6 +26,7 @@ def getDates(day, month, year, numdays, cursor):
     base = dt.date(year, month, day)
     dateList = [base - dt.timedelta(days=x) for x in range(0, numdays)]
 
+    listOfBadDateIDs = [711,741,796,797,798,799,800,801,920,932,951,1005,1006,1007,1008,1009,1010]
     # get date ids from database
     gameIDs = []
     for date in dateList:
@@ -40,10 +41,7 @@ def getDates(day, month, year, numdays, cursor):
             # or (game[0] >= 897 and game[0] <= 1052)) -> should have this!
             # (game[0] >= 695 and game[0] <= 795) -> should have this
             # (game[0] >= 804 and game[0] <= 843) -> should have this
-            if (((game[0] >= 695 and game[0] <= 795))
-                and game[0] != 920 and game[0] != 711 and game[0] != 741
-                or (game[0] >= 897 and game[0] <= 1052)
-                or (game[0] >= 804 and game[0] <= 843)):
+            if game[0] not in listOfBadDateIDs:
                 gameIDs.append(game[0])
 
     return gameIDs

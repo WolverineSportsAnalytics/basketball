@@ -45,7 +45,7 @@ Go to your directory where you cloned the repository
 
 `$ deactivate`
 
-# PyCharm to Virtual ENV Interpreter Instructions
+# Configure PyCharm for Virtual ENV Interpreter Instructions
 
 `git pull`
 
