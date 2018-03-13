@@ -112,6 +112,7 @@
 
 ### Run currentMagic.py
     - Job: aggregates data from all tables and stores in "futures" table as features including everything just scraped
+    	- only adds data of players whose projected minutes is not null for that day
     - Configure gdStartYear, gdStartMonth, gdStartDay to the date you want to pull features in up till  
     - set numdaysGradientDescent to how many days back you want to pull features till
     - these numbers are inclusive...
