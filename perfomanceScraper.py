@@ -303,6 +303,20 @@ def updateAndInsertPlayerRef(
         cursor.close()
         cnx.commit()
         cnx.close()
+
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
+
+    cleanUp = "DELETE FROM performance WHERE blocks IS NULL"
+    cursor.execute(cleanUp)
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+
 def auto():
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
