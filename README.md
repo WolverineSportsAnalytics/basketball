@@ -6,6 +6,65 @@
     - Sri Garlapati
     - Brendan Hart
 
+# Instillation Instructions
+
+#### Clone the repository 
+Make a directory 
+
+`git clone https://github.com/WolverineSportsAnalytics/basketball.git`
+
+#### Install Virtual Env 
+Virtual Env acts as a virtual enviornment so that we can virtually install python packages and not overwrite the ones 
+on our system 
+
+`pip install virtualenv`
+
+#### Create Virtual Env and Enter it 
+Go to your directory where you cloned the repository 
+
+`$ virtualenv ENV`
+
+`$ source env/bin/activate`
+
+#### Install the requirements
+    - Make sure in home directory 
+
+`pip install requirements.txt`
+
+#### Deactivate the Virtual ENV
+`$ deactivate`
+
+##### Extra: If You Want to Install A New Package
+    - make sure in home directory
+    
+`$ source bin/activate`
+
+`pip install package`
+
+`pip freeze > requirements.txt`
+
+`$ deactivate`
+
+# PyCharm to Virtual ENV Interpreter Instructions
+
+`git pull`
+
+Open PyCharm
+
+Go to PyCharm > Preferences > Project: Name > Project Interpreter
+
+Click the Settings/Gear button next to the project Interpreter
+
+Click Add Local
+
+Navigate in the navigator to where your project is stored
+
+Click ENV > bin 
+
+Click Python then select okay
+
+Everything should be ready to go -> run performanceScraper.py to make sure everything is okay
+
 # Trust the Process:
 
 ### Run the generate_dates.py
