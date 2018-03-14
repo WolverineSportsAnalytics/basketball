@@ -147,6 +147,8 @@ Everything should be ready to go -> run performanceScraper.py to make sure every
 ### Run sumPoints.py
     - Job: creates fanduel and draftkings pts based off performance
     - Updates futures to include fandue and draftkings points for previous day
+    - Make sure to set the dayP, monthP, yearP in the constants.py file to the day you are predicting
+        - script will get the fanduel points from yesterday + update the futures table
 
 ### Scrape FanDuel -> generate features for current people
     - Job: put current players playing in the performance table
@@ -169,13 +171,15 @@ Everything should be ready to go -> run performanceScraper.py to make sure every
     - Job: projects the minutes for the people playing and don't have projMinutes
     - Gets the average minutes for a player over the last 7 days 
 
-### Run currentMagic.py
+### Run currentMagic.py or magic.py
     - Job: aggregates data from all tables and stores in "futures" table as features including everything just scraped
     	- only adds data of players whose projected minutes is not null for that day
     - Configure gdStartYear, gdStartMonth, gdStartDay to the date you want to pull features in up till  
     - set numdaysGradientDescent to how many days back you want to pull features till
     - make sure to run this AFTER dailyMinutesScraper.py
     - these numbers are inclusive...
+    - Run currentMagic if just want to pull in features for the day you are projecting for
+    - Run magic.py if you want to pull in features where minutesPlayed is not null 
 
 ## Run train.py 
     - Must specify YearP, MonthP, and DayP for the day you are predicting
