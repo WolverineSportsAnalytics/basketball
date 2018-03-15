@@ -8,10 +8,16 @@
 
 # Instillation Instructions
 
-####
+#### Windows Boyz
+
+Install a virtual machine
+
+Install ubuntu 
+
+Follow the instructions below 
 
 #### Clone the repository 
-Make a directory 
+Make a directory - note - make sure there are no spaces in file path
 
 `git clone https://github.com/WolverineSportsAnalytics/basketball.git`
 
@@ -26,14 +32,16 @@ on our system
 #### Create Virtual Env and Enter it 
 Go to your directory where you cloned the repository 
 
-`$ virtualenv ENV`
+`$ virtualenv --python=/usr/bin/python2.7 ENV/`
+
+Check your python version to see if you are running python 2.7
+
+`$ python --version`
 
 `$ source env/bin/activate`
 
 #### Install the requirements
     - Make sure in home directory - try these to see if it works 
-
-`pip install --upgrade setuptools`
 
 `pip install -r requirements.txt`
 
@@ -68,7 +76,7 @@ Navigate in the navigator to where your project is stored
 
 Click ENV > bin 
 
-Click Python then select okay
+Click python then select okay
 
 Everything should be ready to go -> run performanceScraper.py to make sure everything is okay
 

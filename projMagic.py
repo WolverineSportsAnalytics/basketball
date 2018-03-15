@@ -2,6 +2,7 @@ import numpy as np
 import mysql.connector
 import datetime as dt
 import constants
+import models
 
 def actualProjMagic():
 
@@ -22,104 +23,11 @@ def actualProjMagic():
     print "Projecting with Ben Simmons Model..."
 
 
-    benSimmonsModel = ["projMinutes",
-                       "fanduel",
-                       "FG_DPA",
-                       "pointsDPA",
-                       "FGA_DPA",
-                       "minutesDPA",
-                       "turnoversDPA",
-                       "dReboundDPA",
-                       "USG_DPA",
-                       "FTA_DPA",
-                       "FTP_DPA",
-                       "totalReboundsDPA",
-                       "FTM_DPA",
-                       "AST_DPA",
-                       "stealsDPA",
-                       "personalFoulsDPA",
-                       "doubleDoubleDPA",
-                       "ASTP_DPA",
-                       "blocksDPA",
-                       "oReboundDPA",
-                       "dReboundP_DPA",
-                       "oRatingDPA",
-                       "trueShootingP_DPA",
-                       "FGP_DPA",
-                       "tripleDoubleDPA",
-                       "dRatingDPA",
-                       "3PA_DPA",
-                       "totalReboundP_DPA",
-                       "3PM_DPA",
-                       "3PointAttemptRateDPA",
-                       "plusMinusDPA",
-                       "BLKP_DPA",
-                       "freeThrowAttemptRateDPA",
-                       "STP_DPA",
-                       "ortTvP",
-                       "fgOppTeam",
-                       "oReboundP_DPA",
-                       "eFG_DPA",
-                       "drtTvP",
-                       "ftpTvP",
-                       "astpOppTeam",
-                       "fgTeam",
-                       "orpmTvP",
-                       "usgTvP",
-                       "astpTeam",
-                       "astOppTeam",
-                       "tpmTvP",
-                       "fgpTvP",
-                       "astTeam"]
+    benSimmonsModel = models.benSimmonsModel
 
-    lonzoBallModel = ["projMinutes",
-                      "FTA_DPA",
-                      "usgTvP",
-                      "fanduel",
-                      "minutesDPA",
-                      "AST_DPA",
-                      "dReboundDPA",
-                      "FG_DPA",
-                      "blocksDPA",
-                      "stealsDPA",
-                      "FGA_DPA",
-                      "oReboundDPA",
-                      "apmTvP",
-                      "pointsDPA",
-                      "3PP_DPA",
-                      "ftarTeam",
-                      "FGP_DPA",
-                      "tRebTeam",
-                      "astTeam",
-                      "trueShootingP_DPA",
-                      "STP_DPA",
-                      "pfTeam",
-                      "fgaTeam",
-                      "drtTeam",
-                      "dRatingDPA",
-                      "3pmTvP",
-                      "fgaTvP",
-                      "ftaTvP",
-                      "paceTeam",
-                      "freeThrowAttemptRateDPA",
-                      "oRatingDPA",
-                      "oReboundP_DPA",
-                      "FTM_DPA",
-                      "3PA_DPA",
-                      "drtTvP",
-                      "dReboundsTvP",
-                      "blocksTvP",
-                      "ftaTeam",
-                      "orpTeam",
-                      "ftpTvP",
-                      "drpTeam",
-                      "oRebTeam",
-                      "astpTeam",
-                      "ASTP_DPA",
-                      "tripleDoubleDPA",
-                      "orpmTvP",
-                      "efgTvP",
-                      "trpTeam"]
+    lonzoBallModel = models.lonzoBallModel
+
+    leModel = models.leModel
 
     getFeaturesB = "SELECT "
 
@@ -186,6 +94,41 @@ def actualProjMagic():
     targetLonzoBall = targetX.dot(np.transpose(thetaSKLearnRidge))
     # predict
 
+    print "Predicting Le Lebron Model"
+
+    getFeaturesLe = "SELECT "
+
+    for m in (leModel):
+        getFeaturesLe += m
+        getFeaturesLe += ", "
+    getFeaturesLe = getFeaturesLe[:-2]
+    getFeaturesLe += " FROM futures"  # turn into numpy arrays
+    getFeaturesLe += " WHERE dateID = "
+    getFeaturesLe += str(dateID)
+
+    allPlayerFeatures = []
+
+    cursor.execute(getFeaturesLe)
+
+    features = cursor.fetchall()
+    for feat in features:
+        allPlayerFeatures.append(feat)
+
+    targetX = np.asarray(allPlayerFeatures)
+
+    print "Projecting with Le Lebron Ball Model..."
+
+    print "Number of target examples: " + str(np.shape(targetX)[0])
+
+    # add bias term
+    ones = np.ones((np.shape(targetX)[0], 1), dtype=float)
+    targetX = np.hstack((ones, targetX))
+
+    outfile = open("coefLe.npz", 'r')
+    thetaSKLearnRidge = np.load(outfile)
+
+    targetLeModel = targetX.dot(np.transpose(thetaSKLearnRidge))
+
     statement = "SELECT playerID"
     statement += " FROM futures"    # turn into numpy arrays
     statement += " WHERE dateID = "
@@ -197,14 +140,14 @@ def actualProjMagic():
 
     for counter, x in enumerate(playerIDs):
         playerID = playerIDs[counter]
-        playerProjectionSKLearn = 0
-        playerProjectionSKLearnP = 0
-        playerProjectionSKLearnRidge = float(targetBenSimmons[counter])
-        playerProjectionSKLearnRidgeP = float(targetLonzoBall[counter])
+        hardawayProj = 0
+        leProj = float(targetLeModel[counter])
+        simmonsProj = float(targetBenSimmons[counter])
+        zoProj = float(targetLonzoBall[counter])
 
-        updateBattersDKPoints = "UPDATE performance SET fdPointsPredSKLin = %s, fdPointsPredSKLinP = %s, fdPointsSKLinPredRidge = %s, fdPointsSKLinPredRidgeP = %s WHERE dateID = %s AND playerID = %s"
+        updateBattersDKPoints = "UPDATE performance SET simmonsProj = %s, zoProj = %s, hardawayProj = %s, leProj = %s WHERE dateID = %s AND playerID = %s"
         updateBatterDKPointsData = (
-            playerProjectionSKLearn, playerProjectionSKLearnP, playerProjectionSKLearnRidge, playerProjectionSKLearnRidgeP,
+            simmonsProj, zoProj, hardawayProj, leProj,
             dateID, x[0])
         cursor.execute(updateBattersDKPoints, updateBatterDKPointsData)
         cnx.commit()
@@ -233,104 +176,5 @@ if __name__ == "__main__":
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor()
-
-    benSimmonsModel = ["projMinutes",
-                   "fanduel",
-                   "FG_DPA",
-                   "pointsDPA",
-                   "FGA_DPA",
-                   "minutesDPA",
-                   "turnoversDPA",
-                   "dReboundDPA",
-                   "USG_DPA",
-                   "FTA_DPA",
-                   "FTP_DPA",
-                   "totalReboundsDPA",
-                   "FTM_DPA",
-                   "AST_DPA",
-                   "stealsDPA",
-                   "personalFoulsDPA",
-                   "doubleDoubleDPA",
-                   "ASTP_DPA",
-                   "blocksDPA",
-                   "oReboundDPA",
-                   "dReboundP_DPA",
-                   "oRatingDPA",
-                   "trueShootingP_DPA",
-                   "FGP_DPA",
-                   "tripleDoubleDPA",
-                   "dRatingDPA",
-                   "3PA_DPA",
-                   "totalReboundP_DPA",
-                   "3PM_DPA",
-                   "3PointAttemptRateDPA",
-                   "plusMinusDPA",
-                   "BLKP_DPA",
-                   "freeThrowAttemptRateDPA",
-                   "STP_DPA",
-                   "ortTvP",
-                   "fgOppTeam",
-                   "oReboundP_DPA",
-                   "eFG_DPA",
-                   "drtTvP",
-                   "ftpTvP",
-                   "astpOppTeam",
-                   "fgTeam",
-                   "orpmTvP",
-                   "usgTvP",
-                   "astpTeam",
-                   "astOppTeam",
-                   "tpmTvP",
-                   "fgpTvP",
-                   "astTeam"]
-
-    lonzoBallModel = ["projMinutes",
-                        "FTA_DPA",
-                        "usgTvP",
-                        "fanduel",
-                        "minutesDPA",
-                        "AST_DPA",
-                        "dReboundDPA",
-                        "FG_DPA",
-                        "blocksDPA",
-                        "stealsDPA",
-                        "FGA_DPA",
-                        "oReboundDPA",
-                        "apmTvP",
-                        "pointsDPA",
-                        "3PP_DPA",
-                        "ftarTeam",
-                        "FGP_DPA",
-                        "tRebTeam",
-                        "astTeam",
-                        "trueShootingP_DPA",
-                        "STP_DPA",
-                        "pfTeam",
-                        "fgaTeam",
-                        "drtTeam",
-                        "dRatingDPA",
-                        "3pmTvP",
-                        "fgaTvP",
-                        "ftaTvP",
-                        "paceTeam",
-                        "freeThrowAttemptRateDPA",
-                        "oRatingDPA",
-                        "oReboundP_DPA",
-                        "FTM_DPA",
-                        "3PA_DPA",
-                        "drtTvP",
-                        "dReboundsTvP",
-                        "blocksTvP",
-                        "ftaTeam",
-                        "orpTeam",
-                        "ftpTvP",
-                        "drpTeam",
-                        "oRebTeam",
-                        "astpTeam",
-                        "ASTP_DPA",
-                        "tripleDoubleDPA",
-                        "orpmTvP",
-                        "efgTvP",
-                        "trpTeam"]
 
     actualProjMagic()
