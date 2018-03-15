@@ -8,10 +8,14 @@
 
 # Instillation Instructions
 
+####
+
 #### Clone the repository 
 Make a directory 
 
 `git clone https://github.com/WolverineSportsAnalytics/basketball.git`
+
+`cd basketball`
 
 #### Install Virtual Env 
 Virtual Env acts as a virtual enviornment so that we can virtually install python packages and not overwrite the ones 
@@ -27,9 +31,12 @@ Go to your directory where you cloned the repository
 `$ source env/bin/activate`
 
 #### Install the requirements
-    - Make sure in home directory 
+    - Make sure in home directory - try these to see if it works 
 
-`pip install requirements.txt`
+`pip install --upgrade setuptools`
+
+`pip install -r requirements.txt`
+
 
 #### Deactivate the Virtual ENV
 `$ deactivate`
@@ -55,7 +62,7 @@ Go to PyCharm > Preferences > Project: Name > Project Interpreter
 
 Click the Settings/Gear button next to the project Interpreter
 
-Click Add Local
+Click Add Local. Select add existing intpreter
 
 Navigate in the navigator to where your project is stored
 
@@ -179,7 +186,7 @@ Everything should be ready to go -> run performanceScraper.py to make sure every
     - set numdaysGradientDescent to how many days back you want to pull features till
     - make sure to run this AFTER dailyMinutesScraper.py
     - these numbers are inclusive...
-    - Run currentMagic if just want to pull in features for the day you are projecting for
+    - Run currentMagic.py if just want to pull in features for the day you are projecting for
     - Run magic.py if you want to pull in features where minutesPlayed is not null 
 
 ## Run train.py 
