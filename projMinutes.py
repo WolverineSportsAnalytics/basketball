@@ -14,11 +14,7 @@ def auto():
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
 
-    projMins = "UPDATE performance as p
-SET projMinutes = (
-        SELECT minutes FROM player_seven_daily_avg as d
-    WHERE p.dateID = d.dateID AND p.playerID = d.playerID)
-WHERE projMinutes IS NULL;"
+    projMins = "UPDATE performance as p SET projMinutes SELECT minutes FROM player_seven_daily_avg as d WHERE p.dateID = d.dateID AND p.playerID = d.playerID) WHERE projMinutes IS NULL"
 
     cursor.execute(projMins)
 
