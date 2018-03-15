@@ -163,13 +163,14 @@ Everything should be ready to go -> run performanceScraper.py to make sure every
 ### Run fanduelScraper.py
     - Job: put players in their place like Roger Goodell would want to
 
+### Run projMinutes.sql
+    - Job: projects the minutes for the people playing and don't have projMinutes
+    - Gets the average minutes for a player over the last 7 days 
+    
 ### Run dailyMinutesScraper.py
     - Job: get minutes from rotogrinders and insert into performance table 
     - How: set minutesDateID to the dateID where you are projecting in constants.py
 
-### Run projMinutes.sql
-    - Job: projects the minutes for the people playing and don't have projMinutes
-    - Gets the average minutes for a player over the last 7 days 
 
 ### Run currentMagic.py or magic.py
     - Job: aggregates data from all tables and stores in "futures" table as features including everything just scraped
