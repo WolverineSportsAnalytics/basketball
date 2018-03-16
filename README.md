@@ -6,6 +6,80 @@
     - Sri Garlapati
     - Brendan Hart
 
+# Instillation Instructions
+
+#### Windows Boyz
+
+Install a virtual machine
+
+Install ubuntu 
+
+Follow the instructions below 
+
+#### Clone the repository 
+Make a directory - note - make sure there are no spaces in file path
+
+`git clone https://github.com/WolverineSportsAnalytics/basketball.git`
+
+`cd basketball`
+
+#### Install Virtual Env 
+Virtual Env acts as a virtual enviornment so that we can virtually install python packages and not overwrite the ones 
+on our system 
+
+`pip install virtualenv`
+
+#### Create Virtual Env and Enter it 
+Go to your directory where you cloned the repository 
+
+`$ virtualenv --python=/usr/bin/python2.7 ENV/`
+
+Check your python version to see if you are running python 2.7
+
+`$ python --version`
+
+`$ source env/bin/activate`
+
+#### Install the requirements
+    - Make sure in home directory - try these to see if it works 
+
+`pip install -r requirements.txt`
+
+
+#### Deactivate the Virtual ENV
+`$ deactivate`
+
+##### Extra: If You Want to Install A New Package
+    - make sure in home directory
+    
+`$ source bin/activate`
+
+`pip install package`
+
+`pip freeze > requirements.txt`
+
+`$ deactivate`
+
+# Configure PyCharm for Virtual ENV Interpreter Instructions
+
+`git pull`
+
+Open PyCharm
+
+Go to PyCharm > Preferences > Project: Name > Project Interpreter
+
+Click the Settings/Gear button next to the project Interpreter
+
+Click Add Local. Select add existing intpreter
+
+Navigate in the navigator to where your project is stored
+
+Click ENV > bin 
+
+Click python then select okay
+
+Everything should be ready to go -> run performanceScraper.py to make sure everything is okay
+
 # Trust the Process:
 
 ### Run the generate_dates.py
@@ -40,6 +114,7 @@
 	from which you want to pull the box scores URLS from the database to scrape the data
 		- [(startYearP, startMonthP, startDayP), (endYearP, endMonthP, and endDayP)]
 			- inclusive of start date, inclusive of end date
+    - Cleans up any players who did not play
 
 ### Run team_performance.py
 	- Job: Scrape the box score data and put it into team performance table
@@ -86,14 +161,11 @@
         
 ### Run sumPoints.py
     - Job: creates fanduel and draftkings pts based off performance
+    - Updates futures to include fandue and draftkings points for previous day
+    - Make sure to set the dayP, monthP, yearP in the constants.py file to the day you are predicting
+        - script will get the fanduel points from yesterday + update the futures table
 
-### Run magic.py before scraping
-    - Job: aggregates data from all tables and stores in "futures" table as features
-    - Configure gdStartYear, gdStartMonth, gdStartDay to the date you want to pull features in up till  
-    - set numdaysGradientDescent to how many days back you want to pull features till
-    - these numbers are inclusive 
-
-### Scrape FanDuel
+### Scrape FanDuel -> generate features for current people
     - Job: put current players playing in the performance table
     - Pull in the FanDuel file that you are scraping from the competition you are entering
     - Split the first column into two columns and delimit by the dash (-)
@@ -106,8 +178,24 @@
 ### Run fanduelScraper.py
     - Job: put players in their place like Roger Goodell would want to
 
-### Run projMinutes.sql - might switch in place for projMinutes
-    - Job: projects the minutes for the people playing
+### Run projMinutes.sql
+    - Job: projects the minutes for the people playing and don't have projMinutes
+    - Gets the average minutes for a player over the last 7 days 
+    
+### Run dailyMinutesScraper.py
+    - Job: get minutes from rotogrinders and insert into performance table 
+    - How: set minutesDateID to the dateID where you are projecting in constants.py
+
+
+### Run currentMagic.py or magic.py
+    - Job: aggregates data from all tables and stores in "futures" table as features including everything just scraped
+    	- only adds data of players whose projected minutes is not null for that day
+    - Configure gdStartYear, gdStartMonth, gdStartDay to the date you want to pull features in up till  
+    - set numdaysGradientDescent to how many days back you want to pull features till
+    - make sure to run this AFTER dailyMinutesScraper.py
+    - these numbers are inclusive...
+    - Run currentMagic.py if just want to pull in features for the day you are projecting for
+    - Run magic.py if you want to pull in features where minutesPlayed is not null 
 
 ## Run train.py 
     - Must specify YearP, MonthP, and DayP for the day you are predicting

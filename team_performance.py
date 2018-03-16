@@ -1,9 +1,7 @@
-import re
 import mysql.connector
 from datetime import timedelta, date
 import constants
 from bs4 import BeautifulSoup, Comment
-import urllib2
 import datetime as dt
 import requests
 

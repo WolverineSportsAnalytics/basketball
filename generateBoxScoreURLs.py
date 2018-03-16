@@ -1,9 +1,7 @@
 import mysql.connector
 from datetime import timedelta, date
 import constants
-from bs4 import BeautifulSoup
 import urllib2
-import requests
 
 
 # returns the dateID for a date in order to load data in for that dateID
@@ -84,7 +82,7 @@ def generateBasketballReferenceURLs(cursor):
             newURL = baseURL + str(date.year) + month + day + str(0) + team + ".html"
             try:
                 urllib2.urlopen(newURL)
-                boxScoreID = findDate(date.year, date.month, date.day)
+                boxScoreID = findDate(date.year, date.month, date.day, cursor)
 
                 urlTuple = (newURL, boxScoreID)
                 urls.append(urlTuple)

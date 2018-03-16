@@ -2,7 +2,6 @@ import mysql.connector
 from datetime import timedelta, date
 import constants
 from bs4 import BeautifulSoup, Comment
-import urllib2
 import requests
 import datetime as dt
 
@@ -69,7 +68,9 @@ def updateAndInsertPlayerRef(
         dates.append(str(single_date.year) + '-' +
                      str(single_date.month) + '-' + str(single_date.day))
 
+    selec_id_id = "select playerID from player_reference where bbrefID= %s"
     selec_id = "select playerID from player_reference where nickName=\""
+
     date_counter = 0
 
     # loop through all url's
@@ -111,198 +112,265 @@ def updateAndInsertPlayerRef(
             # scrape regular stats
             for number in range(len(rows_1)):
                 # first find, then updated
-                try:
-                    nickName = rows_1[number].find_all('th')[0].a.text
-                    tds1 = rows_1[number].find_all('td')
-                    minutes = tds1[0].text
-                    get_id = selec_id + nickName + "\""
-                    cursor.execute(get_id)
-                    player_id = cursor.fetchall()[0][0]
-                    blocks = tds1[15].text
-                    steals = tds1[14].text
-                    points = tds1[18].text
-                    assists = tds1[13].text
-                    to = tds1[16].text
-                    rebounds = tds1[12].text
-                    triple_double = 0
-                    double_double = 0
-                    o_rebs = tds1[10].text
-                    d_rebs = tds1[11].text
+                    try:
+                        bbrefID = rows_1[number].find_all('th')[0]['data-append-csv']
+                        bbrefData = (bbrefID,)
+                        cursor.execute(selec_id_id, bbrefData)
+                        player_id = cursor.fetchall()[0][0]
+                    except:
+                        pass
 
-                    fgs = tds1[1].text
-                    fga = tds1[2].text
-                    if fga == 0:
-                        fgpercent = "NULL"
-                    else:
-                        fgpercent = tds1[3].text
+                    try:
+                        nickName = rows_1[number].find_all('th')[0].a.text
+                        tds1 = rows_1[number].find_all('td')
+                        get_id = selec_id + nickName + "\""
+                        cursor.execute(get_id)
+                        player_id = cursor.fetchall()[0][0]
+                    except:
+                        pass
 
-                    tpm = tds1[4].text
-                    tpa = tds1[5].text
-                    if tpa == 0:
-                        tp_percent = "NULL"
-                    else:
-                        tp_percent = tds1[6].text
 
-                    free_throws = tds1[7].text
-                    fta = tds1[8].text
-                    if fta == 0:
-                        ft_percent = "NULL"
-                    else:
-                        ft_percent = tds1[9].text
+                    try:
+                        if tds1[0].text == "Did Not Play":
+                            minutes = 0
+                            blocks = 0
+                            steals = 0
+                            points = 0
+                            assists = 0
+                            to = 0
+                            rebounds = 0
+                            triple_double = 0
+                            double_double = 0
+                            o_rebs = 0
+                            d_rebs = 0
+                            fgs = 0
+                            fga = 0
+                            fgpercent = 0
+                            tpm = 0
+                            tpa = 0
+                            tp_percent = 0
+                            free_throws = 0
+                            fta = 0
+                            ft_percent = 0
+                            pf = 0
+                            plus_minus = 0
+                            TS = 0
+                            eFG = 0
+                            TPAR = 0
+                            FTR = 0
+                            ORBR = 0
+                            DRBR = 0
+                            TRBR = 0
+                            ASTR = 0
+                            STLR = 0
+                            BLKR = 0
+                            TOVR = 0
+                            USGR = 0
+                            ORtg = 0
+                            DRtg = 0
+                        else:
+                            minutes = tds1[0].text
 
-                    pf = tds1[17].text
-                    
-                    #plus_minus = tds1[19].text
-                    plus_minus = '0' 
+                            blocks = tds1[15].text
+                            steals = tds1[14].text
+                            points = tds1[18].text
+                            assists = tds1[13].text
+                            to = tds1[16].text
+                            rebounds = tds1[12].text
+                            triple_double = 0
+                            double_double = 0
+                            o_rebs = tds1[10].text
+                            d_rebs = tds1[11].text
 
-                    # advanced statistics
-                    tds = rows_2[number].find_all('td')
-                    TS = tds[1].text
-                    eFG = tds[2].text
-                    TPAR = tds[3].text
-                    FTR = tds[4].text
-                    ORBR = tds[5].text
-                    DRBR = tds[6].text
-                    TRBR = tds[7].text
-                    ASTR = tds[8].text
-                    STLR = tds[9].text
-                    BLKR = tds[10].text
-                    TOVR = tds[11].text
-                    USGR = tds[12].text
-                    ORtg = tds[13].text
-                    DRtg = tds[14].text
+                            fgs = tds1[1].text
+                            fga = tds1[2].text
+                            if fga == 0:
+                                fgpercent = "NULL"
+                            else:
+                                fgpercent = tds1[3].text
 
-                    plus_tens = 0
-                    if int(steals) >= 10:
-                        plus_tens += 1
-                    if int(blocks) >= 10:
-                        plus_tens += 1
-                    if int(points) >= 10:
-                        plus_tens += 1
-                    if int(assists) >= 10:
-                        plus_tens += 1
-                    if int(rebounds) >= 10:
-                        plus_tens += 1
+                            tpm = tds1[4].text
+                            tpa = tds1[5].text
+                            if tpa == 0:
+                                tp_percent = "NULL"
+                            else:
+                                tp_percent = tds1[6].text
 
-                    if plus_tens > 2:
-                        triple_double = 1
-                    elif plus_tens > 1:
-                        double_double = 1
+                            free_throws = tds1[7].text
+                            fta = tds1[8].text
+                            if fta == 0:
+                                ft_percent = "NULL"
+                            else:
+                                ft_percent = tds1[9].text
 
-                    inserts = (
-                        player_id,
-                        date_id,
-                        points,
-                        minutes,
-                        fgs,
-                        fga,
-                        fgpercent,
-                        tpm,
-                        tpa,
-                        tp_percent,
-                        free_throws,
-                        fta,
-                        ft_percent,
-                        o_rebs,
-                        d_rebs,
-                        rebounds,
-                        assists,
-                        steals,
-                        blocks,
-                        to,
-                        pf,
-                        plus_minus,
-                        TS,
-                        eFG,
-                        TPAR,
-                        FTR,
-                        ORBR,
-                        DRBR,
-                        TRBR,
-                        ASTR,
-                        STLR,
-                        BLKR,
-                        TOVR,
-                        USGR,
-                        ORtg,
-                        DRtg,
-                        triple_double,
-                        double_double,
-                        tea,
-                        opp,
-                        home)
-                    new_insert = (
-                        points,
-                        minutes,
-                        fgs,
-                        fga,
-                        fgpercent,
-                        tpm,
-                        tpa,
-                        tp_percent,
-                        free_throws,
-                        fta,
-                        ft_percent,
-                        o_rebs,
-                        d_rebs,
-                        rebounds,
-                        assists,
-                        steals,
-                        blocks,
-                        to,
-                        pf,
-                        plus_minus,
-                        TS,
-                        eFG,
-                        TPAR,
-                        FTR,
-                        ORBR,
-                        DRBR,
-                        TRBR,
-                        ASTR,
-                        STLR,
-                        BLKR,
-                        TOVR,
-                        USGR,
-                        ORtg,
-                        DRtg,
-                        triple_double,
-                        double_double,
-                        tea,
-                        opp,
-                        home,
-                        player_id,
-                        date_id
+                            pf = tds1[17].text
 
-                        )
-                    update_performance = "INSERT INTO performance (playerID, dateID, points, minutesPlayed, fieldGoals, fieldGoalsAttempted, fieldGoalPercent, 3PM, 3PA, 3PPercent, FT, FTA, FTPercent, offensiveRebounds, defensiveRebounds, totalRebounds, assists,  steals, blocks, turnovers, personalFouls, plusMinus, trueShootingPercent, effectiveFieldGoalPercent, 3pointAttemptRate, freeThrowAttemptRate, offensiveReboundPercent, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, turnoverPercent, usagePercent, offensiveRating, defensiveRating,  tripleDouble, doubleDouble, team, opponent, home) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+                            #plus_minus = tds1[19].text
+                            plus_minus = '0'
 
-                    true_update_perf = "UPDATE performance set points=%s, minutesPlayed=%s, fieldGoals=%s, fieldGoalsAttempted=%s, fieldGoalPercent=%s, 3PM=%s, 3PA=%s, 3PPercent=%s, FT=%s, FTA=%s, FTPercent=%s, offensiveRebounds=%s, defensiveRebounds=%s, totalRebounds=%s, assists=%s,  steals=%s, blocks=%s, turnovers=%s, personalFouls=%s, plusMinus=%s, trueShootingPercent=%s, effectiveFieldGoalPercent=%s, 3pointAttemptRate=%s, freeThrowAttemptRate=%s, offensiveReboundPercent=%s, defensiveReboundPercent=%s, totalReboundPercent=%s, assistPercent=%s, stealPercent=%s, blockPercent=%s, turnoverPercent=%s, usagePercent=%s, offensiveRating=%s, defensiveRating=%s,  tripleDouble=%s, doubleDouble=%s, team=%s, opponent=%s, home=%s where playerID= %s and dateID = %s"
-    
-                    check = "SELECT * from performance where dateID = %s and playerID = %s"
-                    cursor.execute(check,(date_id,player_id))
-                    checks = cursor.fetchall()
-                    if len(checks) > 0:
-                        print "updates"
-                        print new_insert
-                        cursor.execute(true_update_perf, new_insert)
+                            # advanced statistics
+                            tds = rows_2[number].find_all('td')
+                            TS = tds[1].text
+                            eFG = tds[2].text
+                            TPAR = tds[3].text
+                            FTR = tds[4].text
+                            ORBR = tds[5].text
+                            DRBR = tds[6].text
+                            TRBR = tds[7].text
+                            ASTR = tds[8].text
+                            STLR = tds[9].text
+                            BLKR = tds[10].text
+                            TOVR = tds[11].text
+                            USGR = tds[12].text
+                            ORtg = tds[13].text
+                            DRtg = tds[14].text
+
+                            plus_tens = 0
+                            if int(steals) >= 10:
+                                plus_tens += 1
+                            if int(blocks) >= 10:
+                                plus_tens += 1
+                            if int(points) >= 10:
+                                plus_tens += 1
+                            if int(assists) >= 10:
+                                plus_tens += 1
+                            if int(rebounds) >= 10:
+                                plus_tens += 1
+
+                            if plus_tens > 2:
+                                triple_double = 1
+                            elif plus_tens > 1:
+                                double_double = 1
+
+                        inserts = (
+                            player_id,
+                            date_id,
+                            points,
+                            minutes,
+                            fgs,
+                            fga,
+                            fgpercent,
+                            tpm,
+                            tpa,
+                            tp_percent,
+                            free_throws,
+                            fta,
+                            ft_percent,
+                            o_rebs,
+                            d_rebs,
+                            rebounds,
+                            assists,
+                            steals,
+                            blocks,
+                            to,
+                            pf,
+                            plus_minus,
+                            TS,
+                            eFG,
+                            TPAR,
+                            FTR,
+                            ORBR,
+                            DRBR,
+                            TRBR,
+                            ASTR,
+                            STLR,
+                            BLKR,
+                            TOVR,
+                            USGR,
+                            ORtg,
+                            DRtg,
+                            triple_double,
+                            double_double,
+                            tea,
+                            opp,
+                            home)
+                        new_insert = (
+                            points,
+                            minutes,
+                            fgs,
+                            fga,
+                            fgpercent,
+                            tpm,
+                            tpa,
+                            tp_percent,
+                            free_throws,
+                            fta,
+                            ft_percent,
+                            o_rebs,
+                            d_rebs,
+                            rebounds,
+                            assists,
+                            steals,
+                            blocks,
+                            to,
+                            pf,
+                            plus_minus,
+                            TS,
+                            eFG,
+                            TPAR,
+                            FTR,
+                            ORBR,
+                            DRBR,
+                            TRBR,
+                            ASTR,
+                            STLR,
+                            BLKR,
+                            TOVR,
+                            USGR,
+                            ORtg,
+                            DRtg,
+                            triple_double,
+                            double_double,
+                            tea,
+                            opp,
+                            home,
+                            player_id,
+                            date_id
+
+                            )
+                        update_performance = "INSERT INTO performance (playerID, dateID, points, minutesPlayed, fieldGoals, fieldGoalsAttempted, fieldGoalPercent, 3PM, 3PA, 3PPercent, FT, FTA, FTPercent, offensiveRebounds, defensiveRebounds, totalRebounds, assists,  steals, blocks, turnovers, personalFouls, plusMinus, trueShootingPercent, effectiveFieldGoalPercent, 3pointAttemptRate, freeThrowAttemptRate, offensiveReboundPercent, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, turnoverPercent, usagePercent, offensiveRating, defensiveRating,  tripleDouble, doubleDouble, team, opponent, home) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+
+                        true_update_perf = "UPDATE performance set points=%s, minutesPlayed=%s, fieldGoals=%s, fieldGoalsAttempted=%s, fieldGoalPercent=%s, 3PM=%s, 3PA=%s, 3PPercent=%s, FT=%s, FTA=%s, FTPercent=%s, offensiveRebounds=%s, defensiveRebounds=%s, totalRebounds=%s, assists=%s,  steals=%s, blocks=%s, turnovers=%s, personalFouls=%s, plusMinus=%s, trueShootingPercent=%s, effectiveFieldGoalPercent=%s, 3pointAttemptRate=%s, freeThrowAttemptRate=%s, offensiveReboundPercent=%s, defensiveReboundPercent=%s, totalReboundPercent=%s, assistPercent=%s, stealPercent=%s, blockPercent=%s, turnoverPercent=%s, usagePercent=%s, offensiveRating=%s, defensiveRating=%s,  tripleDouble=%s, doubleDouble=%s, team=%s, opponent=%s, home=%s where playerID= %s and dateID = %s"
+
+                        check = "SELECT * from performance where dateID = %s and playerID = %s"
+                        cursor.execute(check,(date_id,player_id))
+                        checks = cursor.fetchall()
+                        if len(checks) > 0:
+                            print "updates"
+                            print new_insert
+                            cursor.execute(true_update_perf, new_insert)
+                            cnx.commit()
+                            print true_update_perf
+                            print new_insert
+
+
+                        else:
+                            cursor.execute(update_performance, inserts)
+
                         cnx.commit()
-                        print true_update_perf
-                        print new_insert
+                    except:
+                        pass
 
-
-                    else:
-                        cursor.execute(update_performance, inserts)
-
-                    cnx.commit()
-                except:
-                    pass
 
 
 
         cursor.close()
         cnx.commit()
         cnx.close()
+
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
+
+    cleanUp = "DELETE FROM performance WHERE blocks IS NULL"
+    cursor.execute(cleanUp)
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+
 def auto():
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,

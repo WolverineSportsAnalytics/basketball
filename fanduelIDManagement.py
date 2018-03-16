@@ -1,7 +1,6 @@
 import mysql.connector
 import constants
 import csv
-import traceback
 from datetime import date
 
 def getDate(day, month, year, cursor):

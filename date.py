@@ -1,5 +1,5 @@
 import mysql.connector
-from datetime import datetime, date
+from datetime import date
 import constants
 '''
 Inserts dates to new_dates in a range specified in the constants file

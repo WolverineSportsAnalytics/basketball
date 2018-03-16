@@ -1,12 +1,7 @@
 import mysql.connector
 import mysql.connector.pooling
-from datetime import timedelta, date
 import constants
-from bs4 import BeautifulSoup, Comment
-import urllib2
-import requests
 import threading
-from multiprocessing import *
 
 cursorL = threading.RLock()
 

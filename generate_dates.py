@@ -1,9 +1,6 @@
 import mysql.connector
 from datetime import timedelta, date
 import constants
-from bs4 import BeautifulSoup
-import urllib2
-import requests
 
 """
 This script generates a range of dates given the start and end date to loop through. This is used in our scrapers to scrape daily historical data from different 
