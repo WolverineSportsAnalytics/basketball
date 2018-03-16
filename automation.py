@@ -23,51 +23,68 @@ to mess with the constants file everyday
 
 '''
 if __name__ == "__main__":
-    # generate dates
-
-    #generate_dates.auto() 
+    
+    # first figure out what day it is through some way
+    # then query database to get that dateID
+    # Now run it all and hope and pray
 
     # scrape players
-    #playerRefScraper.auto()
+    # set start and end date to be equal to current date
+    playerRefScraper.auto()
 
     # generate BoxScoreUrls
-    # generateBoxScoreURLs.auto()
+    # set start and end date to be equal to current date
+    generateBoxScoreURLs.auto()
 
     # scrape performance data
+    # set start and end date to be equal to current date
     perfomanceScraper.auto()
     
-    # team performance
-    team_performance.auto()
-    print "All players scraped"
 
-    exit(1)
+    # team performance
+    # set start and end date to be equal to current date
+    team_performance.auto()
+
     # daily performance  
+    # set dailyPerformanceExtrapolationDateCutOff to be todays date
+    # And set upperbound to be today's date
     dailyPerformanceExtrapolation.auto() 
 
     # team performance  
+    # set TeamPerformanceExtrapolationDateCutOff to today date
+    # And set upperbound to be today's date
     teamPerformanceExtrapolation.auto() 
 
-    #  team vs defense performance  
+    #team vs defense performance  
+    # set PerformanceExtrapolationDateCutOff to be todays date
+    # And set upperbound to be today's date
     teamVsDefenseExtrapolation.auto() 
     
-    # use rotguru to enter into pos sallary 
-    # pos_sallary.auto()
+    
+    # Scarape fanduel file
+    # going to have to change the entire fanduel scraper to run somewhere else
+    newFanduelScraper.auto()
 
+    # get projected minutes
+    #dailyMinutes projection
+    dailyMinutes.auto()
+    
     # run sumPoints
     sumPoints.auto()
 
-    # Scarape fanduel file
-    fanduelScraper.auto()
-
-    # get projected minutes
-    projMinutes.auto()
-
+    # do current magic to place everyone in futures tables
+    currentMagic.auto()
+    
     # do projecting
     projMagic.auto()
 
     # run optimizer
-    optimizer.auto()
+    Optimizer.auto()
     
 
+    '''
+    Need global variable for current date 
+    Need global variable for dateID
+    '''
 
    
