@@ -11,7 +11,7 @@ This scraper scrapes the player names and basketball reference IDs from the dail
 
 # function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
-    for n in range(int((end_date - start_date).days)):
+    for n in range(int((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
 
 # generates the urls for all daily leaders for each day

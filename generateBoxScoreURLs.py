@@ -20,7 +20,7 @@ def findDate(year, month, day, cursor):
 
 # function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
-    for n in range(int((end_date - start_date).days)):
+    for n in range(int((end_date - start_date).days) + 1):
         yield start_date + timedelta(n)
 
 # Generates dates from a range and loads them into the new_dates table in sql to create dateIDs
@@ -84,7 +84,7 @@ def generateBasketballReferenceURLs(cursor):
             newURL = baseURL + str(date.year) + month + day + str(0) + team + ".html"
             try:
                 urllib2.urlopen(newURL)
-                boxScoreID = findDate(date.year, date.month, date.day, cursor)
+                boxScoreID = findDate(date.year, date.month, date.day)
 
                 urlTuple = (newURL, boxScoreID)
                 urls.append(urlTuple)

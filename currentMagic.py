@@ -34,7 +34,6 @@ def getDates(day, month, year, numdays, cursor):
     base = dt.date(year, month, day)
     dateList = [base - dt.timedelta(days=x) for x in range(0, numdays)]
 
-    listOfBadDateIDs = [711,741,796,797,798,799,800,801,920,932,951,1005,1006,1007,1008,1009,1010]
     # get date ids from database
     gameIDs = []
     for date in dateList:
@@ -49,7 +48,10 @@ def getDates(day, month, year, numdays, cursor):
             # or (game[0] >= 897 and game[0] <= 1052)) -> should have this!
             # (game[0] >= 695 and game[0] <= 795) -> should have this
             # (game[0] >= 804 and game[0] <= 843) -> should have this
-            if game[0] not in listOfBadDateIDs:
+            if (((game[0] >= 695 and game[0] <= 795))
+                and game[0] != 920 and game[0] != 711 and game[0] != 741
+                or (game[0] >= 897 and game[0] <= 1052)
+                or (game[0] >= 804 and game[0] <= 843)):
                 gameIDs.append(game[0])
 
     return gameIDs
@@ -91,7 +93,7 @@ if __name__ == "__main__":
     getDailyPlayerAvg = "SELECT blocks, points, steals, AST, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, oRebound, dRebound, minutes, FG, FGA, FGP, 3PA, 3PP, FTM, FTA, FTP, personalFouls, plusMinus, trueShootingP, eFG, freeThrowAttemptRate, 3PointAttemptRate, oReboundP, dReboundP, totalReboundP, ASTP, STP, BLKP, turnoverP, USG, oRating, dRating FROM player_daily_avg WHERE dateID = %s AND playerID = %s"
     getDailyPlayerAvgSeven = "SELECT blocks, points, steals, AST, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, oRebound, dRebound, minutes, FG, FGA, FGP, 3PA, 3PP, FTM, FTA, FTP, personalFouls, plusMinus, trueShootingP, eFG, freeThrowAttemptRate, 3PointAttemptRate, oReboundP, dReboundP, totalReboundP, ASTP, STP, BLKP, turnoverP, USG, oRating, dRating FROM player_seven_daily_avg WHERE dateID = %s AND playerID = %s"
     getDailyPlayerAvgTwoOne = "SELECT blocks, points, steals, AST, turnovers, totalRebounds, tripleDouble, doubleDouble, 3PM, oRebound, dRebound, minutes, FG, FGA, FGP, 3PA, 3PP, FTM, FTA, FTP, personalFouls, plusMinus, trueShootingP, eFG, freeThrowAttemptRate, 3PointAttemptRate, oReboundP, dReboundP, totalReboundP, ASTP, STP, BLKP, turnoverP, USG, oRating, dRating FROM player_two_one_daily_avg WHERE dateID = %s AND playerID = %s"
-    getPerformanceDataForEachPlayer = "SELECT playerID, dateID, fanduel, draftkings, fanduelPosition, draftkingsPosition, team, opponent, fanduelPts, draftkingsPts, projMinutes FROM performance WHERE dateID = %s AND minutesPlayed IS NOT NULL and minutesPlayed >= 8 and projMinutes IS NOT NULL AND fanduel IS NOT NULL AND fanduelPosition IS NOT NULL"
+    getPerformanceDataForEachPlayer = "SELECT playerID, dateID, fanduel, draftkings, fanduelPosition, draftkingsPosition, team, opponent, fanduelPts, draftkingsPts, projMinutes FROM performance WHERE dateID = %s AND fanduel IS NOT NULL AND fanduelPosition IS NOT NULL"
     getTeamData = "SELECT wins, losses, ORT, DRT, avgPointsAllowed, avgPointsScored, pace, effectiveFieldGoalPercent, turnoverPercent, offensiveReboundPercent, FT/FGA, FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP, offensiveRebounds, defensiveRebounds, totalRebounds, assists, steals, blocks, turnovers, personalFouls, trueShootingPercent, 3pointAttemptRate, freeThrowAttemptRate, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, points1Q, points2Q, points3Q, points4Q FROM team_daily_avg_performance WHERE dateID = %s AND dailyTeamID = %s"
     getTeamDataSeven = "SELECT wins, losses, ORT, DRT, avgPointsAllowed, avgPointsScored, pace, effectiveFieldGoalPercent, turnoverPercent, offensiveReboundPercent, FT/FGA, FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP, offensiveRebounds, defensiveRebounds, totalRebounds, assists, steals, blocks, turnovers, personalFouls, trueShootingPercent, 3pointAttemptRate, freeThrowAttemptRate, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, points1Q, points2Q, points3Q, points4Q FROM team_seven_daily_avg_performance WHERE dateID = %s AND dailyTeamID = %s"
     getTeamDataTwoOne = "SELECT wins, losses, ORT, DRT, avgPointsAllowed, avgPointsScored, pace, effectiveFieldGoalPercent, turnoverPercent, offensiveReboundPercent, FT/FGA, FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP, offensiveRebounds, defensiveRebounds, totalRebounds, assists, steals, blocks, turnovers, personalFouls, trueShootingPercent, 3pointAttemptRate, freeThrowAttemptRate, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, points1Q, points2Q, points3Q, points4Q FROM team_two_one_daily_avg_performance WHERE dateID = %s AND dailyTeamID = %s"

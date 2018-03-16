@@ -393,6 +393,12 @@ if __name__ == "__main__":
  #   s = threading.Thread(target=team_vs_defense_two_one_extrapolation, args=(cursor, dates, teams,cnx))
   #  t = threading.Thread(target=team_vs_defense_seven_extrapolation, args=(cursor, dates, teams, cnx))
 
+<<<<<<< HEAD
+=======
+    a = threading.Thread(target=team_vs_defense_extrapolation, args=(cursor, dates, teams, cnx))
+    s = threading.Thread(target=team_vs_defense_two_one_extrapolation, args=(cursor, dates, teams, cnx))
+    t = threading.Thread(target=team_vs_defense_seven_extrapolation, args=(cursor, dates, teams, cnx))
+>>>>>>> 1663ed3a9872b6a6e2a0fb9b2826c690868d5904
 
 
    # a.start()
