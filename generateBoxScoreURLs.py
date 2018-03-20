@@ -56,6 +56,7 @@ def generateBasketballReferenceURLs(cursor):
     baseURL = constants.BasketballRefBoxScoreBase
 
     for date in dates:
+        print date
         for team in teams:
             shouldSave = len(urls) % 1
             if shouldSave == 0 and len(urls) != 0:
