@@ -119,7 +119,7 @@ def team_daily_extrapolate_seven_data(cursor, dates, teams, cnx):
             cnx.commit()
 
             cursorL.release()
-def auto():
+def auto(dateID):
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
@@ -135,8 +135,8 @@ def auto():
     for row in sqlResults:
         teams.append(row[0])
 
-    dateCutOff = constants.teamPerformanceExtrapolationDateCutOff
-    upperBoundCutOff = constants.extapolatorUpperBound
+    dateCutOff = dateID
+    upperBoundCutOff = dateID
 
     getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
     getDatesD = (dateCutOff, upperBoundCutOff)

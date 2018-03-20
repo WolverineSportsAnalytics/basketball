@@ -14,7 +14,7 @@ def getDate(day, month, year, cursor):
 
     return gameIDP
 
-def auto():
+def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
@@ -26,7 +26,7 @@ def auto():
 
     joinFDDKPoints = "UPDATE basketball.futures as f INNER JOIN basketball.performance as p ON (f.dateID = p.dateID AND f.playerID = p.playerID) SET f.draftkingsPts = p.draftkingsPts, f.fanduelPts = p.fanduelPts WHERE p.dateID = %s AND f.dateID = %s"
 
-    dateToJoin = getDate(constants.dayP, constants.monthP, constants.yearP, cursor) - 1
+    dateToJoin = getDate(day, month, year, cursor) - 1
 
     joinData = (dateToJoin,)
     joinJoinData = (dateToJoin, dateToJoin)
@@ -52,7 +52,7 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
 
-    auto()
+    auto(constants.dayP, constants.monthP, constants.yearP)
 
     cursor.close()
     cnx.commit()

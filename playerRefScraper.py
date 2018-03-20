@@ -76,9 +76,9 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
     cnx.commit()
     cnx.close()
 
-def auto():
-    updateAndInsertPlayerRef(constants.startDayP, constants.startMonthP, constants.startYearP,
-                             constants.endDayP, constants.endMonthP, constants.endYearP)
+def auto(day, month, year):
+    updateAndInsertPlayerRef(day, month, year,
+                             day, month, year)
 
 
 if __name__ == "__main__":

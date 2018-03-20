@@ -93,17 +93,13 @@ def automotae():
     cnx.commit()
     cnx.close()
 
-def auto():
+def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
 
     cursor = cnx.cursor(buffered=True)
-
-    year = constants.yearP
-    month = constants.monthP
-    day = constants.dayP
 
     optimize(day, month, year, cursor)
 

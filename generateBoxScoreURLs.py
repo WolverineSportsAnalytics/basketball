@@ -42,15 +42,18 @@ def getTeams(cursor):
     return teams
 
 # function that generates all valid basketball reference urls
-def generateBasketballReferenceURLs(cursor):
+def generateBasketballReferenceURLs(cursor, dates):
     #year month day 0 team
     # if pipe is broken, must delete all the values from the first day, then restart the boxscore url from
     # that day that was just deleted
-    dates = generateDates(constants.startDayP, constants.startMonthP, constants.startYearP,
-                  constants.endDayP, constants.endMonthP, constants.endYearP)
-
     teams = getTeams(cursor)
 
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
+ 
     urls = []
     badURLs = []
     baseURL = constants.BasketballRefBoxScoreBase
@@ -89,14 +92,18 @@ def generateBasketballReferenceURLs(cursor):
             except urllib2.HTTPError, e:
                 badURLs.append(newURL)
 
-def auto():
+def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
+    
+    dates = generateDates(day, month, year,
+                             day, month, year)
 
-    generateBasketballReferenceURLs(cursor)
+
+    generateBasketballReferenceURLs(cursor,dates)
 
     cursor.close()
     cnx.commit()
@@ -110,8 +117,11 @@ if __name__ == "__main__":
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
+    
+    dates = generateDates(constants.startDayP, constants.startMonthP, constants.startYearP,
+                  constants.endDayP, constants.endMonthP, constants.endYearP)
 
-    generateBasketballReferenceURLs(cursor)
+    generateBasketballReferenceURLs(cursor, dates)
 
     cursor.close()
     cnx.commit()

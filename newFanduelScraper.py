@@ -83,7 +83,7 @@ def alignPlayerIDs(cursor):
     cnx.commit()
     cnx.close()
 
-def insert_into_performance(cursor, cnx):
+def insert_into_performance(cursor, cnx, dateID):
     #empty will be used to scrape from rotoguru csv
 
     getPlayerID = "select playerID from player_reference where nickName= %s"
@@ -91,7 +91,6 @@ def insert_into_performance(cursor, cnx):
     getTeamAbbrev = "SELECT wsa from team_reference where fanduel = %s"
     update_performance = "INSERT INTO performance (playerID, dateID, fanduel, team, opponent, fanduelPosition) VALUES (%s, %s, %s, %s, %s, %s)"
 
-    dateID = getDate(constants.dayP, constants.monthP, constants.yearP, cursor)
 
     url = "https://www.rotowire.com/daily/NBA/optimizer.php?site=FanDuel"
 
@@ -104,10 +103,23 @@ def insert_into_performance(cursor, cnx):
         name = names[0] + ' ' + names[1]
         print name
         team = i.find_all('td')[2].text # team 
+        team = team[0] + team[1] + team[2]
+    
+        if team == "CHA":
+            team = "CHO"
+        if team == "BKN":
+            team = "BRK"
         opp = i.find_all('td')[3].text # opp remove @@
         if len(opp) > 3:
             opp = opp[1:]
         print opp
+        opp = opp[0] + opp[1] + opp[2]
+     
+        if opp == "CHA":
+            opp = "CHO"
+        if opp == "BKN":
+            opp = "BRK"
+        
         pos = i.find_all('td')[4].text # pos
         print pos
         sal = i.find_all('td')[10].find('input')['value'] # pos
@@ -147,14 +159,15 @@ def insert_into_performance(cursor, cnx):
     cnx.commit()
     cnx.close()
 
-def auto():
+def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
 
-    insert_into_performance(cursor, cnx)
+    dateID = getDate(day, month, year, cursor)
+    insert_into_performance(cursor, cnx, dateID)
 
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
@@ -163,5 +176,6 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
 
-    insert_into_performance(cursor, cnx)
+    dateID = getDate(constants.dayP, constants.monthP, constants.yearP, cursor)
+    insert_into_performance(cursor, cnx, dateID)
 

@@ -20,14 +20,14 @@ def rotogrinders_fourweeks_scraper():
 	csv_filename = 'rotogrinders_fourweeks_basketball.csv'
 	rotogrindersBasketball(url, csv_filename, stats)
 
-def rotogrinders_minutes_scraper():
+def rotogrinders_minutes_scraper(dateID):
 	url = "https://rotogrinders.com/projected-stats/nba-player"
 	stats = ["Player", "Team", "Pos", "Salary", "GP", "Min", "Reb", "Ast", "Stl", "Blk", "TO", "Pts", "USG", "FPTS"]
 	csv_filename = 'rotogrinders_minutes_basketball.csv'
-	rotogrindersBasketball(url, csv_filename, stats)
+	rotogrindersBasketball(url, csv_filename, stats, dateID)
 
 # use rotogrinders to find the projected minutes for individuals 
-def rotogrindersBasketball(url, csv_filename, stats):
+def rotogrindersBasketball(url, csv_filename, stats, dateID):
 	page = urllib2.urlopen(url).read()
 	soup = BeautifulSoup(page, "html.parser")
 
@@ -61,7 +61,7 @@ def rotogrindersBasketball(url, csv_filename, stats):
         selec_id = "select playerID from player_reference where nickName=\""
 
         # this is date id for today
-        date = constants.minutesDateID  
+        date = dateID  
         update = "UPDATE performance SET projMinutes = %s where dateID = %s and playerID = %s"
         for playerData in basketballData:
 		nickName = playerData['player']['first_name'] + " " + playerData['player']['last_name']
@@ -87,6 +87,8 @@ def rotogrindersBasketball(url, csv_filename, stats):
         cnx.commit()
         cnx.close()
 
+def auto(dateID):
+	rotogrinders_minutes_scraper(dateID)
 
 if __name__ == "__main__":
-	rotogrinders_minutes_scraper()
+	rotogrinders_minutes_scraper(dateID)

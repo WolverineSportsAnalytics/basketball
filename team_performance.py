@@ -38,6 +38,12 @@ def updateAndInsertPlayerRef(
         endMonth,
         endYear,
         cursor):
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor(buffered=True)
+
 
     # sql statement to insert into our database
     insert_team_data = "INSERT INTO basketball.team_performance (dailyTeamID, dailyTeamOpponentID, dateID, pointsAllowed, pointsScored, pace, effectiveFieldGoalPercent, turnoverPercent, FTperFGA, offensiveRating, defensiveRating, FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP, offensiveRebounds, defensiveRebounds, totalRebounds, assists, steals, blocks, turnovers, personalFouls, trueShootingPercent, 3pointAttemptRate, freeThrowAttemptRate, defensiveReboundPercent, offensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, win, loss, points1Q, points2Q, points3Q, points4Q) VALUES( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -218,7 +224,7 @@ def updateAndInsertPlayerRef(
             cnx.commit()
             times += 1
 
-def auto():
+def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
@@ -226,13 +232,7 @@ def auto():
     cursor = cnx.cursor(buffered=True)
 
     updateAndInsertPlayerRef(
-        constants.startDayP,
-        constants.startMonthP,
-        constants.startYearP,
-        constants.endDayP,
-        constants.endMonthP,
-        constants.endYearP,
-        cursor)
+            day, month, year, day, month, year, cursor)
 
     cursor.close()
     cnx.commit()

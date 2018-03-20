@@ -108,7 +108,7 @@ def player_two_one_avg(cursor, dates, players, cnx):
             cursorL.release()
 
 
-def auto():
+def auto(dateID):
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
@@ -125,8 +125,8 @@ def auto():
     for row in sqlResults:
         players.append(row[0])
 
-    dateCutOff = constants.dailyPerformanceExtrapolationDateCutOff
-    upperBoundCutOff = constants.extapolatorUpperBound
+    dateCutOff = dateID
+    upperBoundCutOff = dateID
 
     getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
     getDatesD = (dateCutOff, upperBoundCutOff)
@@ -136,6 +136,8 @@ def auto():
     sqlResults = cursor.fetchall()
     for row in sqlResults:
         dates.append(row[0])
+
+    print "Dates Length", len(dates)
 
     t = threading.Thread(target=player_total_avg, args=(cursor, dates, players, cnx))
     s = threading.Thread(target=player_seven_avg, args=(cursor, dates, players, cnx))

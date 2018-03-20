@@ -4,13 +4,10 @@ import datetime as dt
 import constants
 import models
 
-def actualProjMagic():
+def actualProjMagic(day, month, year):
 
     # dates to retrieve data for batter test data
     # start date
-    year = constants.yearP
-    month = constants.monthP
-    day = constants.dayP
 
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
@@ -167,7 +164,16 @@ def getDate(day, month, year, cursor):
 
     return gameIDP
 
+def auto(day, month, year):
+    print "Loading data..."
 
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+    cursor = cnx.cursor()
+
+    actualProjMagic(day, month, year)
 if __name__ == "__main__":
     print "Loading data..."
 
@@ -177,4 +183,8 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor()
 
-    actualProjMagic()
+    year = constants.yearP
+    month = constants.monthP
+    day = constants.dayP
+    
+    actualProjMagic(day, month, year)

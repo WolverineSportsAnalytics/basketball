@@ -1,4 +1,7 @@
 # have to write a script that will pull in and read in the fanduel file as is, so that it can be done without manuelly doint it
+import datetime
+import mysql
+import constants
 import generate_dates
 import playerRefScraper
 import generateBoxScoreURLs
@@ -10,6 +13,11 @@ import teamVsDefenseExtrapolation
 import pos_sallary
 import sumPoints
 import fanduelScraper
+import newFanduelScraper
+import dailyMinutesScraper
+import currentMagic
+import projMagic
+import Optimizer
 
 
 '''
@@ -23,63 +31,94 @@ to mess with the constants file everyday
 
 '''
 if __name__ == "__main__":
+    cnx = mysql.connector.connect(user=constants.databaseUser,                                                                                                                       
+                                  host=constants.databaseHost,                                                                                                                       
+                                  database=constants.databaseName,                                                                                                                   
+                                  password=constants.databasePassword)                                                                                                               
+    cursor = cnx.cursor()    
+    now = datetime.datetime.now()
+
+    print str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
+    date =  str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
     
+
     # first figure out what day it is through some way
+    # get current date 
+    findGame = "SELECT iddates FROM new_dates WHERE date = %s"                                                                                                                   
+    findGameData = (date,)                                                                                                                                                       
     # then query database to get that dateID
+    cursor.execute(findGame, findGameData)   
+    dateID = cursor.fetchall()[0][0]
+    print dateID
+    
     # Now run it all and hope and pray
+    
+    # fix day - 1
 
     # scrape players
     # set start and end date to be equal to current date
-    playerRefScraper.auto()
+    print "PlayerRef"
+    playerRefScraper.auto(now.day-1, now.month, now.year)
 
     # generate BoxScoreUrls
     # set start and end date to be equal to current date
-    generateBoxScoreURLs.auto()
+    print "Generate Box Score"
+    generateBoxScoreURLs.auto(now.day-1, now.month, now.year)
 
     # scrape performance data
     # set start and end date to be equal to current date
-    perfomanceScraper.auto()
-    
+    print "Performance"
+    perfomanceScraper.auto(now.day-1, now.month, now.year)
 
     # team performance
     # set start and end date to be equal to current date
-    team_performance.auto()
+    print "Team Performance"
+    team_performance.auto(now.day-1, now.month, now.year)
 
     # daily performance  
     # set dailyPerformanceExtrapolationDateCutOff to be todays date
     # And set upperbound to be today's date
-    dailyPerformanceExtrapolation.auto() 
+    print "Performance Exrapotlate"
+    dailyPerformanceExtrapolation.auto(dateID) 
 
     # team performance  
     # set TeamPerformanceExtrapolationDateCutOff to today date
     # And set upperbound to be today's date
-    teamPerformanceExtrapolation.auto() 
+    print "Team Performance Exrapotlate"
+    teamPerformanceExtrapolation.auto(dateID) 
 
     #team vs defense performance  
     # set PerformanceExtrapolationDateCutOff to be todays date
     # And set upperbound to be today's date
-    teamVsDefenseExtrapolation.auto() 
+    print "Team Vs Defense Exrapotlate"
+    teamVsDefenseExtrapolation.auto(dateID) 
     
     
     # Scarape fanduel file
     # going to have to change the entire fanduel scraper to run somewhere else
-    newFanduelScraper.auto()
+    print "Fanduel Scraping"
+    newFanduelScraper.auto(now.day, now.month, now.year)
 
     # get projected minutes
     #dailyMinutes projection
-    dailyMinutes.auto()
+    print "Minutes Scaping"
+    dailyMinutesScraper.auto(dateID)
     
     # run sumPoints
-    sumPoints.auto()
+    sumPoints.auto(now.day-1, now.month, now.year)
+
+    # need to update futures tables for yesterday
 
     # do current magic to place everyone in futures tables
-    currentMagic.auto()
+    print "Current Magic"
+    currentMagic.auto(now.day, now.month, now.year)
+    
     
     # do projecting
-    projMagic.auto()
+    projMagic.auto(now.day, now.month, now.year)
 
     # run optimizer
-    Optimizer.auto()
+    Optimizer.auto(now.day, now.month, now.year)
     
 
     '''

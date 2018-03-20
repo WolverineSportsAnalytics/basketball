@@ -257,7 +257,7 @@ def team_vs_defense_extrapolation(cursor, dates, teams, cnx):
             tableID = tableID + 1
 
             cursorL.release()
-def auto():
+def auto(dateID):
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
@@ -299,8 +299,8 @@ def auto():
     for row in sqlResults:
         teams.append(row[0])
 
-    dateCutOff = constants.teamVsDefenseExtrapolationDateCutOff
-    upperBoundCutOff = constants.extapolatorUpperBound
+    dateCutOff = dateID 
+    upperBoundCutOff = dateID
 
     getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
     getDatesD = (dateCutOff, upperBoundCutOff)
@@ -382,19 +382,13 @@ if __name__ == "__main__":
     for row in sqlResults:
         dates.append(row[0])
     
-    team_vs_defense_extrapolation(cursor, dates, teams, cnx)
-    team_vs_defense_two_one_extrapolation(cursor, dates, teams, cnx)
-    team_vs_defense_seven_extrapolation(cursor, dates, teams, cnx)
-#    a = threading.Thread(target=team_vs_defense_extrapolation, args=(cursor, dates, teams, cnx))
- #   s = threading.Thread(target=team_vs_defense_two_one_extrapolation, args=(cursor, dates, teams,cnx))
-  #  t = threading.Thread(target=team_vs_defense_seven_extrapolation, args=(cursor, dates, teams, cnx))
+   # team_vs_defense_extrapolation(cursor, dates, teams, cnx)
+   # team_vs_defense_two_one_extrapolation(cursor, dates, teams, cnx)
+   # team_vs_defense_seven_extrapolation(cursor, dates, teams, cnx)
 
-<<<<<<< HEAD
-=======
     a = threading.Thread(target=team_vs_defense_extrapolation, args=(cursor, dates, teams, cnx))
     s = threading.Thread(target=team_vs_defense_two_one_extrapolation, args=(cursor, dates, teams, cnx))
     t = threading.Thread(target=team_vs_defense_seven_extrapolation, args=(cursor, dates, teams, cnx))
->>>>>>> 1663ed3a9872b6a6e2a0fb9b2826c690868d5904
 
 
    # a.start()
