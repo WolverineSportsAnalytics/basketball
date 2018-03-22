@@ -62,7 +62,7 @@ def rotogrindersBasketball(url, csv_filename, stats, dateID):
 
         # this is date id for today
         date = dateID  
-        update = "UPDATE performance SET projMinutes = %s where dateID = %s and playerID = %s"
+        update = "UPDATE futures SET projMinutes = %s where dateID = %s and playerID = %s"
         getPrevProj = "SELECT projMinutes from performance where dateID = %s and playerID = %s and projMinutes > 0"
         deleteFutures = "DELETE from futures where dateID = %s and playerID = %s"
 
@@ -82,7 +82,7 @@ def rotogrindersBasketball(url, csv_filename, stats, dateID):
                     oldProjMinutes = cursor.fetchall()
                     if playerData['minutes'] == 0
                     	cursor.execute(deleteFutures, getNonZeros)
-                    
+
                     # execute insert
                     cursor.execute(update, inserts)
                     cnx.commit()
