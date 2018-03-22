@@ -24,7 +24,7 @@ Make a directory - note - make sure there are no spaces in file path
 `cd basketball`
 
 #### Install Virtual Env 
-Virtual Env acts as a virtual enviornment so that we can virtually install python packages and not overwrite the ones 
+Virtual Env acts as a virtual environment so that we can virtually install python packages and not overwrite the ones 
 on our system 
 
 `pip install virtualenv`
@@ -218,6 +218,6 @@ Everything should be ready to go -> run performanceScraper.py to make sure every
 
 ### If updating Rotogrinders minutes projections after running optimizer previously in the day
     - Run lateMinScraper.py to update projMinutes in futures
-    - Run train.py
-    - Run projMagic.py
+    - Run train.py to use the new data in futures to train the models
+    - Run projMagic.py to predict new player performances for the day
     - Run optimizer.py to generate new lineups
