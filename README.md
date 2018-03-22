@@ -6,7 +6,7 @@
     - Sri Garlapati
     - Brendan Hart
 
-# Instillation Instructions
+# Installation Instructions
 
 #### Windows Boyz
 
@@ -185,7 +185,6 @@ Everything should be ready to go -> run performanceScraper.py to make sure every
 ### Run dailyMinutesScraper.py
     - Job: get minutes from rotogrinders and insert into performance table 
     - How: set minutesDateID to the dateID where you are projecting in constants.py
-
 
 ### Run currentMagic.py or magic.py
     - Job: aggregates data from all tables and stores in "futures" table as features including everything just scraped
