@@ -100,7 +100,7 @@ if __name__ == "__main__":
     ones = np.ones((np.shape(testXB)[0], 1), dtype=float)
     testXB = np.hstack((ones, testXB))
 
-    ridge = Ridge(alpha=9, fit_intercept=True, normalize=True)
+    ridge = Ridge(alpha=0, fit_intercept=True, normalize=True)
     ridge.fit(testXB, testY)
     thetaSKLearnRidge = ridge.coef_
     fileName = 'coef' + "Ben" + '.npz'
@@ -127,7 +127,7 @@ if __name__ == "__main__":
     ones = np.ones((np.shape(testXL)[0], 1), dtype=float)
     testXL = np.hstack((ones, testXL))
 
-    ridge = Ridge(alpha=9, fit_intercept=True, normalize=True)
+    ridge = Ridge(alpha=0, fit_intercept=True, normalize=True)
     ridge.fit(testXL, testY)
     thetaSKLearnRidge = ridge.coef_
     fileName = 'coef' + "Lonzo" + '.npz'
@@ -154,7 +154,7 @@ if __name__ == "__main__":
     ones = np.ones((np.shape(testXL)[0], 1), dtype=float)
     testXL = np.hstack((ones, testXL))
 
-    ridge = Ridge(alpha=9, fit_intercept=True, normalize=True)
+    ridge = Ridge(alpha=0, fit_intercept=True, normalize=True)
     ridge.fit(testXL, testY)
     thetaSKLearnRidge = ridge.coef_
     fileName = 'coef' + "Le" + '.npz'

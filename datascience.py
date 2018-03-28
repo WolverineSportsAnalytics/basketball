@@ -4,6 +4,8 @@ import mysql.connector
 import datetime as dt
 import constants
 import models
+from sklearn.model_selection import cross_val_score
+import operator
 
 def getDate(day, month, year, cursor):
     gameIDP = 0
@@ -100,7 +102,20 @@ if __name__ == "__main__":
     ones = np.ones((np.shape(testXB)[0], 1), dtype=float)
     testXB = np.hstack((ones, testXB))
 
-    ridge = Ridge(alpha=9, fit_intercept=True, normalize=True)
+    alphaScore = {}
+
+    for i in range(0,100):
+        a = (float(i)/float(10))
+        ridge = Ridge(alpha=a, fit_intercept=True, normalize=True)
+        scores = cross_val_score(ridge, testXB, testY, cv=10)
+        alphaScore[a] = scores.mean()
+        print "Alpha " + str(a) + " Score: " + str(scores.mean())
+
+    maxAlpha = max(alphaScore.iteritems(), key=operator.itemgetter(1))[0]
+    print "Max Alpha: " + str(maxAlpha)
+    print "Max Accuracy: " + str(alphaScore[maxAlpha])
+
+    ridge = Ridge(alpha=maxAlpha, fit_intercept=True, normalize=True)
     ridge.fit(testXB, testY)
     thetaSKLearnRidge = ridge.coef_
     fileName = 'coef' + "Ben" + '.npz'
@@ -127,7 +142,20 @@ if __name__ == "__main__":
     ones = np.ones((np.shape(testXL)[0], 1), dtype=float)
     testXL = np.hstack((ones, testXL))
 
-    ridge = Ridge(alpha=9, fit_intercept=True, normalize=True)
+    alphaScoreL = {}
+
+    for i in range(0,100):
+        a = (float(i)/float(10))
+        ridge = Ridge(alpha=a, fit_intercept=True, normalize=True)
+        scores = cross_val_score(ridge, testXL, testY, cv=10)
+        alphaScoreL[a] = scores.mean()
+        print "Alpha " + str(a) + " Score: " + str(scores.mean())
+
+    maxAlpha = max(alphaScoreL.iteritems(), key=operator.itemgetter(1))[0]
+    print "Max Alpha: " + str(maxAlpha)
+    print "Max Accuracy: " + str(alphaScoreL[maxAlpha])
+
+    ridge = Ridge(alpha=maxAlpha, fit_intercept=True, normalize=True)
     ridge.fit(testXL, testY)
     thetaSKLearnRidge = ridge.coef_
     fileName = 'coef' + "Lonzo" + '.npz'
@@ -146,7 +174,7 @@ if __name__ == "__main__":
         allPlayerFeatures.append(feat)
 
     numFeatures = len(allPlayerFeatures[0])
-    testXL = np.asarray(allPlayerFeatures)
+    testXLe = np.asarray(allPlayerFeatures)
 
     print "Number of training examples: " + str(np.shape(testXL)[0])
 
@@ -154,8 +182,21 @@ if __name__ == "__main__":
     ones = np.ones((np.shape(testXL)[0], 1), dtype=float)
     testXL = np.hstack((ones, testXL))
 
-    ridge = Ridge(alpha=9, fit_intercept=True, normalize=True)
-    ridge.fit(testXL, testY)
+    alphaScoreLe = {}
+
+    for i in range(0,100):
+        a = (float(i)/float(10))
+        ridge = Ridge(alpha=a, fit_intercept=True, normalize=True)
+        scores = cross_val_score(ridge, testXL, testY, cv=10)
+        alphaScoreLe[a] = scores.mean()
+        print "Alpha " + str(a) + " Score: " + str(scores.mean())
+
+    maxAlpha = max(alphaScoreLe.iteritems(), key=operator.itemgetter(1))[0]
+    print "Max Alpha: " + str(maxAlpha)
+    print "Max Accuracy: " + str(alphaScoreLe[maxAlpha])
+
+    ridge = Ridge(alpha=maxAlpha, fit_intercept=True, normalize=True)
+    ridge.fit(testXLe, testY)
     thetaSKLearnRidge = ridge.coef_
     fileName = 'coef' + "Le" + '.npz'
 
