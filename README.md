@@ -221,3 +221,6 @@ Everything should be ready to go -> run performanceScraper.py to make sure every
     - Run train.py to use the new data in futures to train the models
     - Run projMagic.py to predict new player performances for the day
     - Run optimizer.py to generate new lineups
+    
+### Run historicLineupScraper.py
+    - Job: re-runs optimizer for date range and fills MySQL Table with the 3 models' projections against the actual data
