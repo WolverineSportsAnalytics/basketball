@@ -17,14 +17,19 @@ def getDate(day, month, year, cursor):
     return dateID
 
 def optimizeAndFill(day, month, year, model, cursor):
-	gameID = getDate(day, month, year, cursor)
+    gameID = getDate(day, month, year, cursor)
 
     # get players
-    playas = []
-    dkPointsDict = {}
-    dkPlayersPoints = {}
+    fdPointsDict = {}
+    fdPlayersPoints = {}
 
-    getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.leProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.leProj IS NOT NULL AND p.leProj > 0"
+    if model == "LeBron":
+        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.leProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.leProj IS NOT NULL AND p.leProj > 0"
+    elif model == "Lonzo":
+        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.zoProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.zoProj IS NOT NULL AND p.leProj > 0"
+    elif model == "Simmons":
+        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.simmonsProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.simmonsProj IS NOT NULL AND p.leProj > 0"
+
     getBPlayersData = (gameID,)
     cursor.execute(getPlayersQuery, getBPlayersData)
 
@@ -34,16 +39,16 @@ def optimizeAndFill(day, month, year, model, cursor):
     for baller in players:
         positions = []
         positions.append(str(baller[2]))
-        dkPointsDict[baller[1]] = float(baller[7])
-        dkPlayersPoints[baller[1]] = baller[0]
+        fdPointsDict[baller[1]] = float(baller[7])
+        fdPlayersPoints[baller[1]] = baller[0]
 
         newPlaya = Player(baller[1], baller[0], "", positions, baller[4], int(baller[5]), float(baller[3]))
-        playas.append(newPlaya)
+        players.append(newPlaya)
 
     #instantiate optimizer + run
 
     optimizer = get_optimizer(Site.FANDUEL, Sport.BASKETBALL)
-    optimizer.load_players(playas)
+    optimizer.load_players(players)
 
     # if duplicate player, increase n + generate next lineup,
     # next lineup will generate lineup with next highest amount of points
@@ -62,32 +67,32 @@ def optimizeAndFill(day, month, year, model, cursor):
         for player in lineup.lineup:
             playerIDList.append(player.id)
             if count == 1:
-        		count += 1
-	        else:
-	        	count -= 1
+                count += 1
+            else:
+                count -= 1
 
-		    posString = baller[2] + count
-			# insert playerID, name, team, salary, projectedPoints
-		    insertHistory = "INSERT INTO historic_lineups ("
-		    insertHistory += posString + "playerID, "
-		    insertHistory += posString + ", "
-		    insertHistory += "team" + posString + ", "
-		    insertHistory += "salary" + posString + ", "
-		    insertHistory += "projPoints" + posString + ", "
-		    insertHistory += "actualPoints" + posString + ")"
-		    # VALUES (%s, %s, %s, %s, %s)"
-		    insertHistoryT = (baller[1], baller[0], baller[4], baller[5], baller[3])
-		    cursor.execute(insertHistory, insertHistoryT)
+            posString = baller[2] + count
+            # insert playerID, name, team, salary, projectedPoints
+            insertHistory = "INSERT INTO historic_lineups ("
+            insertHistory += posString + "playerID, "
+            insertHistory += posString + ", "
+            insertHistory += "team" + posString + ", "
+            insertHistory += "salary" + posString + ", "
+            insertHistory += "projPoints" + posString + ", "
+            insertHistory += "actualPoints" + posString + ")"
+            # VALUES (%s, %s, %s, %s, %s)"
+            insertHistoryT = (baller[1], baller[0], baller[4], baller[5], baller[3])
+            cursor.execute(insertHistory, insertHistoryT)
 
         for player in playerIDList:
-            dkpoints = dkpoints + dkPointsDict[player]
-            playerName = dkPlayersPoints[player]
+            dkpoints = dkpoints + fdPointsDict[player]
+            playerName = fdPlayersPoints[player]
 
             # print optimized lineups
-            print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(dkPointsDict[player]))
+            print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(fdPointsDict[player]))
 
         print("Total Points: " + str(dkpoints))
-        print ("\n")
+        print("\n")
 
 if __name__ == "__main__":
     print("Loading data...")
