@@ -1,9 +1,7 @@
-from datetime import timedelta, date
+from datetime import date
 import mysql.connector
-import datetime as dt
+from pydfs_lineup_optimizer import *
 import constants
-import warnings
-import requests
 
 def getDate(day, month, year, cursor):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
@@ -20,21 +18,23 @@ def optimizeAndFill(day, month, year, model, cursor):
     gameID = getDate(day, month, year, cursor)
 
     # get players
+    playas = []
     fdPointsDict = {}
     fdPlayersPoints = {}
+    getPlayersQuery = ""
 
     if model == "LeBron":
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.leProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.leProj IS NOT NULL AND p.leProj > 0"
     elif model == "Lonzo":
-        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.zoProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.zoProj IS NOT NULL AND p.leProj > 0"
+        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.zoProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.zoProj IS NOT NULL AND p.zoProj > 0"
     elif model == "Simmons":
-        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.simmonsProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.simmonsProj IS NOT NULL AND p.leProj > 0"
+        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.simmonsProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.simmonsProj IS NOT NULL AND p.simmonsProj > 0"
 
     getBPlayersData = (gameID,)
     cursor.execute(getPlayersQuery, getBPlayersData)
 
-    print ("Number of players being considered: " + str(cursor.rowcount))
     players = cursor.fetchall()
+    print ("Number of players being considered: " + str(cursor.rowcount))
 
     for baller in players:
         positions = []
@@ -43,12 +43,12 @@ def optimizeAndFill(day, month, year, model, cursor):
         fdPlayersPoints[baller[1]] = baller[0]
 
         newPlaya = Player(baller[1], baller[0], "", positions, baller[4], int(baller[5]), float(baller[3]))
-        players.append(newPlaya)
+        playas.append(newPlaya)
 
     #instantiate optimizer + run
 
     optimizer = get_optimizer(Site.FANDUEL, Sport.BASKETBALL)
-    optimizer.load_players(players)
+    optimizer.load_players(playas)
 
     # if duplicate player, increase n + generate next lineup,
     # next lineup will generate lineup with next highest amount of points
@@ -71,7 +71,7 @@ def optimizeAndFill(day, month, year, model, cursor):
             else:
                 count -= 1
 
-            posString = baller[2] + count
+            posString = player[2] + str(count)
             # insert playerID, name, team, salary, projectedPoints
             insertHistory = "INSERT INTO historic_lineups ("
             insertHistory += posString + "playerID, "
@@ -81,7 +81,7 @@ def optimizeAndFill(day, month, year, model, cursor):
             insertHistory += "projPoints" + posString + ", "
             insertHistory += "actualPoints" + posString + ")"
             # VALUES (%s, %s, %s, %s, %s)"
-            insertHistoryT = (baller[1], baller[0], baller[4], baller[5], baller[3])
+            insertHistoryT = (player[1], player[0], player[4], baller[5], baller[3], baller[7])
             cursor.execute(insertHistory, insertHistoryT)
 
         for player in playerIDList:

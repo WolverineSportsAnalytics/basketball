@@ -186,5 +186,5 @@ if __name__ == "__main__":
     year = constants.yearP
     month = constants.monthP
     day = constants.dayP
-    
+
     actualProjMagic(day, month, year)
