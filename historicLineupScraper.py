@@ -17,6 +17,10 @@ def getDate(day, month, year, cursor):
 def optimizeAndFill(day, month, year, model, cursor):
     gameID = getDate(day, month, year, cursor)
 
+    dateQuery = "INSERT INTO basketball.historic_lineups (dateID, date, model) VALUES (%s, %s, %s)"
+    dateQueryT = (gameID, str(month) + "-" + str(day) + "-" + str(year), model)
+    cursor.execute(dateQuery, dateQueryT)
+
     # get players
     playas = []
     fdPointsDict = {}
@@ -71,17 +75,21 @@ def optimizeAndFill(day, month, year, model, cursor):
             else:
                 count -= 1
 
-            posString = player[2] + str(count)
+            if player.lineup_position != "C":
+                posString = player.lineup_position + str(count)
+            else:
+                posString = "C"
             # insert playerID, name, team, salary, projectedPoints
-            insertHistory = "INSERT INTO historic_lineups ("
-            insertHistory += posString + "playerID, "
-            insertHistory += posString + ", "
-            insertHistory += "team" + posString + ", "
-            insertHistory += "salary" + posString + ", "
-            insertHistory += "projPoints" + posString + ", "
-            insertHistory += "actualPoints" + posString + ")"
+            insertHistory = "UPDATE historic_lineups SET "
+            insertHistory += posString + "playerID = %s, "
+            insertHistory += posString + " = %s, "
+            insertHistory += "team" + posString + " = %s, "
+            insertHistory += "salary" + posString + " = %s, "
+            insertHistory += "projPoints" + posString + " = %s, "
+            insertHistory += "actualPoints" + posString + " = %s "
+            insertHistory += "WHERE dateID = %s AND model = %s"
             # VALUES (%s, %s, %s, %s, %s)"
-            insertHistoryT = (player[1], player[0], player[4], baller[5], baller[3], baller[7])
+            insertHistoryT = (player.id, player.first_name, player.team, player.salary, player.fppg, fdPointsDict[player.id], gameID, model)
             cursor.execute(insertHistory, insertHistoryT)
 
         for player in playerIDList:
