@@ -100,6 +100,9 @@ def optimizeAndFill(day, month, year, model, cursor):
             print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(fdPointsDict[player]))
 
         print("Total Points: " + str(dkpoints))
+        insertTotals = "UPDATE historic_lineups SET projPointsLineup = %s, actualPointsLineup = %s WHERE dateID = %s AND model = %s"
+        insertTotalsData = (lineup.fantasy_points_projection, dkpoints, gameID, model)
+        cursor.execute(insertTotals, insertTotalsData)
         print("\n")
 
 if __name__ == "__main__":
