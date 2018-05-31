@@ -1,4 +1,5 @@
 import unittest
+import python-coveralls
 
 class MyTest(unittest.TestCase):
     def test(self):
