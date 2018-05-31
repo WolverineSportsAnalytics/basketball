@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/WolverineSportsAnalytics/basketball.svg?branch=master)](https://travis-ci.com/WolverineSportsAnalytics/basketball)
 # Contributors:
     - Jake Becker
     - Evan Ciancio
