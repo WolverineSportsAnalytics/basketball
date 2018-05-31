@@ -2,6 +2,8 @@ language: python
 install:
   - pip install coveralls
   - pip install pyyaml
+before_script:
+  - coverage run test.py
 script: pytest 
 after_success:
   - coveralls
