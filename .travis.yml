@@ -1,7 +1,7 @@
 language: python
 install:
   - pip install coveralls
-  - pip install pyyaml
+  - pip install pytest-cov
 script: pytest --cov=./
 after_success:
   - coveralls
