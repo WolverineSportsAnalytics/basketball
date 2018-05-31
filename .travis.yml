@@ -3,7 +3,7 @@ install:
   - pip install coveralls
   - pip install pyyaml
 before_script:
-  - coverage run test.py
+  - coverage run test_sample.py
 script: pytest 
 after_success:
   - coveralls
