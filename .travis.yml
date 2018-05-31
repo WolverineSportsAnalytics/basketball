@@ -1,6 +1,7 @@
 language: python
 install:
   - pip install coveralls
+  - pip install pyyaml
 script: pytest 
 after_success:
   - coveralls
