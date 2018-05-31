@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/WolverineSportsAnalytics/basketball.svg?branch=master)](https://travis-ci.com/WolverineSportsAnalytics/basketball)
+[![Build Status](https://travis-ci.com/WolverineSportsAnalytics/basketball.svg?branch=master)](https://travis-ci.com/WolverineSportsAnalytics/basketball) [![Coverage Status](https://coveralls.io/repos/github/WolverineSportsAnalytics/basketball/badge.svg?branch=master)](https://coveralls.io/github/WolverineSportsAnalytics/basketball?branch=master)
 # Contributors:
     - Jake Becker
     - Evan Ciancio
