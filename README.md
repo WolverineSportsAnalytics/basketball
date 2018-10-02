@@ -9,7 +9,7 @@
 
 # Installation Instructions
 
-#### Windows Boyz
+#### Windows Users
 
 Install a virtual machine
 
