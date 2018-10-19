@@ -3,20 +3,20 @@ from datetime import timedelta, date
 import constants
 
 """
-This script generates a range of dates given the start and end date to loop through. This is used in our scrapers to scrape daily historical data from different 
+This script generates a range of dates given the start and end date to loop through. This is used in our scrapers to scrape daily historical data from different
 sites like basketball reference and bovada.
 """
 
 # Generates dates from a range and loads them into the new_dates table in sql to create dateIDs
 def generatedates(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
-    date_statement = 'DECLARE @date date = '	
+    date_statement = 'DECLARE @date date = '
     insert = "INSERT into new_dates(date) VALUES(%s)"
     start_date = date(startYear, startMonth, startDay)
     end_date = date(endYear, endMonth, endDay)
     for single_date in daterange(start_date, end_date):
 	    dates =  str(single_date.year) + '-' + str(single_date.month) + '-' + str(single_date.day)
-	    new_date = date_statement + "\'" + dates +"\';" 
-	    date_stat = (dates,) 
+	    new_date = date_statement + "\'" + dates +"\';"
+	    date_stat = (dates,)
 	    cursor.execute(insert, date_stat)
 	    print new_date
 
