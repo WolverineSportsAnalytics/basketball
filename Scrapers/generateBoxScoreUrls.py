@@ -119,7 +119,8 @@ def auto(day, month, year):
     cnx.commit()
     cnx.close()
 
-
+#function to generate all url's for one date
+#function to insert all these url's into table
 
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
