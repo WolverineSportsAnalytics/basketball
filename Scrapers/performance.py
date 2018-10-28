@@ -1,5 +1,4 @@
 import mysql.connector
-from datetime import timedelta, date
 import constants
 from bs4 import BeautifulSoup, Comment
 import requests
@@ -25,9 +24,6 @@ def updateAndInsertPlayerRef(
         endYear,
         cursor,
         cnx):
-
-    # set range of dates
-    # urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
 
     # get start_date_id and print it
 
@@ -69,6 +65,7 @@ def updateAndInsertPlayerRef(
         for i in soup1.find_all('tr')[2:]:
             l = i.find_all("td")[0].text
             teams.append(l)
+        
         date_id = score[2]
 
         tables = soup.find_all("tbody")
@@ -325,6 +322,7 @@ def updateAndInsertPlayerRef(
                     except:
                         pass
 
+    # remove row of data from performance table where the blocks are empty
     cleanUp = "DELETE FROM performance WHERE blocks IS NULL"
     cursor.execute(cleanUp)
 
