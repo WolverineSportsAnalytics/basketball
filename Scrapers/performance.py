@@ -56,14 +56,6 @@ def updateAndInsertPlayerRef(
 
     box_url = cursor.fetchall()
 
-    # start_date = date(startYear, startMonth, startDay)
-    # end_date = date(endYear, endMonth, endDay)
-    #
-    # dates = []
-    # for single_date in daterange(start_date, end_date):
-    #     dates.append(str(single_date.year) + '-' +
-    #                  str(single_date.month) + '-' + str(single_date.day))
-
     selec_id_id = "select playerID from player_reference where bbrefID= %s"
     selec_id = "select playerID from player_reference where nickName=\""
 
@@ -343,17 +335,16 @@ def updateAndInsertPlayerRef(
     cleanUp = "DELETE FROM performance WHERE blocks IS NULL"
     cursor.execute(cleanUp)
 
-    cursor.close()
-    cnx.commit()
-    cnx.close()
-
 if __name__ == "__main__":
+
+    # initiate connection with database
     cnx = mysql.connector.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
 
+    # call function to insert data into performance table
     updateAndInsertPlayerRef(
         constants.startDayP,
         constants.startMonthP,
@@ -363,3 +354,8 @@ if __name__ == "__main__":
         constants.endYearP,
         cursor,
         cnx)
+
+    # close connection with database
+    cursor.close()
+    cnx.commit()
+    cnx.close()
