@@ -16,13 +16,6 @@ def getDate(day, month, year, cursor):
     # return result
     return cursor.fetchone()[1]
 
-def daterange(start_date, end_date):
-    # return list of dates between start_date and end_date using
-    # generator to save memory usage
-    for n in range(int((end_date - start_date).days) + 1):
-        yield start_date + timedelta(n)
-
-
 def updateAndInsertPlayerRef(
         startDay,
         startMonth,
