@@ -1,11 +1,11 @@
 """
 Steps:
-1. Get the dateID
-2. Convert the dateID to an actual date
+1. Get the actual date
+2. Convert the date to a dateID
 3. Go to the basketball reference URL for that date
 4. Get the list of games that are being played on that date
 5. Get the URL for each of those games and insert each one into the database
-http://www.espn.com/nba/schedule/_/date/20181021
+https://www.basketball-reference.com/leagues/NBA_2019_games.html
 """
 
 
@@ -54,7 +54,7 @@ def getTeams(cursor):
     return teams
 
 # function that generates all valid basketball reference urls
-def generateBasketballReferenceURLs(cursor, dateID):
+def generateBasketballReferenceURLs(cursor, year, month, day):
     #year month day 0 team
     # if pipe is broken, must delete all the values from the first day, then restart the boxscore url from
     # that day that was just deleted
@@ -64,43 +64,38 @@ def generateBasketballReferenceURLs(cursor, dateID):
                                   database=constants.databaseName,
                                   password=constants.databasePassword)
     cursor = cnx.cursor(buffered=True)
+    dateID = findDate(year, month, day, cursor)
 
-    urls = []
-    badURLs = []
-    baseURL = constants.BasketballRefBoxScoreBase
 
-    print date
-    for team in teams:
-        shouldSave = len(urls) % 1
-        if shouldSave == 0 and len(urls) != 0:
-            queryBoxScoreURL = "INSERT INTO box_score_urls (url, dateID) VALUES (%s, %s)"
-            cursor.executemany(queryBoxScoreURL, urls)
-            cnx.commit()
-            print "Inserted + Committed URLs"
-            urls = []
+    if shouldSave == 0 and len(urls) != 0:
+        queryBoxScoreURL = "INSERT INTO box_score_urls (url, dateID) VALUES (%s, %s)"
+        cursor.executemany(queryBoxScoreURL, urls)
+        cnx.commit()
+        print "Inserted + Committed URLs"
+        urls = []
 
-        month = ""
-        day = ""
+    month = ""
+    day = ""
 
-        if len(str(date.month)) == 1:
-            month = "0" + str(date.month)
-        else:
-            month = str(date.month)
+    if len(str(date.month)) == 1:
+        month = "0" + str(date.month)
+    else:
+        month = str(date.month)
 
-        if len(str(date.day)) == 1:
-            day = "0" + str(date.day)
-        else:
-            day = str(date.day)
+    if len(str(date.day)) == 1:
+        day = "0" + str(date.day)
+    else:
+        day = str(date.day)
 
-        newURL = baseURL + str(date.year) + month + day + str(0) + team + ".html"
-        try:
-            urllib2.urlopen(newURL)
-            boxScoreID = findDate(date.year, date.month, date.day, cursor)
+    newURL = baseURL + str(date.year) + month + day + str(0) + team + ".html"
+    try:
+        urllib2.urlopen(newURL)
+        boxScoreID = findDate(date.year, date.month, date.day, cursor)
 
-            urlTuple = (newURL, boxScoreID)
-            urls.append(urlTuple)
-        except urllib2.HTTPError, e:
-            badURLs.append(newURL)
+        urlTuple = (newURL, boxScoreID)
+        urls.append(urlTuple)
+    except urllib2.HTTPError, e:
+        badURLs.append(newURL)
 
 def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
@@ -119,7 +114,8 @@ def auto(day, month, year):
     cnx.commit()
     cnx.close()
 
-
+#function to generate all url's for one date
+#function to insert all these url's into table
 
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user=constants.databaseUser,
