@@ -54,10 +54,10 @@ def getTeams(cursor):
 
 # function that generates all valid basketball reference urls
 def generateBasketballReferenceURLs(cursor, year, month, day):
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
+    cnx = mysql.connector.connect(user="root",
+                                  host=127.0.0.1,
+                                  database="basketball",
+                                  password="")
     cursor = cnx.cursor(buffered=True)
 
     dateID = findDate(cursor, year, month, day)
@@ -81,7 +81,7 @@ def generateBasketballReferenceURLs(cursor, year, month, day):
     page = requests.get("https://www.basketball-reference.com/leagues/NBA_20" + str(year) + "_games-" + str(strMonth) + ".html")
     soup = BeautifulSoup(page.text, 'html.parser')
     print(soup.find_all('th'))
-    
+
     """
     if shouldSave == 0 and len(urls) != 0:
         queryBoxScoreURL = "INSERT INTO box_score_urls (url, dateID) VALUES (%s, %s)"
