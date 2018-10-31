@@ -5,19 +5,18 @@ Steps:
 3. Go to the basketball reference URL for that date
 4. Get the list of games that are being played on that date
 5. Get the URL for each of those games and insert each one into the database
-https://www.basketball-reference.com/leagues/NBA_2019_games.html
 """
 
-
-
 import mysql.connector
-from datetime import timedelta, date
 import constants
+from bs4 import BeautifulSoup
+import requests
+from datetime import timedelta, date
 import urllib2
 
 
 # returns the dateID for a date in order to load data in for that dateID
-def findDate(year, month, day, cursor):
+def findDate(cursor, year, month, day):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
     findGameData = (date(year, month, day),)
     cursor.execute(findGame, findGameData)
@@ -55,18 +54,35 @@ def getTeams(cursor):
 
 # function that generates all valid basketball reference urls
 def generateBasketballReferenceURLs(cursor, year, month, day):
-    #year month day 0 team
-    # if pipe is broken, must delete all the values from the first day, then restart the boxscore url from
-    # that day that was just deleted
-
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
+    cnx = mysql.connector.connect(user="root",
+                                  host=127.0.0.1,
+                                  database="basketball",
+                                  password="")
     cursor = cnx.cursor(buffered=True)
-    dateID = findDate(year, month, day, cursor)
 
+    dateID = findDate(cursor, year, month, day)
 
+    strMonth = ""
+    if month == 10:
+        strMonth = "october"
+    elif month == 11:
+        strMonth = "november"
+    elif month == 12:
+        strMonth = "december"
+    elif month == 1:
+        strMonth = "january"
+    elif month == 2:
+        strMonth = "february"
+    elif month == 3:
+        strMonth = "march"
+    elif month == 4:
+        strMonth = "april"
+
+    page = requests.get("https://www.basketball-reference.com/leagues/NBA_20" + str(year) + "_games-" + str(strMonth) + ".html")
+    soup = BeautifulSoup(page.text, 'html.parser')
+    print(soup.find_all('th'))
+
+    """
     if shouldSave == 0 and len(urls) != 0:
         queryBoxScoreURL = "INSERT INTO box_score_urls (url, dateID) VALUES (%s, %s)"
         cursor.executemany(queryBoxScoreURL, urls)
@@ -95,7 +111,7 @@ def generateBasketballReferenceURLs(cursor, year, month, day):
         urlTuple = (newURL, boxScoreID)
         urls.append(urlTuple)
     except urllib2.HTTPError, e:
-        badURLs.append(newURL)
+        badURLs.append(newURL)"""
 
 def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
@@ -126,7 +142,7 @@ if __name__ == "__main__":
 
     #date = generateDates(constants.startDayP, constants.startMonthP, constants.startYearP,constants.endDayP, constants.endMonthP, constants.endYearP)
 
-    generateBasketballReferenceURLs(cursor, 681)
+    generateBasketballReferenceURLs(cursor, constants.yearP, constants.monthP, constants.dayP)
 
     cursor.close()
     cnx.commit()
