@@ -55,9 +55,9 @@ def getTeams(cursor):
 # function that generates all valid basketball reference urls
 def generateBasketballReferenceURLs(cursor, year, month, day):
     cnx = mysql.connector.connect(user="root",
-                                  host=127.0.0.1,
+                                  host='127.0.0.1',
                                   database="basketball",
-                                  password="")
+                                  password="lebron>mj23")
     cursor = cnx.cursor(buffered=True)
 
     dateID = findDate(cursor, year, month, day)
@@ -78,9 +78,17 @@ def generateBasketballReferenceURLs(cursor, year, month, day):
     elif month == 4:
         strMonth = "april"
 
-    page = requests.get("https://www.basketball-reference.com/leagues/NBA_20" + str(year) + "_games-" + str(strMonth) + ".html")
+    page = requests.get("https://www.basketball-reference.com/leagues/NBA_" + str(year) + "_games-" + "november" + ".html")
     soup = BeautifulSoup(page.text, 'html.parser')
-    print(soup.find_all('th'))
+    arr = soup.find_all('tr')
+
+    for tr in arr:
+        th = tr.find_all('th')
+        date = str(th[0].get('csk'))
+        y = date[0:4]
+        m = date[4:6]
+        d = date[6:8]
+        print(y, m, d)
 
     """
     if shouldSave == 0 and len(urls) != 0:
@@ -136,8 +144,7 @@ def URLSforDate(cursor, year, month, day):
     id = findDate(cursor, year, month, day)
     #need to get the number of games on that date - potential for loop
     #need to get the home team in abbreviated form to add to url
-    
-    page = requests.get("https://www.basketball-reference.com/leagues/NBA_20" + str(year) + "_games-" + str(strMonth) + str(day) + "0" + ".html")
+    page = requests.get("https://www.basketball-reference.com/leagues/NBA" + str(year) + "_games-" + str(strMonth) + str(day) + "0" + ".html")
 
 
 #function to insert all these url's into table
