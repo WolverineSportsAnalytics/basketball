@@ -15,14 +15,14 @@ def generateURLS():
 
 class PlayerRefObject:
 
-    def __init__(self, name, team, bbref):
+    def __init__(self, name, team, bbrefID):
         self.name = name
         self.team = team
-        self.bbref = bbref
+        self.bbrefID = bbrefID
 
     def add_to_table(self, cursor, cnx):
         addPlayer = "INSERT INTO player_reference (nickName, bbrefID, firstName, lastName, team) VALUES(%s, %s, %s, %s, %s)"
-        payload = (self.name, self.bbref, self.name.split()[0], " ".join(self.name.split()[1:]), self.team)
+        payload = (self.name, self.bbrefID, self.name.split()[0], " ".join(self.name.split()[1:]), self.team)
 
         cursor.execute(addPlayer, payload)
         cnx.commit()
@@ -46,3 +46,12 @@ def scrapeHtml(cursor, cnx):
             team = url[1]
             player = PlayerRefObject(name, team, bbref)
             player.add_to_table(cursor, cnx)
+
+if __name__ == "__main__":
+    cnx = mysql.connector.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+
+    cursor = cnx.cursor(buffered=True)
+    scrapeHtml(cursor, cnx)
