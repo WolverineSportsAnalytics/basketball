@@ -15,6 +15,14 @@ def cross_validation(model, train_x, train_y, k):
     pass
 
 
+def split_features(featuresMatrix, chosenFeatures):
+    '''
+    Takes a matrix of features and a list of indices (chosen features) 
+    to take all the features from the futures table and slim them to 
+    only the features we want to train on and evaluate
+
+    returns new featuresMatrix with only the chosenFeatures
+    '''
 def main():
     # call them in here
     pass
