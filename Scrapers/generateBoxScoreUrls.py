@@ -131,6 +131,15 @@ def auto(day, month, year):
     cnx.close()
 
 #function to generate all url's for one date
+
+def URLSforDate(cursor, year, month, day):
+    id = findDate(cursor, year, month, day)
+    #need to get the number of games on that date - potential for loop
+    #need to get the home team in abbreviated form to add to url
+    
+    page = requests.get("https://www.basketball-reference.com/leagues/NBA_20" + str(year) + "_games-" + str(strMonth) + str(day) + "0" + ".html")
+
+
 #function to insert all these url's into table
 
 if __name__ == "__main__":
