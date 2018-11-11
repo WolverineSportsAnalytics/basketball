@@ -54,11 +54,11 @@ def getTeams(cursor):
 
 # function that generates all valid basketball reference urls
 def generateBasketballReferenceURLs(cursor, year, month, day):
-    cnx = mysql.connector.connect(user="root",
-                                  host=127.0.0.1,
+    """cnx = mysql.connector.connect(user="root",
+                                  host='127.0.0.1',
                                   database="basketball",
-                                  password="")
-    cursor = cnx.cursor(buffered=True)
+                                  password="lebron>mj23")
+    cursor = cnx.cursor(buffered=True)"""
 
     dateID = findDate(cursor, year, month, day)
 
@@ -78,40 +78,30 @@ def generateBasketballReferenceURLs(cursor, year, month, day):
     elif month == 4:
         strMonth = "april"
 
-    page = requests.get("https://www.basketball-reference.com/leagues/NBA_20" + str(year) + "_games-" + str(strMonth) + ".html")
+    page = requests.get("https://www.basketball-reference.com/leagues/NBA_" + str(year) + "_games-" + strMonth + ".html")
     soup = BeautifulSoup(page.text, 'html.parser')
-    print(soup.find_all('th'))
+    arr = soup.find_all('tr')
 
-    """
-    if shouldSave == 0 and len(urls) != 0:
-        queryBoxScoreURL = "INSERT INTO box_score_urls (url, dateID) VALUES (%s, %s)"
-        cursor.executemany(queryBoxScoreURL, urls)
-        cnx.commit()
-        print "Inserted + Committed URLs"
-        urls = []
+    if month > 4:
+        year -= 1;
 
-    month = ""
-    day = ""
+    for tr in arr:
+        th = tr.find_all('th')
+        #print(th)
+        date = str(th[0].get('csk'))
+        if date != "None":
+            y = int(date[0:4])
+            m = int(date[4:6])
+            d = int(date[6:8])
+            print(y, m, d)
+            if y == year and m == month and d == day:
+                url = "https://www.basketball-reference.com/boxscores/" + date + ".html"
+                print(url)
 
-    if len(str(date.month)) == 1:
-        month = "0" + str(date.month)
-    else:
-        month = str(date.month)
-
-    if len(str(date.day)) == 1:
-        day = "0" + str(date.day)
-    else:
-        day = str(date.day)
-
-    newURL = baseURL + str(date.year) + month + day + str(0) + team + ".html"
-    try:
-        urllib2.urlopen(newURL)
-        boxScoreID = findDate(date.year, date.month, date.day, cursor)
-
-        urlTuple = (newURL, boxScoreID)
-        urls.append(urlTuple)
-    except urllib2.HTTPError, e:
-        badURLs.append(newURL)"""
+                queryBoxScoreURL = "INSERT INTO box_score_urls (url, dateID) VALUES (%s, %s)"
+                cursor.execute(queryBoxScoreURL, url, dateID)
+                cnx.commit()
+                print "Inserted URL"
 
 def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
@@ -131,13 +121,21 @@ def auto(day, month, year):
     cnx.close()
 
 #function to generate all url's for one date
+
+def URLSforDate(cursor, year, month, day):
+    id = findDate(cursor, year, month, day)
+    #need to get the number of games on that date - potential for loop
+    #need to get the home team in abbreviated form to add to url
+    page = requests.get("https://www.basketball-reference.com/leagues/NBA" + str(year) + "_games-" + str(strMonth) + str(day) + "0" + ".html")
+
+
 #function to insert all these url's into table
 
 if __name__ == "__main__":
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
+    cnx = mysql.connector.connect(user="root",
+                                  host='127.0.0.1',
+                                  database="basketball",
+                                  password="lebron>mj23")
     cursor = cnx.cursor(buffered=True)
 
     #date = generateDates(constants.startDayP, constants.startMonthP, constants.startYearP,constants.endDayP, constants.endMonthP, constants.endYearP)
