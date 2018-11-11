@@ -1,5 +1,4 @@
 import mysql.connector
-import constants
 from bs4 import BeautifulSoup, Comment
 import requests
 import datetime as dt
@@ -15,7 +14,7 @@ def getDate(day, month, year, cursor):
     cursor.execute(findGame, findGameData)
 
     # return result
-    return cursor.fetchone()[1]
+    return cursor.fetchone()[0]
 
 # get boxscoreurls of games in date range
 def getURLs(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
@@ -27,7 +26,9 @@ def getURLs(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
 
     # query database and get all box_score_urls with dateID between start_date_id and end_date_id
     select_dates = "Select * from box_score_urls WHERE dateID >= %s AND dateID <= %s"
+
     boxScoreDatesD = (start_date_id, end_date_id)
+
     cursor.execute(select_dates, boxScoreDatesD)
 
     # return result of query
@@ -43,7 +44,7 @@ def getPlayerID(bbrefID, cursor):
     cursor.execute(selec_player_id, bbrefData)
 
     # return result of query
-    return cursor.fetchall()[0][0]
+    return cursor.fetchone()[0]
 
 # remove row of data from performance table where the blocks are empty
 def cleanup(cursor):
@@ -58,11 +59,10 @@ def cleanup(cursor):
 def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, cursor, cnx):
 
     # table 1 row 1
-    basic = basictable.find_all('tr')
+    basic = basictable[0].find_all('tr')
 
     # table 2 row 1
-    advance = advancedtable.find_all('tr')
-
+    advance = advancedtable[0].find_all('tr')
 
     # scrape regular stats
     for number in range(len(basic)):
@@ -80,114 +80,141 @@ def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, c
         # get all table cells of basic table
         tdbasic = basic[number].find_all('td')
 
-        try:
-            # check if the player played the game
-            if tdbasic[0].text == "Did Not Play":
-                # set all stats equal to 0
-                inserts = np.zeros(36)
+        # check if the player played the game
+        if tdbasic[0].text == "Did Not Play" or tdbasic[0].text == "Not With Team" or tdbasic[0].text == "Did Not Dress":
+            # set all stats equal to 0
+            continue
 
+        else:
+            # record each respective basic stats
+            minutes_raw = str(tdbasic[0].text).split(':')
+            minutes = int(minutes_raw[0]) + float(minutes_raw[1]) / 60.0
+            fgs = tdbasic[1].text
+            fga = tdbasic[2].text
+
+            if int(fga) == 0:
+                fgpercent = 0
             else:
-                # record each respective basic stats
-                minutes = tdbasic[0].text
-                fgs = tdbasic[1].text
-                fga = tdbasic[2].text
+                fgpercent = tdbasic[3].text
 
-                if fga == 0:
-                    fgpercent = 0
-                else:
-                    fgpercent = tdbasic[3].text
+            tpm = tdbasic[4].text
+            tpa = tdbasic[5].text
 
-                tpm = tdbasic[4].text
-                tpa = tdbasic[5].text
+            if int(tpa) == 0:
+                tp_percent = 0
+            else:
+                tp_percent = tdbasic[6].text
 
-                if tpa == 0:
-                    tp_percent = 0
-                else:
-                    tp_percent = tdbasic[6].text
+            free_throws = tdbasic[7].text
+            fta = tdbasic[8].text
 
-                free_throws = tdbasic[7].text
-                fta = tdbasic[8].text
+            if int(fta) == 0:
+                ft_percent = 0
+            else:
+                ft_percent = tdbasic[9].text
 
-                if fta == 0:
-                    ft_percent = 0
-                else:
-                    ft_percent = tdbasic[9].text
+            o_rebs = tdbasic[10].text
+            d_rebs = tdbasic[11].text
+            rebounds = tdbasic[12].text
+            assists = tdbasic[13].text
+            steals = tdbasic[14].text
+            blocks = tdbasic[15].text
+            to = tdbasic[16].text
+            pf = tdbasic[17].text
+            points = tdbasic[18].text
 
-                o_rebs = tdbasic[10].text
-                d_rebs = tdbasic[11].text
-                rebounds = tdbasic[12].text
-                assists = tdbasic[13].text
-                steals = tdbasic[14].text
-                blocks = tdbasic[15].text
-                to = tdbasic[16].text
-                pf = tdbasic[17].text
-                points = tdbasic[18].text
+            triple_double = 0
+            double_double = 0
 
-                triple_double = 0
-                double_double = 0
+            plus_minus_raw = str(tdbasic[19].text)
+            if plus_minus_raw == '' or plus_minus_raw == '0':
+                plus_minus = 0
+            elif plus_minus_raw.find('-'):
+                plus_minus = -int(plus_minus_raw[1:])
+            else:
+                plus_minus = int(plus_minus_raw[1:])
 
-                plus_minus_raw = tdbasic[19].text
+            # record each respective advanced stats
+            tdadvance = advance[number].find_all('td')
 
-                if plus_minus_raw.contains('-'):
-                    plus_minus = -int(plus_minus_raw[1:])
-                else:
-                    plus_minus = int(plus_minus_raw[1:])
+            TS = tdadvance[1].text
+            if TS == '':
+                TS = 0
+            eFG = tdadvance[2].text
+            if eFG == '':
+                eFG = 0
+            TPAR = tdadvance[3].text
+            if TPAR == '':
+                TPAR = 0
+            FTR = tdadvance[4].text
+            if FTR == '':
+                FTR = 0
+            ORBR = tdadvance[5].text
+            if ORBR == '':
+                ORBR = 0
+            DRBR = tdadvance[6].text
+            if DRBR == '':
+                DRBR = 0
+            TRBR = tdadvance[7].text
+            if TRBR == '':
+                TRBR = 0
+            ASTR = tdadvance[8].text
+            if ASTR == '':
+                ASTR = 0
+            STLR = tdadvance[9].text
+            if STLR == '':
+                STLR = 0
+            BLKR = tdadvance[10].text
+            if BLKR == '':
+                BLKR = 0
+            TOVR = tdadvance[11].text
+            if TOVR == '':
+                TOVR = 0
+            USGR = tdadvance[12].text
+            if USGR == '':
+                USGR = 0
+            ORtg = tdadvance[13].text
+            if ORtg == '':
+                ORtg = 0
+            DRtg = tdadvance[14].text
+            if DRtg == '':
+                DRtg = 0
 
-                # record each respective advanced stats
-                tdadvance = advance[number].find_all('td')
+            # caculate double doubles and triple doubles
+            plus_tens = 0
+            if int(steals) >= 10:
+                plus_tens += 1
+            if int(blocks) >= 10:
+                plus_tens += 1
+            if int(points) >= 10:
+                plus_tens += 1
+            if int(assists) >= 10:
+                plus_tens += 1
+            if int(rebounds) >= 10:
+                plus_tens += 1
 
-                TS = tdadvance[1].text
-                eFG = tdadvance[2].text
-                TPAR = tdadvance[3].text
-                FTR = tdadvance[4].text
-                ORBR = tdadvance[5].text
-                DRBR = tdadvance[6].text
-                TRBR = tdadvance[7].text
-                ASTR = tdadvance[8].text
-                STLR = tdadvance[9].text
-                BLKR = tdadvance[10].text
-                TOVR = tdadvance[11].text
-                USGR = tdadvance[12].text
-                ORtg = tdadvance[13].text
-                DRtg = tdadvance[14].text
+            if plus_tens > 2:
+                triple_double = 1
+            elif plus_tens > 1:
+                double_double = 1
 
-                # caculate double doubles and triple doubles
-                plus_tens = 0
-                if int(steals) >= 10:
-                    plus_tens += 1
-                if int(blocks) >= 10:
-                    plus_tens += 1
-                if int(points) >= 10:
-                    plus_tens += 1
-                if int(assists) >= 10:
-                    plus_tens += 1
-                if int(rebounds) >= 10:
-                    plus_tens += 1
+            # make array of all stats
+            inserts = (player_id, date_id, points, minutes, fgs,
+                       fga, fgpercent, tpm, tpa, tp_percent,
+                       free_throws, fta, ft_percent, o_rebs, d_rebs,
+                       rebounds, assists, steals, blocks, to,
+                       pf, plus_minus, TS, eFG, TPAR,
+                       FTR, ORBR, DRBR, TRBR, ASTR,
+                       STLR, BLKR, TOVR, USGR, ORtg,
+                       DRtg, triple_double, double_double, team, opp,
+                       homeaway)
 
-                if plus_tens > 2:
-                    triple_double = 1
-                elif plus_tens > 1:
-                    double_double = 1
+        # set up insert statement of database
+        insert_performance = "INSERT INTO performance (playerID, dateID, points, minutesPlayed, fieldGoals, fieldGoalsAttempted, fieldGoalPercent, 3PM, 3PA, 3PPercent, FT, FTA, FTPercent, offensiveRebounds, defensiveRebounds, totalRebounds, assists,  steals, blocks, turnovers, personalFouls, plusMinus, trueShootingPercent, effectiveFieldGoalPercent, 3pointAttemptRate, freeThrowAttemptRate, offensiveReboundPercent, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, turnoverPercent, usagePercent, offensiveRating, defensiveRating,  tripleDouble, doubleDouble, team, opponent, home) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-                # make array of all stats
-                inserts = (player_id, date_id, points, minutes, fgs,
-                           fga, fgpercent, tpm, tpa, tp_percent,
-                           free_throws, fta, ft_percent, o_rebs, d_rebs,
-                           rebounds, assists, steals, blocks, to,
-                           pf, plus_minus, TS, eFG, TPAR,
-                           FTR, ORBR, DRBR, TRBR, ASTR,
-                           STLR, BLKR, TOVR, USGR, ORtg,
-                           DRtg, triple_double, double_double, team, opp,
-                           homeaway)
-            # set up insert statement of database
-            insert_performance = "INSERT INTO performance (playerID, dateID, points, minutesPlayed, fieldGoals, fieldGoalsAttempted, fieldGoalPercent, 3PM, 3PA, 3PPercent, FT, FTA, FTPercent, offensiveRebounds, defensiveRebounds, totalRebounds, assists,  steals, blocks, turnovers, personalFouls, plusMinus, trueShootingPercent, effectiveFieldGoalPercent, 3pointAttemptRate, freeThrowAttemptRate, offensiveReboundPercent, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, turnoverPercent, usagePercent, offensiveRating, defensiveRating,  tripleDouble, doubleDouble, team, opponent, home) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-            # insert performance data to database
-            cursor.execute(insert_performance, inserts)
-            cnx.commit()
-
-        except:
-            pass
+        # insert performance data to database
+        cursor.execute(insert_performance, inserts)
+        cnx.commit()
 
 # get team names from url
 def getTeams(url):
@@ -199,8 +226,11 @@ def getTeams(url):
     # create beautiful soup using html text
     soup = BeautifulSoup(page.text, 'html.parser')
 
+    comments = soup.findAll(text=lambda text: isinstance(text, Comment))
+
     # find div tag with class "game_summary nohover current"
-    div = soup.find_all("div",'game_summary nohover current')
+    soup1 = BeautifulSoup(comments[11], 'html.parser')
+    div = soup1.find_all("div",'game_summary nohover current')
 
     # find tr in div
     for tr in div[0].find_all('tr'):
@@ -263,20 +293,20 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 if __name__ == "__main__":
 
     # initiate connection with database
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
+    cnx = mysql.connector.connect(user="root",
+                                  host="127.0.0.1",
+                                  database="basketball",
+                                  password="19981111Zsz")
     cursor = cnx.cursor(buffered=True)
 
     # call function to insert data into performance table
     updateAndInsertPlayerRef(
-        constants.startDayP,
-        constants.startMonthP,
-        constants.startYearP,
-        constants.endDayP,
-        constants.endMonthP,
-        constants.endYearP,
+        3,
+        3,
+        2017,
+        4,
+        3,
+        2017,
         cursor,
         cnx)
 
