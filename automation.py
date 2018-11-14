@@ -38,12 +38,12 @@ def run_scrapers():
     # run player reference scaper
 
     # run generate box score urls
-    generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, now.year, now.month, now.day)
+    generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, now.year, now.month, now.day-1)
     # run performance 
-    performance.updateAndInsertPlayerRef(now.day, now.month, now.year, now.day, now.month, now.year, cursor, cnx)
+    performance.updateAndInsertPlayerRef(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cursor, cnx)
     
     # run team performance
-    teamPerformance.statsFiller(now.day, now.month, now.year, now.day, now.month, now.year, cnx, cursor)
+    teamPerformance.statsFiller(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cnx, cursor)
     # 3 Extrapilators
 
     # fandual scraper 
