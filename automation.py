@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 ''' Automate of running WSA Engine '''
+import mysql.connector
+import datetime
+import teamPerformance
 
 def main():
     ''' Script to automate running of all basketball engine daily '''
@@ -19,7 +22,7 @@ def run_scrapers():
     # run performance 
 
     # run team performance
-
+    teamPerformance.statsFiller(today.day, today.month, today.year, today.day, today.month, today.year, cnx, cursor)
     # 3 Extrapilators
 
     # fandual scraper 
