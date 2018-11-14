@@ -47,7 +47,7 @@ def getPlayerID(bbrefID, cursor):
     return cursor.fetchone()[0]
 
 # remove row of data from performance table where the blocks are empty
-def cleanup(cursor):
+def cleanup(cursor, cnx):
 
     cleanUp = "DELETE FROM performance WHERE blocks IS NULL"
 

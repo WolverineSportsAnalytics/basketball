@@ -30,12 +30,9 @@ def clean_tuple(inserts):
     return tuple(inserts)
 
 
-def statsFiller(startDay, startMonth, startYear, endDay, endMonth, endYear, cursor):
-    cnx = mysql.connector.connect(user="root",
-                                  host="127.0.0.1",
-                                  database="basketball",
-                                  password="test",
-                                  auth_plugin='mysql_native_password')
+def statsFiller(startDay, startMonth, startYear, endDay, endMonth, endYear, cnx, cursor):
+
+
     cursor = cnx.cursor(buffered=True)
 
     stmt = "Insert into basketball.team_performance (dailyTeamID, dailyTeamOpponentID, dateID, pointsAllowed, pointsScored, pace, effectiveFieldGoalPercent, turnoverPercent, FTperFGA, offensiveRating, defensiveRating, FG, FGA, FGP, 3P, 3PA, 3PP, FT, FTA, FTP, offensiveRebounds, defensiveRebounds, totalRebounds, assists, steals, blocks, turnovers, personalFouls, trueShootingPercent, 3pointAttemptRate, freeThrowAttemptRate, defensiveReboundPercent, offensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, win, loss, points1Q, points2Q, points3Q, points4Q) VALUES( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -312,6 +309,15 @@ def statsFiller(startDay, startMonth, startYear, endDay, endMonth, endYear, curs
 
     return None
 
+def auto(day, month, year, cnx, cursor):
+    
+
+    statsFiller(
+            day, month, year, day, month, year, cnx, cursor)
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
 
 def main():
     cnx = mysql.connector.connect(user="root",
