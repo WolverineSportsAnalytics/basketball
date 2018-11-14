@@ -4,6 +4,7 @@ import mysql.connector
 import datetime
 from Scrapers import performance
 from Scrapers import generateBoxScoreUrls
+from Scrapers import playerReference
 
 def main():
     ''' Script to automate running of all basketball engine daily '''
@@ -34,11 +35,12 @@ def run_scrapers():
     
 
     # run player reference scaper
+    playerReference.scrapeHtml(cursor, cnx) 
 
     # run generate box score urls
-    generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, now.year, now.month, now.day)
+    generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, now.year, now.month, now.day-1)
     # run performance 
-    performance.updateAndInsertPlayerRef(now.day, now.month, now.year, now.day, now.month, now.year, cursor, cnx)
+    performance.updateAndInsertPlayerRef(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cursor, cnx)
     
     # run team performance
 
