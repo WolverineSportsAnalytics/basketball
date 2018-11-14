@@ -2,7 +2,10 @@
 ''' Automate of running WSA Engine '''
 import mysql.connector
 import datetime
-import performance
+from Scrapers import teamPerformance
+from Scrapers import performance
+from Scrapers import generateBoxScoreUrls
+
 
 def main():
     ''' Script to automate running of all basketball engine daily '''
@@ -35,12 +38,12 @@ def run_scrapers():
     # run player reference scaper
 
     # run generate box score urls
-
+    generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, now.year, now.month, now.day-1)
     # run performance 
-    performance.updateAndInsertPlayerRef(now.day, now.month, now.year, now.day, now.month, now.year, cursor, cnx)
+    performance.updateAndInsertPlayerRef(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cursor, cnx)
     
     # run team performance
-
+    teamPerformance.statsFiller(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cnx, cursor)
     # 3 Extrapilators
 
     # fandual scraper 
@@ -50,3 +53,6 @@ def run_scrapers():
     # machine learning stuff
 
     pass
+
+if __name__=="__main__":
+    main()
