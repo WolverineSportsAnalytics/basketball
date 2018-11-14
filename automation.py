@@ -2,7 +2,12 @@
 ''' Automate of running WSA Engine '''
 import mysql.connector
 import datetime
+<<<<<<< HEAD
 import teamPerformance
+=======
+from Scrapers import performance
+from Scrapers import generateBoxScoreUrls
+>>>>>>> 35da457148421f085f3cc494b1a180f13bf72ef3
 
 def main():
     ''' Script to automate running of all basketball engine daily '''
@@ -10,17 +15,35 @@ def main():
 
 def run_scrapers():
     ''' Run the scrapers '''
-    cursor = _
-    cnx = _
-    dateID = _
-    today = _
+    cnx = mysql.connector.connect(user="wsa@wsabasketball",
+                                  host='wsabasketball.mysql.database.azure.com',
+                                  database="basketball",
+                                  password="")
+    cursor = cnx.cursor(buffered=True)
+
+    cursor = cnx.cursor()    
+    now = datetime.datetime.now()
+
+    print str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
+    date =  str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
+    
+
+    # first figure out what day it is through some way
+    # get current date 
+    findGame = "SELECT iddates FROM new_dates WHERE date = %s"
+    findGameData = (date,)
+    # then query database to get that dateI
+    cursor.execute(findGame, findGameData) 
+    dateID = cursor.fetchall()[0][0]
+    
 
     # run player reference scaper
 
     # run generate box score urls
-
+    generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, now.year, now.month, now.day)
     # run performance 
-
+    performance.updateAndInsertPlayerRef(now.day, now.month, now.year, now.day, now.month, now.year, cursor, cnx)
+    
     # run team performance
     teamPerformance.statsFiller(today.day, today.month, today.year, today.day, today.month, today.year, cnx, cursor)
     # 3 Extrapilators
@@ -32,3 +55,6 @@ def run_scrapers():
     # machine learning stuff
 
     pass
+
+if __name__=="__main__":
+    main()
