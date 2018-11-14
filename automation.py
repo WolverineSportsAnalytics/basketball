@@ -48,3 +48,6 @@ def run_scrapers():
     # machine learning stuff
 
     pass
+
+if __name__=="__main__":
+    main()
