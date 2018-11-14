@@ -53,7 +53,7 @@ def getTeams(cursor):
     return teams
 
 # function that generates all valid basketball reference urls
-def generateBasketballReferenceURLs(cursor, year, month, day):
+def generateBasketballReferenceURLs(cursor,cnx, year, month, day):
     """cnx = mysql.connector.connect(user="root",
                                   host='127.0.0.1',
                                   database="basketball",
@@ -61,6 +61,7 @@ def generateBasketballReferenceURLs(cursor, year, month, day):
     cursor = cnx.cursor(buffered=True)"""
 
     dateID = findDate(cursor, year, month, day)
+    print dateID
 
     strMonth = ""
     if month == 10:
@@ -77,6 +78,9 @@ def generateBasketballReferenceURLs(cursor, year, month, day):
         strMonth = "march"
     elif month == 4:
         strMonth = "april"
+    if month > 4:
+        year += 1;
+
 
     page = requests.get("https://www.basketball-reference.com/leagues/NBA_" + str(year) + "_games-" + strMonth + ".html")
     soup = BeautifulSoup(page.text, 'html.parser')
@@ -99,7 +103,8 @@ def generateBasketballReferenceURLs(cursor, year, month, day):
                 print(url)
 
                 queryBoxScoreURL = "INSERT INTO box_score_urls (url, dateID) VALUES (%s, %s)"
-                cursor.execute(queryBoxScoreURL, url, dateID)
+                inserts = (url, dateID)
+                cursor.execute(queryBoxScoreURL, inserts)
                 cnx.commit()
                 print "Inserted URL"
 
@@ -140,7 +145,7 @@ if __name__ == "__main__":
 
     #date = generateDates(constants.startDayP, constants.startMonthP, constants.startYearP,constants.endDayP, constants.endMonthP, constants.endYearP)
 
-    generateBasketballReferenceURLs(cursor, constants.yearP, constants.monthP, constants.dayP)
+    generateBasketballReferenceURLs(cursor, cnx, constants.yearP, constants.monthP, constants.dayP)
 
     cursor.close()
     cnx.commit()
