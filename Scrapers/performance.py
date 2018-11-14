@@ -288,29 +288,3 @@ def updateAndInsertPlayerRef(startDay, startMonth, startYear, endDay, endMonth, 
 
         # insert performance of home team
         insertperformance(tables[2], tables[3], teams[1], teams[0], 1, date_id, cursor, cnx)
-
-# main function
-if __name__ == "__main__":
-
-    # initiate connection with database
-    cnx = mysql.connector.connect(user="root",
-                                  host="127.0.0.1",
-                                  database="basketball",
-                                  password="19981111Zsz")
-    cursor = cnx.cursor(buffered=True)
-
-    # call function to insert data into performance table
-    updateAndInsertPlayerRef(
-        3,
-        3,
-        2017,
-        4,
-        3,
-        2017,
-        cursor,
-        cnx)
-
-    # close connection with database
-    cursor.close()
-    cnx.commit()
-    cnx.close()
