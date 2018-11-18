@@ -90,7 +90,7 @@ def insert_into_performance(cursor, cnx, dateID):
     getPlayerID = "select playerID from player_reference where nickName= %s"
 
     getTeamAbbrev = "SELECT wsa from team_reference where fanduel = %s"
-    update_performance = "INSERT INTO performance (playerID, dateID, fanduel, team, opponent, fanduelPosition) VALUES (%s, %s, %s, %s, %s, %s)"
+    update_performance = "INSERT INTO performance (playerID, dateID, fanduel, team, opponent, fanduelPosition, projMinutes) VALUES (%s, %s, %s, %s, %s, %s, %s)"
 
 
     url = "https://www.rotowire.com/daily/tables/optimizer-nba.php?sport=NBA&site=FanDuel&projections=&type=main&slate=all"
@@ -106,7 +106,8 @@ def insert_into_performance(cursor, cnx, dateID):
                 pos = player['position'] # pos
                 team  = player['team']
 		opp = str(player['opponent'])
-		sal = player['salary']
+                sal = player['salary']
+                minutes = player['minutes']
 
 		if opp[0] == '@':
 			opp = opp[1:]
@@ -135,7 +136,8 @@ def insert_into_performance(cursor, cnx, dateID):
               		sal,
               		team,
               		opp,
-              		pos)
+              		pos,
+                        minutes)
 		cursor.execute(update_performance, inserts)
 	except Exception as e:
 		print e
