@@ -5,6 +5,10 @@ import datetime
 from Scrapers import teamPerformance
 from Scrapers import performance
 from Scrapers import generateBoxScoreUrls
+from Scrapers import playerReference
+from Scrapers import fanduel_scraper
+from Extrapilators import dailyPerformanceExtrapolation, teamPerformanceExtrapolation, teamVsDefenseExtrapolation
+from Extrapilators import sumPoints, fill_features
 
 
 def main():
@@ -34,8 +38,9 @@ def run_scrapers():
     cursor.execute(findGame, findGameData) 
     dateID = cursor.fetchall()[0][0]
     
-
+    '''
     # run player reference scaper
+    playerReference.scrapeHtml(cursor, cnx) 
 
     # run generate box score urls
     generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, now.year, now.month, now.day-1)
@@ -44,11 +49,23 @@ def run_scrapers():
     
     # run team performance
     teamPerformance.statsFiller(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cnx, cursor)
+    '''
+   
     # 3 Extrapilators
+    dailyPerformanceExtrapolation.auto(dateID,cnx, cursor)
+    teamPerformanceExtrapolation.auto(dateID, cnx, cursor)
+    teamVsDefenseExtrapolation.auto(dateID, cnx, cursor)
+
+    # sum fanduel and draftkings points
+    sumPoints.sum_points(dateID, cursor, cnx)
+
+
+    # starts the prediction section 
 
     # fandual scraper 
+    fanduel_scraper.insert_into_performance(cusor, cnx, dateID)
+    fill_features.futues(dateID, cnx, cursor)
 
-    # daily minutes
 
     # machine learning stuff
 
