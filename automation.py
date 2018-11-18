@@ -6,6 +6,7 @@ from Scrapers import teamPerformance
 from Scrapers import performance
 from Scrapers import generateBoxScoreUrls
 from Scrapers import playerReference
+from Scrapers import fanduel_scraper
 from Extrapilators import dailyPerformanceExtrapolation, teamPerformanceExtrapolation, teamVsDefenseExtrapolation
 
 
@@ -56,6 +57,7 @@ def run_scrapers():
 
 
     # fandual scraper 
+    fanduel_scraper.insert_into_performance(cusor, cnx, dateID)
 
     # daily minutes
 
