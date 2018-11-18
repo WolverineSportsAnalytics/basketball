@@ -1,5 +1,4 @@
 import mysql.connector
-import constants
 
 import threading
 from multiprocessing import *
@@ -318,81 +317,6 @@ def auto(dateID, cnx, cursor):
     a.join()
     s.join()
     t.join()
-
-    cursor.close()
-    cnx.commit()
-    cnx.close()
-if __name__ == "__main__":
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-    cursor = cnx.cursor(buffered=True)
-
-    # team vs. position
-
-    # ball handlers
-    # PG, SG
-
-    # wings
-    # SG, SF
-
-    # bigs
-    # SF, PF
-
-    # centers
-    # C
-
-    '''
-    for ball_handlers
-    avg pts, rebounds, offensive stats defensive stats etc....
-    for every player that has played vs that team before or on that date
-
-    for all teams:
-        get all players who played pg, sg, sf vs that team
-            average their performances noe
-
-    '''
-
-    # get all teams
-    getBbreffs = "SELECT bbreff FROM team_reference"
-    cursor.execute(getBbreffs)
-
-    teams = []
-
-    sqlResults = cursor.fetchall()
-    for row in sqlResults:
-        teams.append(row[0])
-
-    dateCutOff = constants.teamVsDefenseExtrapolationDateCutOff
-    upperBoundCutOff = constants.extapolatorUpperBound
-
-    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
-    getDatesD = (dateCutOff, upperBoundCutOff)
-    cursor.execute(getDates, getDatesD)
-
-    dates = []
-
-    sqlResults = cursor.fetchall()
-    for row in sqlResults:
-        dates.append(row[0])
-    
-   # team_vs_defense_extrapolation(cursor, dates, teams, cnx)
-   # team_vs_defense_two_one_extrapolation(cursor, dates, teams, cnx)
-   # team_vs_defense_seven_extrapolation(cursor, dates, teams, cnx)
-
-    a = threading.Thread(target=team_vs_defense_extrapolation, args=(cursor, dates, teams, cnx))
-    s = threading.Thread(target=team_vs_defense_two_one_extrapolation, args=(cursor, dates, teams, cnx))
-    t = threading.Thread(target=team_vs_defense_seven_extrapolation, args=(cursor, dates, teams, cnx))
-
-
-   # a.start()
-    #s.start()
-   # t.start()
-
-    #a.join()
-   # s.join()
-   # t.join()
 
     cursor.close()
     cnx.commit()

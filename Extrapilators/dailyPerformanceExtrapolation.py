@@ -1,6 +1,5 @@
 import mysql.connector
 import mysql.connector.pooling
-import constants
 import threading
 
 cursorL = threading.RLock()
@@ -149,49 +148,4 @@ def auto(dateID, cnx, cursor):
     cnx.commit()
     cnx.close()
 
-
-if __name__ == "__main__":
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-    cursor = cnx.cursor(buffered=True)
-
-    cursorL = threading.RLock()
-
-    getPlayerIDs = "SELECT playerID FROM player_reference"
-    cursor.execute(getPlayerIDs)
-
-    players = []
-    sqlResults = cursor.fetchall()
-    for row in sqlResults:
-        players.append(row[0])
-
-    dateCutOff = constants.dailyPerformanceExtrapolationDateCutOff
-    upperBoundCutOff = constants.extapolatorUpperBound
-
-    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
-    getDatesD = (dateCutOff, upperBoundCutOff)
-    cursor.execute(getDates, getDatesD)
-
-    dates = []
-    sqlResults = cursor.fetchall()
-    for row in sqlResults:
-        dates.append(row[0])
-
-    t = threading.Thread(target=player_total_avg, args=(cursor, dates, players, cnx))
-    s = threading.Thread(target=player_seven_avg, args=(cursor, dates, players, cnx))
-    o = threading.Thread(target=player_two_one_avg, args=(cursor, dates, players, cnx))
-
-    t.start()
-    s.start()
-    o.start()
-
-    t.join()
-    s.join()
-    o.join()
-
-    cursor.close()
-    cnx.commit()
-    cnx.close()
 

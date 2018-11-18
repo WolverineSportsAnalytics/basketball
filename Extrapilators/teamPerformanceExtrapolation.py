@@ -1,5 +1,4 @@
 import mysql.connector
-import constants
 import threading
 
 cursorL = threading.RLock()
@@ -159,47 +158,4 @@ def auto(dateID, cnx, cursor):
     cnx.commit()
     cnx.close()
 
-if __name__ == "__main__":
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-    cursor = cnx.cursor(buffered=True)
 
-    # get teams
-    getTeamIDs = "SELECT teamID FROM team_reference"
-    cursor.execute(getTeamIDs)
-
-    teams = []
-    sqlResults = cursor.fetchall()
-    for row in sqlResults:
-        teams.append(row[0])
-
-    dateCutOff = constants.teamPerformanceExtrapolationDateCutOff
-    upperBoundCutOff = constants.extapolatorUpperBound
-
-    getDates = "SELECT iddates FROM new_dates WHERE iddates >= %s AND iddates <= %s"
-    getDatesD = (dateCutOff, upperBoundCutOff)
-    cursor.execute(getDates, getDatesD)
-
-    dates = []
-    sqlResults = cursor.fetchall()
-    for row in sqlResults:
-        dates.append(row[0])
-
-
-    a = threading.Thread(target=team_daily_extrapolate_data, args=(cursor, dates, teams, cnx))
-    s = threading.Thread(target=team_daily_extrapolate_seven_data, args=(cursor, dates, teams, cnx))
-    t = threading.Thread(target=team_daily_extrapolate_two_one_data, args=(cursor, dates, teams, cnx))
-
-    a.start()
-    s.start()
-    t.start()
-
-    a.join()
-    s.join()
-    t.join()
-
-    cursor.close()
-    cnx.commit()
-    cnx.close()
