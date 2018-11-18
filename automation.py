@@ -8,6 +8,7 @@ from Scrapers import generateBoxScoreUrls
 from Scrapers import playerReference
 from Scrapers import fanduel_scraper
 from Extrapilators import dailyPerformanceExtrapolation, teamPerformanceExtrapolation, teamVsDefenseExtrapolation
+from Extrapilators import sumPoints
 
 
 def main():
@@ -55,6 +56,11 @@ def run_scrapers():
     teamPerformanceExtrapolation.auto(dateID, cnx, cursor)
     teamVsDefenseExtrapolation.auto(dateID, cnx, cursor)
 
+    # sum fanduel and draftkings points
+    sumPoints.sum_points(dateID, cursor, cnx)
+
+
+    # starts the prediction section 
 
     # fandual scraper 
     fanduel_scraper.insert_into_performance(cusor, cnx, dateID)
