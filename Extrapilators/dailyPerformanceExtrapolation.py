@@ -144,8 +144,6 @@ def auto(dateID, cnx, cursor):
     s.join()
     o.join()
 
-    cursor.close()
     cnx.commit()
-    cnx.close()
 
 
