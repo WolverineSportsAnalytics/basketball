@@ -6,6 +6,7 @@ from Scrapers import teamPerformance
 from Scrapers import performance
 from Scrapers import generateBoxScoreUrls
 from Scrapers import playerReference
+from Extrapilators import dailyPerformanceExtrapolation, teamPerformanceExtrapolation, teamVsDefenseExtrapolation
 
 
 def main():
@@ -46,7 +47,12 @@ def run_scrapers():
     
     # run team performance
     teamPerformance.statsFiller(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cnx, cursor)
+   
     # 3 Extrapilators
+    dailyPerformanceExtrapolation.auto(dateID, cursor, cnx)
+    teamPerformanceExtrapolation.auto(dateID, cursor, cnx)
+    teamVsDefenseExtrapolation.auto(dateID, cursor, cnx)
+
 
     # fandual scraper 
 
