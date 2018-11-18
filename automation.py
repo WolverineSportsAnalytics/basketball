@@ -36,7 +36,7 @@ def run_scrapers():
     cursor.execute(findGame, findGameData) 
     dateID = cursor.fetchall()[0][0]
     
-
+    '''
     # run player reference scaper
     playerReference.scrapeHtml(cursor, cnx) 
 
@@ -47,11 +47,12 @@ def run_scrapers():
     
     # run team performance
     teamPerformance.statsFiller(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cnx, cursor)
+    '''
    
     # 3 Extrapilators
-    dailyPerformanceExtrapolation.auto(dateID, cursor, cnx)
-    teamPerformanceExtrapolation.auto(dateID, cursor, cnx)
-    teamVsDefenseExtrapolation.auto(dateID, cursor, cnx)
+    dailyPerformanceExtrapolation.auto(dateID,cnx, cursor)
+    teamPerformanceExtrapolation.auto(dateID, cnx, cursor)
+    teamVsDefenseExtrapolation.auto(dateID, cnx, cursor)
 
 
     # fandual scraper 
