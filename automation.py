@@ -8,7 +8,7 @@ from Scrapers import generateBoxScoreUrls
 from Scrapers import playerReference
 from Scrapers import fanduel_scraper
 from Extrapilators import dailyPerformanceExtrapolation, teamPerformanceExtrapolation, teamVsDefenseExtrapolation
-from Extrapilators import sumPoints
+from Extrapilators import sumPoints, fill_features
 
 
 def main():
@@ -64,8 +64,8 @@ def run_scrapers():
 
     # fandual scraper 
     fanduel_scraper.insert_into_performance(cusor, cnx, dateID)
+    fill_features.futues(dateID, cnx, cursor)
 
-    # daily minutes
 
     # machine learning stuff
 
