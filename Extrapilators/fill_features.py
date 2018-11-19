@@ -1,6 +1,5 @@
 import mysql.connector
 import datetime as dt
-import constants
 import warnings
 
 '''

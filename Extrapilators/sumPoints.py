@@ -1,5 +1,4 @@
 import mysql.connector
-import constants
 import datetime as dt
 
 def sum_points(dateID, cursor, cnx):
