@@ -125,6 +125,6 @@ if __name__=="__main__":
     cnx = mysql.connector.connect(user="wsa@wsabasketball",
                                   host='wsabasketball.mysql.database.azure.com',
                                   database="basketball",
-                                  password="LeBron>MJ!")
+                                  password="")
     cursor = cnx.cursor(buffered=True)
     run_scraper_from_today(cursor,cnx, 20)
