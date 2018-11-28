@@ -243,7 +243,7 @@ def team_vs_defense_extrapolation(cursor, dates, teams, cnx):
 
     cursorL.release()
 
-    beginningSeasonID = 1248
+    beginningSeasonID = 1247
 
     for date in dates:
         print date
