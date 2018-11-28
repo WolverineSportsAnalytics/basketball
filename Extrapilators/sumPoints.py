@@ -19,7 +19,12 @@ def sum_points(dateID, cursor, cnx):
     cursor.execute(joinFDDKPoints, joinJoinData)
     print "Updated Futures DK and FD Points"
 
-    cursor.close()
     cnx.commit()
-    cnx.close()
+
+    projMins = "UPDATE basketball.performance as p SET p.projMinutes = (SELECT d.minutesPlayed FROM (select * from basketball.performance) as d WHERE p.dateID = d.dateID AND p.playerID = d.playerID) WHERE p.projMinutes IS NULL AND p.dateID = %s"
+
+
+    cursor.execute(projMins,joinData)
+
+    cnx.commit()
     
