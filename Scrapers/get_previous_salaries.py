@@ -36,7 +36,7 @@ def get_player_id(f_name, l_name, pos, team, cursor):
 
 
 def insert_into_performance(cursor, cnx, dateID, url):
-    update_performance = "INSERT INTO performance (playerID, dateID, fanduel, team, opponent, fanduelPosition) VALUES (%s, %s, %s, %s, %s, %s)"
+    update_performance = "Update performance set fanduel=%s, team=%s, opponent=%s, fanduelPosition=%s where playerID=%s and dateID=%s"
 
     page = requests.get(url)
 
@@ -72,9 +72,8 @@ def insert_into_performance(cursor, cnx, dateID, url):
             name = first_name + " " + last_name
             player_id = get_player_id(first_name, last_name, pos, team, cursor)
 
-            print first_name, last_name, pos, salary, team, opp
 
-            inserts = (player_id, dateID, salary, team, opp, pos)
+            inserts = (salary, team, opp, pos, player_id, dateID)
 	    cursor.execute(update_performance, inserts)
             cnx.commit()
         except Exception as E:
