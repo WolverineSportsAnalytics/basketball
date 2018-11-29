@@ -68,103 +68,106 @@ def averaging(cursor, team, dateLower, dateUpper, tableID, playasVsOpponentsScri
 
     players = {'ball_handlers': ballHandlers, 'wings': wings, 'bigs': bigs, 'centers': centers}
     for key, value in players.items():
-        ##############################
-        # for each player in bucket
-        # (sum all stats / games played till that point)
-        blocks = 0
-        points = 0
-        steals = 0
-        assists = 0
-        turnovers = 0
-        totalRebounds = 0
-        tripleDouble = 0
-        doubleDouble = 0
-        threePM = 0
-        threePA = 0
-        offensiveRebounds = 0
-        defensiveRebounds = 0
-        minutesPlayed = 0
-        fieldGoals = 0
-        fieldGoalsAttempted = 0
-        FT = 0
-        FTA = 0
-        usagePercent = 0
-        offensiveRating = 0
-        defensiveRating = 0
-        trueShootingPercent = 0
-        effectiveFieldGoalPercent = 0
+        try:
+            ##############################
+            # for each player in bucket
+            # (sum all stats / games played till that point)
+            blocks = 0
+            points = 0
+            steals = 0
+            assists = 0
+            turnovers = 0
+            totalRebounds = 0
+            tripleDouble = 0
+            doubleDouble = 0
+            threePM = 0
+            threePA = 0
+            offensiveRebounds = 0
+            defensiveRebounds = 0
+            minutesPlayed = 0
+            fieldGoals = 0
+            fieldGoalsAttempted = 0
+            FT = 0
+            FTA = 0
+            usagePercent = 0
+            offensiveRating = 0
+            defensiveRating = 0
+            trueShootingPercent = 0
+            effectiveFieldGoalPercent = 0
 
-        # unlazy but position = ballHandler
-        for ballHandler in value:
-            blocks = blocks + ballHandler[blockIdx]
-            points = points + ballHandler[pointsIdx]
-            steals = steals + ballHandler[stealsIdx]
-            assists = assists + ballHandler[assistsIdx]
-            turnovers = turnovers + ballHandler[turnoversIdx]
-            totalRebounds = totalRebounds + ballHandler[totalRIdx]
-            tripleDouble = tripleDouble + ballHandler[tripleDoubleIdx]
-            doubleDouble = doubleDouble + ballHandler[doubleDoubleIdx]
-            threePM = threePM + ballHandler[threePMIdx]
-            threePA = threePA + ballHandler[threePAIdx]
-            offensiveRebounds = offensiveRebounds + ballHandler[offensiveReboundsIdx]
-            defensiveRebounds = defensiveRebounds + ballHandler[defensiveReboundsIdx]
-            minutesPlayed = minutesPlayed + ballHandler[minutesPlayedIdx]
-            fieldGoals = fieldGoals + ballHandler[fieldGoalsIdx]
-            fieldGoalsAttempted = fieldGoalsAttempted + ballHandler[fieldGoalsAttemptedIdx]
-            FT = FT + ballHandler[FTIdx]
-            FTA = FTA + ballHandler[FTAIdx]
-            usagePercent = usagePercent + ballHandler[usageIdx]
-            offensiveRating = offensiveRating + ballHandler[ortIdx]
-            defensiveRating = defensiveRating + ballHandler[drtIdx]
-            trueShootingPercent = trueShootingPercent + ballHandler[tStIdx]
-            effectiveFieldGoalPercent = effectiveFieldGoalPercent + ballHandler[eFGIdx]
+            # unlazy but position = ballHandler
+            for ballHandler in value:
+                blocks = blocks + ballHandler[blockIdx]
+                points = points + ballHandler[pointsIdx]
+                steals = steals + ballHandler[stealsIdx]
+                assists = assists + ballHandler[assistsIdx]
+                turnovers = turnovers + ballHandler[turnoversIdx]
+                totalRebounds = totalRebounds + ballHandler[totalRIdx]
+                tripleDouble = tripleDouble + ballHandler[tripleDoubleIdx]
+                doubleDouble = doubleDouble + ballHandler[doubleDoubleIdx]
+                threePM = threePM + ballHandler[threePMIdx]
+                threePA = threePA + ballHandler[threePAIdx]
+                offensiveRebounds = offensiveRebounds + ballHandler[offensiveReboundsIdx]
+                defensiveRebounds = defensiveRebounds + ballHandler[defensiveReboundsIdx]
+                minutesPlayed = minutesPlayed + ballHandler[minutesPlayedIdx]
+                fieldGoals = fieldGoals + ballHandler[fieldGoalsIdx]
+                fieldGoalsAttempted = fieldGoalsAttempted + ballHandler[fieldGoalsAttemptedIdx]
+                FT = FT + ballHandler[FTIdx]
+                FTA = FTA + ballHandler[FTAIdx]
+                usagePercent = usagePercent + ballHandler[usageIdx]
+                offensiveRating = offensiveRating + ballHandler[ortIdx]
+                defensiveRating = defensiveRating + ballHandler[drtIdx]
+                trueShootingPercent = trueShootingPercent + ballHandler[tStIdx]
+                effectiveFieldGoalPercent = effectiveFieldGoalPercent + ballHandler[eFGIdx]
 
-        blocksPerMinute = float(blocks) / minutesPlayed if minutesPlayed else 0
-        pointsPerMinute = float(points) / minutesPlayed if minutesPlayed else 0
-        stealsPerMinute = float(steals) / minutesPlayed if minutesPlayed else 0
-        assistsPerMinute = float(assists) / minutesPlayed if minutesPlayed else 0
-        turnoversPerMinute = float(turnovers) / minutesPlayed if minutesPlayed else 0
-        tripleDoubles = float(tripleDouble) / len(ballHandlers) if len(ballHandlers) else 0
-        doubleDoubles = float(doubleDouble) / len(ballHandlers) if len(ballHandlers) else 0
-        threePP = float(threePM) / float(threePA) if threePA else 0
-        offensiveReboundsPerMinute = float(offensiveRebounds) / minutesPlayed if minutesPlayed else 0
-        defensiveReoundsPerMinute = float(defensiveRebounds) / minutesPlayed if minutesPlayed else 0
-        fieldGoalP = float(fieldGoals) / float(fieldGoalsAttempted) if fieldGoalsAttempted else 0
-        FTP = float(FT) / float(FTA) if FTA else 0
-        usagePercentTot = usagePercent / len(ballHandlers) if len(ballHandlers) else 0
-        offensiveRatingTot = offensiveRating / len(ballHandlers) if len(ballHandlers) else 0
-        defensiveRatingTot = defensiveRating / len(ballHandlers) if len(ballHandlers) else 0
-        trueShooting = points / (2 * (float(fieldGoalsAttempted) + 0.44 * FTA)) if fieldGoalsAttempted else 0
-        effectiveFieldGoal = (float(fieldGoals) + 0.5 * float(threePM)) / float(
-            fieldGoalsAttempted) if fieldGoalsAttempted else 0
+            blocksPerMinute = float(blocks) / minutesPlayed if minutesPlayed else 0
+            pointsPerMinute = float(points) / minutesPlayed if minutesPlayed else 0
+            stealsPerMinute = float(steals) / minutesPlayed if minutesPlayed else 0
+            assistsPerMinute = float(assists) / minutesPlayed if minutesPlayed else 0
+            turnoversPerMinute = float(turnovers) / minutesPlayed if minutesPlayed else 0
+            tripleDoubles = float(tripleDouble) / len(ballHandlers) if len(ballHandlers) else 0
+            doubleDoubles = float(doubleDouble) / len(ballHandlers) if len(ballHandlers) else 0
+            threePP = float(threePM) / float(threePA) if threePA else 0
+            offensiveReboundsPerMinute = float(offensiveRebounds) / minutesPlayed if minutesPlayed else 0
+            defensiveReoundsPerMinute = float(defensiveRebounds) / minutesPlayed if minutesPlayed else 0
+            fieldGoalP = float(fieldGoals) / float(fieldGoalsAttempted) if fieldGoalsAttempted else 0
+            FTP = float(FT) / float(FTA) if FTA else 0
+            usagePercentTot = usagePercent / len(ballHandlers) if len(ballHandlers) else 0
+            offensiveRatingTot = offensiveRating / len(ballHandlers) if len(ballHandlers) else 0
+            defensiveRatingTot = defensiveRating / len(ballHandlers) if len(ballHandlers) else 0
+            trueShooting = points / (2 * (float(fieldGoalsAttempted) + 0.44 * FTA)) if fieldGoalsAttempted else 0
+            effectiveFieldGoal = (float(fieldGoals) + 0.5 * float(threePM)) / float(
+                fieldGoalsAttempted) if fieldGoalsAttempted else 0
 
-        # get team id
-        teamIDQ = "SELECT teamID FROM team_reference WHERE bbreff = %s"
-        teamIDD = (team,)
-        cursor.execute(teamIDQ, teamIDD)
+            # get team id
+            teamIDQ = "SELECT teamID FROM team_reference WHERE bbreff = %s"
+            teamIDD = (team,)
+            cursor.execute(teamIDQ, teamIDD)
 
-        teamID = 0
-        for id in cursor.fetchall():
-            teamID = id[0]
+            teamID = 0
+            for id in cursor.fetchall():
+                teamID = id[0]
 
     
-        teamVsPlayerData = (tableID, teamID, dateUpper, blocks, points, steals, assists, turnovers, totalRebounds,
-                            tripleDouble, doubleDouble,
-                            threePM, threePA, offensiveRebounds, defensiveRebounds, minutesPlayed, fieldGoals,
-                            fieldGoalsAttempted, FT, FTA, blocksPerMinute, pointsPerMinute, stealsPerMinute,
-                            assistsPerMinute, turnoversPerMinute, tripleDoubles, doubleDoubles, threePP,
-                            offensiveReboundsPerMinute, defensiveReoundsPerMinute, fieldGoalP, FTP,
-                            usagePercentTot,
-                            offensiveRatingTot, defensiveRatingTot, trueShooting, effectiveFieldGoal)
+            teamVsPlayerData = (tableID, teamID, dateUpper, blocks, points, steals, assists, turnovers, totalRebounds,
+                                tripleDouble, doubleDouble,
+                                threePM, threePA, offensiveRebounds, defensiveRebounds, minutesPlayed, fieldGoals,
+                                fieldGoalsAttempted, FT, FTA, blocksPerMinute, pointsPerMinute, stealsPerMinute,
+                                assistsPerMinute, turnoversPerMinute, tripleDoubles, doubleDoubles, threePP,
+                                offensiveReboundsPerMinute, defensiveReoundsPerMinute, fieldGoalP, FTP,
+                                usagePercentTot,
+                                offensiveRatingTot, defensiveRatingTot, trueShooting, effectiveFieldGoal)
 
-        if key == 'ball_handlers':
-            cursor.execute(insertTeamVsDefenseBallHandlers, teamVsPlayerData)
-        if key == 'wings':
-            cursor.execute(insertTeamVsDefenseWings, teamVsPlayerData)
-        if key == 'bigs':
-            cursor.execute(insertTeamVsDefenseBigs, teamVsPlayerData)
-        if key == 'centers':
-            cursor.execute(insertTeamVsDefenseCenters, teamVsPlayerData)
+            if key == 'ball_handlers':
+                cursor.execute(insertTeamVsDefenseBallHandlers, teamVsPlayerData)
+            if key == 'wings':
+                cursor.execute(insertTeamVsDefenseWings, teamVsPlayerData)
+            if key == 'bigs':
+                cursor.execute(insertTeamVsDefenseBigs, teamVsPlayerData)
+            if key == 'centers':
+                cursor.execute(insertTeamVsDefenseCenters, teamVsPlayerData)
+        except Exception as e:
+            print teams
 
         cnx.commit()
 
@@ -214,7 +217,6 @@ def team_vs_defense_two_one_extrapolation(cursor, dates, teams, cnx):
     cursorL.release()
 
     for date in dates:
-        print date
         for team in teams:
             cursorL.acquire()
 
