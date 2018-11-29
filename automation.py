@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 ''' Automate of running WSA Engine '''
 import mysql.connector
 import datetime
@@ -9,6 +9,7 @@ from Scrapers import playerReference
 from Scrapers import fanduel_scraper
 from Extrapilators import dailyPerformanceExtrapolation, teamPerformanceExtrapolation, teamVsDefenseExtrapolation
 from Extrapilators import sumPoints, fill_features
+from MachineLearning import predict
 
 
 def main():
@@ -45,25 +46,22 @@ def run_scrapers():
     # run generate box score urls
     generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, yesterday.year, yesterday.month, yesterday.day)
     # run performance 
-
     print "Running Perforamnce DateID:", dateID-1
     performance.updateAndInsertPlayerRef(yesterday.day, yesterday.month, yesterday.year, yesterday.day, yesterday.month, yesterday.year, cursor, cnx)
     
     # run team performance
-
     print "Running Team Performance DateID:", dateID-1
     teamPerformance.statsFiller(yesterday.day, yesterday.month, yesterday.year, yesterday.day, yesterday.month, yesterday.year, cnx, cursor)
-   
-    # 3 Extrapilators
+
     print "Extrapolating:", dateID
     dailyPerformanceExtrapolation.auto(dateID,cnx, cursor)
     teamPerformanceExtrapolation.auto(dateID, cnx, cursor)
     teamVsDefenseExtrapolation.auto(dateID, cnx, cursor)
 
+
     # sum fanduel and draftkings points
     sumPoints.sum_points(dateID, cursor, cnx)
 
-    
     # starts the prediction section 
 
     # fandual scraper 
@@ -74,8 +72,7 @@ def run_scrapers():
 
 
     # machine learning stuff
-
-    pass
+    predict.makeProjections(now.day, now.month, now.year, cursor, cnx) 
 
 if __name__=="__main__":
     main()
