@@ -143,9 +143,7 @@ def insert_into_performance(cursor, cnx, dateID):
 		print e
 
 
-    cursor.close()
     cnx.commit()
-    cnx.close()
 
 def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
