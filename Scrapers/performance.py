@@ -75,7 +75,11 @@ def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, c
         bbrefID = basic[number].find_all('th')[0]['data-append-csv']
 
         # use bbrefID to get player_id through database
-        player_id = getPlayerID(bbrefID, cursor)
+        try:
+            player_id = getPlayerID(bbrefID, cursor)
+        except:
+            print bbrefID
+            continue
 
         # get all table cells of basic table
         tdbasic = basic[number].find_all('td')
