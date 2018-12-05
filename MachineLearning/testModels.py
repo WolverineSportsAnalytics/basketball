@@ -1,4 +1,5 @@
 import mysql.connector
+import sklearn
 from sklearn.svm import SVR
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LinearRegression, Ridge
@@ -6,10 +7,14 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import scale
 from sklearn.ensemble import ExtraTreesRegressor
+from sklearn.ensemble import RandomForestRegressor
 import random
 import numpy as np
 from sklearn.metrics import mean_squared_error, make_scorer, explained_variance_score
 from sklearn.model_selection import KFold
+from sklearn.feature_selection import SelectFromModel
+from sklearn.svm import LinearSVC
+
 
 from sklearn.preprocessing import normalize
 
@@ -34,7 +39,7 @@ def cross_validation(clf, train_x, train_y, k):
     can take in any model
     '''
     k_fold = KFold(5, shuffle = True)
-    scores = cross_val_score(clf, train_x, train_y, cv=k_fold, n_jobs=1, scoring='explained_variance')
+    scores = cross_val_score(clf, train_x, train_y, cv=k_fold, n_jobs=1, scoring='neg_mean_squared_error')
     return scores
 
 
@@ -71,71 +76,33 @@ def main():
     features = get_features_matrix(cnx, cursor, 0, 900)
 
     
-    
-    X_train, Y_train = split_features(features, np.linspace(0, 455, dtype=int)); #456 relevant features after removal of fanduel and draftkings
+    print len(features[0])
+    X_train, Y_train = split_features(features, np.linspace(0, 455, dtype=int, num=455)); #456 relevant features after removal of fanduel and draftkings
+    print len(features[0])
     #X_train = normalize(X_train)
     
     estimator = LinearRegression()
-    '''selector = GeneticSelectionCV(estimator,
-                                  cv=5,
-                                  verbose=1,
-                                  scoring="r2",
-                                  n_population=50,
-                                  crossover_proba=0.5,
-                                  mutation_proba=0.2,
-                                  n_generations=1,
-                                  crossover_independent_proba=0.5,
-                                  mutation_independent_proba=0.05,
-                                  tournament_size=3,
-                                  caching=True,
-                                  n_jobs=-1)
-    selector = selector.fit(X_train, Y_train)
-
-    #print(selector.support_)
-    selection = selector.support_
-    final= []
-    index = 0;
-    #perform feature selection
-    for item in selection:
-        if(item =='True'):
-            final.append(index)
-        index+=1;
-    #Extract selected features
-    X_train, Y_train = split_features(features, final)
-    '''
-    '''
-    print len(X_train)
-    exit(1)
-    length = (len(X_train[1])/2)
-    print length
-    hidden_layer = (length)
-    for i in range(1):
-        print "start"
-        #model = LinearRegression()
-        scorer = make_scorer(mean_squared_error, greater_is_better=True)
-        model = Ridge(100)
-        # model = MLPRegressor(hidden_layer_sizes=(hidden_layer))
-        #print hidden_layer
-        #model = SVR(max_iter=10000)
-        print i+1, cross_val_score(model, X_train, Y_train, cv=5, scoring=scorer)
     
-    '''
-
-   
-   
     length = (len(X_train[1])/2, 50, 20, 10)
-    X = X_train[:1300]
-    Y = Y_train[:1300]
-    x_test = X_train[1300:]
-    y_test = Y_train[1300:]
+    print "Length", len(X_train[0])
+    X = X_train[:13000]
+    print "Length", len(X[0])
+    Y = Y_train[:13000]
+    x_test = X_train[13000:]
+    y_test = Y_train[13000:]
+    print y_test[0]
 
     hidden_layer = (length)
     #model = MLPRegressor(hidden_layer_sizes=(hidden_layer), alpha=100, activation='relu', learning_rate="adaptive")
     #model - Ridge(100)
 
     #Run Random Forest without Feature Selection to get Variable Importance
-    model = ExtraTreesRegressor() 
+    '''model = linear_model.Lasso(alpha=0.01)
+    model = SelectFromModel(model, prefit=True)'''
+
+    model = RandomForestRegressor() 
     model.fit(X,Y)
+    #print model.feature_importances_
     y_pred1 = model.predict(X) #train prediction
     y_pred2 = model.predict(x_test) #test prediction
     #print "MLP RELU", hidden_layer
@@ -143,67 +110,72 @@ def main():
     print "Feature Selection Method: None"
 
     
-    r_squared_train = explained_variance_score(Y, y_pred1)
-    r_squared_test = explained_variance_score(y_test, y_pred2)
-    
-    
-    n_train = len(X); # number of train samples
-    n_test = len(x_test); #number of test samples
-    k_before = 455; #number of features prior to feature selection
+    r_squared_train = mean_squared_error(Y, y_pred1)
+    r_squared_test = mean_squared_error(y_test, y_pred2)
     
 
-    print "Train Adjusted r squared:", 1-((1-r_squared_train)*(n_train-1)/(n_train-k_before-1))
-    
-    print "Test adjusted r squared:", 1-((1-r_squared_test)*(n_test-1)/(n_test-k_before-1))
+    print "Train MSE: ", r_squared_train   
+    print "Test MSE: ", r_squared_test
 
  
 
     final =[]
     count=1;
     #perform feature selection based on Random Forest's variable importance ranking
-    print model.feature_importances_
+    #print model.feature_importances_
     for imp in model.feature_importances_:
-        if (imp>0.001): #somewhat arbitrary criterion; could be 0.01 or 0.0001
+        if (imp>0.002): #somewhat arbitrary criterion; could be 0.01 or 0.0001
             final.append(count)
         count+=1;
+    #print count 
         
     #split features
+    features = get_features_matrix(cnx, cursor, 0, 900)
+    print len(features[0])
     X_train, Y_train = split_features(features, final)
+    print len(X_train[0])
     length = (len(X_train[1])/2, 50, 20, 10)
-    X = X_train[:1300]
-    Y = Y_train[:1300]
-    x_test = X_train[1300:]
-    y_test = Y_train[1300:]
+    X = X_train[:13000]
+    Y = Y_train[:13000]
+    x_test = X_train[13000:]
+    y_test = Y_train[13000:]
+    print y_test[0] 
+
+    
 
     #now run Ridge regression with only the most important features
     hidden_layer = (length)
     #model = MLPRegressor(hidden_layer_sizes=(hidden_layer), alpha=100, activation='relu', learning_rate="adaptive")
-    model = Ridge(100)
-    #model = ExtraTreesRegressor()
+    #model = Ridge(100)
+
+    '''model.fit(X,Y)
+    model_new = SelectFromModel(model, prefit=True);
+    model_new = model_new.transform(X);
+    
+    y_pred1 = model_new.predict(X) #train prediction
+    y_pred2 = model_new.predict(x_test) #test prediction '''
+
     model.fit(X,Y)
     y_pred1 = model.predict(X) #train prediction
-    y_pred2 = model.predict(x_test) #test prediction
+    y_pred2 = model.predict(x_test) #test prediction 
 
     
-    r_squared_train = explained_variance_score(Y, y_pred1)
-    r_squared_test = explained_variance_score(y_test, y_pred2)
+    r_squared_train = mean_squared_error(Y, y_pred1)
+    r_squared_test = mean_squared_error(y_test, y_pred2)
     k_after = count; #number of features after feature selection
                                         
     #print "MLP RELU", hidden_layer
     print "Ridge Regressor"
     print "Feature Selection Method: RF Feature Importance"
-    print "Train adjusted R squared:", 1-((1-r_squared_train)*(n_train-1)/(n_train-k_after-1))
-   
-    print "Test adjusted R squared: ", 1-((1-r_squared_test)*(n_test-1)/(n_test-k_after-1))
+    print "Train MSE: ", r_squared_train   
+    print "Test MSE: ", r_squared_test
 
 
-    #perform cross-val using r^2 as metric
+    #perform cross-val using MSE as metric
     scores = cross_validation(model, X_train, Y_train, 5)
     print scores
     
         
-        
-
     # call them in here
     pass
 if __name__=="__main__":
