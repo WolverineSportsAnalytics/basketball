@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python2
 ''' Automate of running WSA Engine '''
 import mysql.connector
 import datetime
@@ -9,6 +9,7 @@ from Scrapers import playerReference
 from Scrapers import fanduel_scraper
 from Extrapilators import dailyPerformanceExtrapolation, teamPerformanceExtrapolation, teamVsDefenseExtrapolation
 from Extrapilators import sumPoints, fill_features
+from MachineLearning import predict
 
 
 def main():
@@ -25,6 +26,7 @@ def run_scrapers():
 
     cursor = cnx.cursor()    
     now = datetime.datetime.now()
+    yesterday = now - datetime.timedelta(days=1)
 
     print str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
     date =  str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
@@ -38,38 +40,39 @@ def run_scrapers():
     cursor.execute(findGame, findGameData) 
     dateID = cursor.fetchall()[0][0]
     
-    '''
     # run player reference scaper
     playerReference.scrapeHtml(cursor, cnx) 
 
     # run generate box score urls
-    generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, now.year, now.month, now.day-1)
+    generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, yesterday.year, yesterday.month, yesterday.day)
     # run performance 
-    performance.updateAndInsertPlayerRef(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cursor, cnx)
+    print "Running Perforamnce DateID:", dateID-1
+    performance.updateAndInsertPlayerRef(yesterday.day, yesterday.month, yesterday.year, yesterday.day, yesterday.month, yesterday.year, cursor, cnx)
     
     # run team performance
-    teamPerformance.statsFiller(now.day-1, now.month, now.year, now.day-1, now.month, now.year, cnx, cursor)
-    '''
-   
-    # 3 Extrapilators
+    print "Running Team Performance DateID:", dateID-1
+    teamPerformance.statsFiller(yesterday.day, yesterday.month, yesterday.year, yesterday.day, yesterday.month, yesterday.year, cnx, cursor)
+
+    print "Extrapolating:", dateID
     dailyPerformanceExtrapolation.auto(dateID,cnx, cursor)
     teamPerformanceExtrapolation.auto(dateID, cnx, cursor)
     teamVsDefenseExtrapolation.auto(dateID, cnx, cursor)
 
+
     # sum fanduel and draftkings points
     sumPoints.sum_points(dateID, cursor, cnx)
-
 
     # starts the prediction section 
 
     # fandual scraper 
-    fanduel_scraper.insert_into_performance(cusor, cnx, dateID)
-    fill_features.futues(dateID, cnx, cursor)
+    fanduel_scraper.insert_into_performance(cursor, cnx, dateID)
+
+    # fill fetaures
+    fill_features.fill_futures(dateID, cnx, cursor)
 
 
     # machine learning stuff
-
-    pass
+    predict.makeProjections(now.day, now.month, now.year, cursor, cnx) 
 
 if __name__=="__main__":
     main()

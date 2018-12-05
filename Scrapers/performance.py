@@ -75,7 +75,11 @@ def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, c
         bbrefID = basic[number].find_all('th')[0]['data-append-csv']
 
         # use bbrefID to get player_id through database
-        player_id = getPlayerID(bbrefID, cursor)
+        try:
+            player_id = getPlayerID(bbrefID, cursor)
+        except:
+            print bbrefID
+            continue
 
         # get all table cells of basic table
         tdbasic = basic[number].find_all('td')
@@ -199,7 +203,7 @@ def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, c
                 double_double = 1
 
             # make array of all stats
-            inserts = (player_id, date_id, points, minutes, fgs,
+            inserts = (points, minutes, fgs,
                        fga, fgpercent, tpm, tpa, tp_percent,
                        free_throws, fta, ft_percent, o_rebs, d_rebs,
                        rebounds, assists, steals, blocks, to,
@@ -207,14 +211,29 @@ def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, c
                        FTR, ORBR, DRBR, TRBR, ASTR,
                        STLR, BLKR, TOVR, USGR, ORtg,
                        DRtg, triple_double, double_double, team, opp,
-                       homeaway)
+                       homeaway, player_id, date_id)
 
         # set up insert statement of database
-        insert_performance = "INSERT INTO performance (playerID, dateID, points, minutesPlayed, fieldGoals, fieldGoalsAttempted, fieldGoalPercent, 3PM, 3PA, 3PPercent, FT, FTA, FTPercent, offensiveRebounds, defensiveRebounds, totalRebounds, assists,  steals, blocks, turnovers, personalFouls, plusMinus, trueShootingPercent, effectiveFieldGoalPercent, 3pointAttemptRate, freeThrowAttemptRate, offensiveReboundPercent, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, turnoverPercent, usagePercent, offensiveRating, defensiveRating,  tripleDouble, doubleDouble, team, opponent, home) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        insert_performance = "INSERT INTO performance (points, minutesPlayed, fieldGoals, fieldGoalsAttempted, fieldGoalPercent, 3PM, 3PA, 3PPercent, FT, FTA, FTPercent, offensiveRebounds, defensiveRebounds, totalRebounds, assists,  steals, blocks, turnovers, personalFouls, plusMinus, trueShootingPercent, effectiveFieldGoalPercent, 3pointAttemptRate, freeThrowAttemptRate, offensiveReboundPercent, defensiveReboundPercent, totalReboundPercent, assistPercent, stealPercent, blockPercent, turnoverPercent, usagePercent, offensiveRating, defensiveRating,  tripleDouble, doubleDouble, team, opponent, home, playerID, dateID) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
 
-        # insert performance data to database
-        cursor.execute(insert_performance, inserts)
-        cnx.commit()
+        update_performance = "UPDATE performance set points=%s, minutesPlayed=%s, fieldGoals=%s, fieldGoalsAttempted=%s, fieldGoalPercent=%s, 3PM=%s, 3PA=%s, 3PPercent=%s, FT=%s, FTA=%s, FTPercent=%s, offensiveRebounds=%s, defensiveRebounds=%s, totalRebounds=%s, assists=%s,  steals=%s, blocks=%s, turnovers=%s, personalFouls=%s, plusMinus=%s, trueShootingPercent=%s, effectiveFieldGoalPercent=%s, 3pointAttemptRate=%s, freeThrowAttemptRate=%s, offensiveReboundPercent=%s, defensiveReboundPercent=%s, totalReboundPercent=%s, assistPercent=%s, stealPercent=%s, blockPercent=%s, turnoverPercent=%s, usagePercent=%s, offensiveRating=%s, defensiveRating=%s,  tripleDouble=%s, doubleDouble=%s, team=%s, opponent=%s, home=%s where playerID= %s and dateID = %s"
+
+        check = "SELECT * from performance where dateID = %s and playerID = %s"
+        cursor.execute(check,(date_id,player_id))
+        checks = cursor.fetchall()
+        if len(checks) > 0:  # if a player already has pos, salary for that day just update
+          print "Updating player", player_id
+          print "DateId", date_id
+          cursor.execute(update_performance, inserts)
+          cnx.commit()
+        else: # the player was not in the table 
+          print "Inserting for first time"
+          cursor.execute(insert_performance, inserts) # insert performance data to database
+          cnx.commit()
+
+    cleanUp = "DELETE FROM performance WHERE blocks IS NULL"
+    cursor.execute(cleanUp)
+    cnx.commit()
 
 # get team names from url
 def getTeams(url):
