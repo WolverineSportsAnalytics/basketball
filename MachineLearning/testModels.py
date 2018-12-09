@@ -15,6 +15,7 @@ from sklearn.model_selection import KFold
 from sklearn.feature_selection import SelectFromModel
 from sklearn.svm import LinearSVC
 import models
+from feature_selector import FeatureSelector
 
 
 from sklearn.preprocessing import normalize
@@ -81,8 +82,20 @@ def split_features(featuresMatrix, chosenFeatures):
     #return only the chosen features from features table, and the fanduel points
     return featuresMatrix[:, chosenFeatures], fanduel
 
-
+def feature_selection(train, test):
+     '''
+    Feature selection method developed here: https://towardsdatascience.com/a-feature-selection-tool-for-machine-learning-in-python-b64dd23710f0
     
+    Based off of GBM, eliminates variables with too many missing values, collinearity, zero-importance, low-cumulative importance and zero variance
+    '''
+    train_labels = train[0,]
+    fs = FeatureSelector(data = train[1:(nrow(data)-1),], labels = train_labels)
+    fs.identify_all(selection_params = {'missing_threshold': 0.6,    
+                                    'correlation_threshold': 0.98, 
+                                    'task': 'regression',    
+                                    'eval_metric': 'auc', 
+                                    'cumulative_importance': 0.99})
+    return(fs.remove(methods = 'all'))
 
 def main():
     cnx = mysql.connector.connect(user="root",
