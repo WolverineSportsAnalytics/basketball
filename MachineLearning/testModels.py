@@ -14,11 +14,29 @@ from sklearn.metrics import mean_squared_error, make_scorer, explained_variance_
 from sklearn.model_selection import KFold
 from sklearn.feature_selection import SelectFromModel
 from sklearn.svm import LinearSVC
+import models
 
 
 from sklearn.preprocessing import normalize
 
 from genetic_selection import GeneticSelectionCV
+
+def get_features_from_model(model, dateID, cursor):
+    getFeatures = "SELECT "
+    for m in (model):
+        getFeatures += m
+        getFeatures += ", "
+    getFeatures = getFeatures[:-2]
+    getFeatures += " FROM futures"    # turn into numpy arrays
+    getFeatures += " WHERE dateID < "
+    getFeatures += str(dateID)
+    print getFeatures
+
+    cursor.execute(getFeatures)
+    return cursor.fetchall()
+
+
+
 
 def get_features_matrix(cnx, cursor, start_date, end_date):
     '''
@@ -70,10 +88,14 @@ def main():
     cnx = mysql.connector.connect(user="root",
                                   host="127.0.0.1",
                                   database="basketball",
-                                  password="Federer123!")
+                                  password="")
     cursor = cnx.cursor(buffered=True)
 
-    features = get_features_matrix(cnx, cursor, 0, 900)
+    # this gets features by using model list in models.py
+    leModel = models.leModel
+    features = get_features_from_model(leModel, 900, cursor)
+
+    # features = get_features_matrix(cnx, cursor, 0, 900)
 
     
     print len(features[0])
