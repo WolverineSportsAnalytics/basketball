@@ -89,17 +89,15 @@ if __name__ == "__main__":
     cnx = mysql.connector.connect(user="wsa@wsabasketball",
                                   host='wsabasketball.mysql.database.azure.com',
                                   database="basketball",
-                                  password="LeBron>MJ!")
+                                  password="")
     cursor = cnx.cursor(buffered=True)
 
 
 
     now = datetime.datetime.now()
-    now = now - datetime.timedelta(days=3) 
     day = now.day
     year = now.year
     month = now.month
-    print day, month, year
 
     optimize(day, month, year, cursor)
 
