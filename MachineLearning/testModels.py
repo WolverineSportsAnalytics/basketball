@@ -14,14 +14,14 @@ from sklearn.metrics import mean_squared_error, make_scorer, explained_variance_
 from sklearn.model_selection import KFold
 from sklearn.feature_selection import SelectFromModel
 from sklearn.svm import LinearSVC
-<<<<<<< HEAD
+
 from feature_selector import FeatureSelector
 import pandas as pd
-=======
+
 import models
 from feature_selector import FeatureSelector
 
->>>>>>> 281ee2ff9f210f6778ad443e1637d7344c19ac4a
+
 
 from sklearn.preprocessing import normalize
 
@@ -116,33 +116,18 @@ def split_features(featuresMatrix, chosenFeatures):
     #return only the chosen features from features table, and the fanduel points
     return featuresMatrix[:, chosenFeatures], fanduel
 
-def feature_selection(train, test):
-     '''
-    Feature selection method developed here: https://towardsdatascience.com/a-feature-selection-tool-for-machine-learning-in-python-b64dd23710f0
-    
-    Based off of GBM, eliminates variables with too many missing values, collinearity, zero-importance, low-cumulative importance and zero variance
-    '''
-    train_labels = train[0,]
-    fs = FeatureSelector(data = train[1:(nrow(data)-1),], labels = train_labels)
-    fs.identify_all(selection_params = {'missing_threshold': 0.6,    
-                                    'correlation_threshold': 0.98, 
-                                    'task': 'regression',    
-                                    'eval_metric': 'auc', 
-                                    'cumulative_importance': 0.99})
-    return(fs.remove(methods = 'all'))
-
 def main():
     cnx = mysql.connector.connect(user="root",
                                   host="127.0.0.1",
                                   database="basketball",
-                                  password="")
+                                  password="Federer123!")
     cursor = cnx.cursor(buffered=True)
 
     # this gets features by using model list in models.py
-    leModel = models.leModel
-    features = get_features_from_model(leModel, 900, cursor)
+    #leModel = models.leModel
+    #features = get_features_from_model(leModel, 900, cursor)
 
-    # features = get_features_matrix(cnx, cursor, 0, 900)
+    features = get_features_matrix(cnx, cursor, 0, 900)
 
     
     print len(features[0])
