@@ -23,7 +23,6 @@ def optimize(day, month, year, cursor):
 
     gameID = getDate(day, month, year, cursor)
     print gameID
-    gameID = 1297
 
     # get players
     playas = []
@@ -89,7 +88,7 @@ if __name__ == "__main__":
     cnx = mysql.connector.connect(user="wsa@wsabasketball",
                                   host='wsabasketball.mysql.database.azure.com',
                                   database="basketball",
-                                  password="")
+                                  password="LeBron>MJ!")
     cursor = cnx.cursor(buffered=True)
 
 
