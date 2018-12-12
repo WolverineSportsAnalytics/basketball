@@ -14,7 +14,8 @@ from sklearn.metrics import mean_squared_error, make_scorer, explained_variance_
 from sklearn.model_selection import KFold
 from sklearn.feature_selection import SelectFromModel
 from sklearn.svm import LinearSVC
-
+from feature_selector import FeatureSelector
+import pandas as pd
 
 from sklearn.preprocessing import normalize
 
@@ -31,6 +32,35 @@ def get_features_matrix(cnx, cursor, start_date, end_date):
     cursor.execute(select,days)
     features_tuples = cursor.fetchall()
     return [list(feature) for feature in features_tuples]
+
+def feature_selection(train_data, fanduel_points):
+
+    '''
+
+    Feature selection method developed here: https://towardsdatascience.com/a-feature-selection-tool-for-machine-learning-in-python-b64dd23710f0
+
+    
+
+    Based off of GBM, eliminates variables with too many missing values, collinearity, zero-importance, low-cumulative importance and zero variance
+
+    '''
+    print "Data", train_data[1:,1:];
+    print "Index", train_data[1:,0];
+    print "Columns", train_data[0,1:];
+    
+    fs = FeatureSelector(data = pd.DataFrame(data=train_data[1:,1:], index=train_data[1:,0], columns=train_data[0,1:]), labels = fanduel_points);
+
+    fs.identify_all(selection_params = {'missing_threshold': 0.6,    
+
+                                        'correlation_threshold': 0.98, 
+
+                                        'task': 'regression',    
+
+                                        'eval_metric': 'auc', 
+
+                                        'cumulative_importance': 0.99})
+
+    return(fs.remove(methods = 'all'))
 
 def cross_validation(clf, train_x, train_y, k):
     '''
@@ -117,9 +147,17 @@ def main():
     print "Train MSE: ", r_squared_train   
     print "Test MSE: ", r_squared_test
 
+    print "Length", len(X_train[0])
+    X_train = feature_selection(X,Y);
+    X = X_train[:13000]
+    Y= y_train[:13000]
+    x_test = X_train[13000:]
+    y_test = Y_train[13000:]
+    
+
  
 
-    final =[]
+    '''final =[]
     count=1;
     #perform feature selection based on Random Forest's variable importance ranking
     #print model.feature_importances_
@@ -139,7 +177,7 @@ def main():
     Y = Y_train[:13000]
     x_test = X_train[13000:]
     y_test = Y_train[13000:]
-    print y_test[0] 
+    print y_test[0] '''
 
     
 
