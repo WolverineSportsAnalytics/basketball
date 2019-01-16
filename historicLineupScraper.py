@@ -9,17 +9,13 @@ def getDate(day, month, year, cursor):
     cursor.execute(findGame, findGameData)
 
     dateID = -1
-    for datez in cursor:
-        dateID = datez[0]
+    for date in cursor:
+        dateID = date[0]
 
     return dateID
 
 def optimizeAndFill(day, month, year, model, cursor):
     gameID = getDate(day, month, year, cursor)
-
-    dateQuery = "INSERT INTO basketball.historic_lineups (dateID, date, model) VALUES (%s, %s, %s)"
-    dateQueryT = (gameID, str(month) + "-" + str(day) + "-" + str(year), model)
-    cursor.execute(dateQuery, dateQueryT)
 
     # get players
     playas = []
@@ -56,13 +52,21 @@ def optimizeAndFill(day, month, year, model, cursor):
 
     # if duplicate player, increase n + generate next lineup,
     # next lineup will generate lineup with next highest amount of points
-    numLineups = 1
+    numLineups = 5
 
     lineups = optimizer.optimize(n=numLineups)
 
     count = 2
 
+    modelStr = ""
+    modelNum = 1
+
     for lineup in lineups:
+        modelStr = model + str(modelNum)
+        dateQuery = "INSERT INTO basketball.historic_lineups (dateID, date, model) VALUES (%s, %s, %s)"
+        dateQueryT = (gameID, str(month) + "-" + str(day) + "-" + str(year), modelStr)
+        cursor.execute(dateQuery, dateQueryT)
+
         print(lineup)
         print(lineup.fantasy_points_projection)
         print(lineup.salary_costs)
@@ -89,7 +93,7 @@ def optimizeAndFill(day, month, year, model, cursor):
             insertHistory += "actualPoints" + posString + " = %s "
             insertHistory += "WHERE dateID = %s AND model = %s"
             # VALUES (%s, %s, %s, %s, %s)"
-            insertHistoryT = (player.id, player.first_name, player.team, player.salary, player.fppg, fdPointsDict[player.id], gameID, model)
+            insertHistoryT = (player.id, player.first_name, player.team, player.salary, player.fppg, fdPointsDict[player.id], gameID, modelStr)
             cursor.execute(insertHistory, insertHistoryT)
 
         for player in playerIDList:
@@ -101,9 +105,11 @@ def optimizeAndFill(day, month, year, model, cursor):
 
         print("Total Points: " + str(dkpoints))
         insertTotals = "UPDATE historic_lineups SET projPointsLineup = %s, actualPointsLineup = %s WHERE dateID = %s AND model = %s"
-        insertTotalsData = (lineup.fantasy_points_projection, dkpoints, gameID, model)
+        insertTotalsData = (lineup.fantasy_points_projection, dkpoints, gameID, modelStr)
         cursor.execute(insertTotals, insertTotalsData)
         print("\n")
+
+        modelNum += 1
 
 if __name__ == "__main__":
     print("Loading data...")
