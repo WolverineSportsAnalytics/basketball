@@ -67,11 +67,11 @@ def feature_selection(train_data, fanduel_points):
     Based off of GBM, eliminates variables with too many missing values, collinearity, zero-importance, low-cumulative importance and zero variance
 
     '''
-    print "Data", train_data[1:,1:];
-    print "Index", train_data[1:,0];
-    print "Columns", train_data[0,1:];
-    
-    fs = FeatureSelector(data = pd.DataFrame(data=train_data[1:,1:], index=train_data[1:,0], columns=train_data[0,1:]), labels = fanduel_points);
+    #print "Data", train_data[1:,1:];
+    #print "Index", train_data[1:,0];
+    #print "Columns", train_data[0,1:];
+    data = pd.DataFrame(train_data)
+    fs = FeatureSelector(data = data,labels = fanduel_points)
 
     fs.identify_all(selection_params = {'missing_threshold': 0.6,    
 
@@ -120,7 +120,7 @@ def main():
     cnx = mysql.connector.connect(user="root",
                                   host="127.0.0.1",
                                   database="basketball",
-                                  password="Federer123!")
+                                  password="")
     cursor = cnx.cursor(buffered=True)
 
     # this gets features by using model list in models.py
@@ -174,7 +174,7 @@ def main():
     print "Length", len(X_train[0])
     X_train = feature_selection(X,Y);
     X = X_train[:13000]
-    Y= y_train[:13000]
+    Y = Y_train[:13000]
     x_test = X_train[13000:]
     y_test = Y_train[13000:]
     
