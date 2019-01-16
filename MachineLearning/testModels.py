@@ -73,15 +73,15 @@ def feature_selection(train_data, fanduel_points):
     data = pd.DataFrame(train_data)
     fs = FeatureSelector(data = data,labels = fanduel_points)
 
-    fs.identify_all(selection_params = {'missing_threshold': 0.6,    
+    fs.identify_all(selection_params = {'missing_threshold': 0.5,    
 
-                                        'correlation_threshold': 0.98, 
+                                        'correlation_threshold': 0.7, 
 
                                         'task': 'regression',    
 
-                                        'eval_metric': 'auc', 
+                                        'eval_metric': 'l2', 
 
-                                        'cumulative_importance': 0.99})
+                                        'cumulative_importance': 0.9})
 
     return(fs.remove(methods = 'all'))
 
@@ -173,10 +173,13 @@ def main():
 
     print "Length", len(X_train[0])
     X_train = feature_selection(X,Y);
-    X = X_train[:13000]
-    Y = Y_train[:13000]
-    x_test = X_train[13000:]
-    y_test = Y_train[13000:]
+    print X_train
+    print len(X_train)
+
+    X = X_train[:10000]
+    Y = Y_train[:10000]
+    x_test = X_train[10000:]
+    y_test = Y_train[10000:]
     
 
  
