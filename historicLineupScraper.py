@@ -3,6 +3,12 @@ import mysql.connector
 from pydfs_lineup_optimizer import *
 import constants
 
+# function to iterate through a range of dates in the scrapers
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days) + 1):
+        yield start_date + timedelta(n)
+
+
 def getDate(day, month, year, cursor):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
     findGameData = (wsadate(year, month, day),)
@@ -34,7 +40,7 @@ def optimizeAndFill(day, month, year, model, cursor):
     cursor.execute(getPlayersQuery, getBPlayersData)
 
     players = cursor.fetchall()
-    print ("Number of players being considered: " + str(cursor.rowcount))
+    #print ("Number of players being considered: " + str(cursor.rowcount))
 
     for baller in players:
         positions = []
@@ -67,9 +73,9 @@ def optimizeAndFill(day, month, year, model, cursor):
         dateQueryT = (gameID, str(month) + "-" + str(day) + "-" + str(year), modelStr)
         cursor.execute(dateQuery, dateQueryT)
 
-        print(lineup)
-        print(lineup.fantasy_points_projection)
-        print(lineup.salary_costs)
+        # print(lineup)
+        # print(lineup.fantasy_points_projection)
+        # print(lineup.salary_costs)
         playerIDList = []
         dkpoints = 0
         for player in lineup.lineup:
@@ -101,13 +107,13 @@ def optimizeAndFill(day, month, year, model, cursor):
             playerName = fdPlayersPoints[player]
 
             # print optimized lineups
-            print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(fdPointsDict[player]))
+            #print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(fdPointsDict[player]))
 
-        print("Total Points: " + str(dkpoints))
+        #print("Total Points: " + str(dkpoints))
         insertTotals = "UPDATE historic_lineups SET projPointsLineup = %s, actualPointsLineup = %s WHERE dateID = %s AND model = %s"
         insertTotalsData = (lineup.fantasy_points_projection, dkpoints, gameID, modelStr)
         cursor.execute(insertTotals, insertTotalsData)
-        print("\n")
+        #print("\n")
 
         modelNum += 1
 
@@ -120,13 +126,20 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor()
 
-    year = constants.yearP
-    month = constants.monthP
-    day = constants.dayP
+    startyear = constants.startYearP
+    startmonth = constants.startMonthP
+    startday = constants.startDayP
 
-    optimizeAndFill(day, month, year, "LeBron", cursor)
-    optimizeAndFill(day, month, year, "Lonzo", cursor)
-    optimizeAndFill(day, month, year, "Simmons", cursor)
+    endyear = constants.endYearP
+    endmonth = constants.endMonthP
+    endday = constants.endDayP
+
+    start_date = date(startYearP, startMonthP, startDayP)
+    end_date = date(endYearP, endMonthP, endDayP)
+    for single_date in daterange(start_date, end_date):
+        optimizeAndFill(single_date.day, single_date.month, single_date.year, "LeBron", cursor)
+        optimizeAndFill(single_date.day, single_date.month, single_date.year, "Lonzo", cursor)
+        optimizeAndFill(single_date.day, single_date.month, single_date.year, "Simmons", cursor)
 
     cursor.close()
     cnx.commit()
