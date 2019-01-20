@@ -1,11 +1,11 @@
-from datetime import date
+from datetime import date as wsadate
 import mysql.connector
 from pydfs_lineup_optimizer import *
 import constants
 
 def getDate(day, month, year, cursor):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
-    findGameData = (date(year, month, day),)
+    findGameData = (wsadate(year, month, day),)
     cursor.execute(findGame, findGameData)
 
     dateID = -1
