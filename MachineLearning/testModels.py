@@ -137,38 +137,21 @@ def feature_selection(train_data, fanduel_points):
 
 
     '''
-
-    #print "Data", train_data[1:,1:];
-
+   #print "Data", train_data[1:,1:];
     #print "Index", train_data[1:,0];
-
     #print "Columns", train_data[0,1:];
-
     data = pd.DataFrame(train_data)
-
     fs = FeatureSelector(data = data,labels = fanduel_points)
-
-
 
     fs.identify_all(selection_params = {'missing_threshold': 0.5,    
 
-
-
                                         'correlation_threshold': 0.7, 
-
-
 
                                         'task': 'regression',    
 
-
-
                                         'eval_metric': 'l2', 
 
-
-
                                         'cumulative_importance': 0.9})
-
-
 
     return(fs.remove(methods = 'all'))
 
@@ -244,8 +227,7 @@ def main():
 
                                   database="basketball",
 
-                                  password="Federer123!")
-
+                                  password="")
     cursor = cnx.cursor(buffered=True)
 
 
@@ -310,7 +292,7 @@ def main():
 
     reduced_features = feature_selection(features, response);
 
-    
+   
     reduced_features_train = reduced_features[:10000]
 
     response_train = response[:10000]
