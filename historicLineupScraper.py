@@ -1,4 +1,5 @@
 from datetime import date as wsadate
+from datetime import timedelta
 import mysql.connector
 from pydfs_lineup_optimizer import *
 import constants
@@ -134,9 +135,11 @@ if __name__ == "__main__":
     endmonth = constants.endMonthP
     endday = constants.endDayP
 
-    start_date = date(startYearP, startMonthP, startDayP)
-    end_date = date(endYearP, endMonthP, endDayP)
+    start_date = wsadate(startyear, startmonth, startday)
+    end_date = wsadate(endyear, endmonth, endday)
+
     for single_date in daterange(start_date, end_date):
+        print(single_date)
         optimizeAndFill(single_date.day, single_date.month, single_date.year, "LeBron", cursor)
         optimizeAndFill(single_date.day, single_date.month, single_date.year, "Lonzo", cursor)
         optimizeAndFill(single_date.day, single_date.month, single_date.year, "Simmons", cursor)
