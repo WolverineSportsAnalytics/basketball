@@ -1,5 +1,5 @@
 import mysql.connector as ms
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 import constants
 from bs4 import BeautifulSoup
 import requests
@@ -16,17 +16,26 @@ def daterange(start_date, end_date):
 # function that generates all sportsbookreview urls within the daterange
 def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
     start_date = date(startYear, startMonth, startDay)
-    end_date = date(endYear, endMonth, endDay)
+    now = datetime.today()
+    end_date = date(now.year, now.month, now.day)
     urls = []
     for single_date in daterange(start_date, end_date):
-        if single_date.day > 9:
+        if single_date.day > 9 and single_date.month > 9:
             urls.append(
                 'https://www.sportsbookreview.com/betting-odds/nba-basketball/?date=' + str(single_date.year) + str(
                     single_date.month) + str(single_date.day))
+        elif single_date.day > 9 and single_date.month < 10:
+            urls.append(
+                'https://www.sportsbookreview.com/betting-odds/nba-basketball/?date=' + str(single_date.year) + '0' +
+                str(single_date.month) + str(single_date.day))
+        elif single_date.day < 10 and single_date.month > 9:
+            urls.append(
+                'https://www.sportsbookreview.com/betting-odds/nba-basketball/?date=' + str(single_date.year) +
+                str(single_date.month) + '0' + str(single_date.day))
         else:
             urls.append(
-                'https://www.sportsbookreview.com/betting-odds/nba-basketball/?date=' + str(single_date.year) + str(
-                    single_date.month) + '0' + str(single_date.day))
+                'https://www.sportsbookreview.com/betting-odds/nba-basketball/?date=' + str(single_date.year) + '0' +
+                str(single_date.month) + '0' + str(single_date.day))
     return urls
 
 # inserts the odds into sql
@@ -68,7 +77,9 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
             awaySpread = float(''.join(awayOdds[0][1:].replace("½", ".5")))
             awayMoneyLine = float(''.join(awayOdds[1][1:].replace("½", ".5")))
 
-            addGame = ("INSERT INTO game_odds (homeID, awayID, homeSpread, awaySpread, homeMoneyLine, awayMoneyLine) VALUES(%s, %s, %s, %s, %s, %s)")
+            idOdds += 1
+
+            addGame = ("INSERT INTO game_odds (homeID, awayID, homeMoneyLine, awayMoneyLine, idOdds, homeSpread, awaySpread) VALUES(%s, %s, %s, %s, %s, %s, %s)")
             addGameD = (homeID[0][0], awayID[0][0], homeSpread, awaySpread, homeMoneyLine, awayMoneyLine)
             cursor.execute(addGame, addGameD)
 
