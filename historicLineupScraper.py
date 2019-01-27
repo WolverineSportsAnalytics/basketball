@@ -127,16 +127,16 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor()
 
-    startyear = constants.startYearP
-    startmonth = constants.startMonthP
-    startday = constants.startDayP
+    startYear = constants.startYearP
+    startMonth = constants.startMonthP
+    startDay = constants.startDayP
 
-    endyear = constants.endYearP
-    endmonth = constants.endMonthP
-    endday = constants.endDayP
+    endYear = constants.endYearP
+    endMonth = constants.endMonthP
+    endDay = constants.endDayP
 
-    start_date = wsadate(startyear, startmonth, startday)
-    end_date = wsadate(endyear, endmonth, endday)
+    start_date = wsadate(startYear, startMonth, startDay)
+    end_date = wsadate(endYear, endMonth, endDay)
 
     for single_date in daterange(start_date, end_date):
         print(single_date)
