@@ -3,18 +3,15 @@ import mysql.connector
 import datetime as dt
 import constants
 import models
+from datetime import date as wsadate
+from datetime import timedelta
 
-def actualProjMagic(day, month, year):
+# function to iterate through a range of dates in the scrapers
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days) + 1):
+        yield start_date + timedelta(n)
 
-    # dates to retrieve data for batter test data
-    # start date
-
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-    cursor = cnx.cursor()
-
+def actualProjMagic(day, month, year, cursor):
     dateID = getDate(day, month, year, cursor)
 
     print "Projecting with Ben Simmons Model..."
@@ -174,6 +171,7 @@ def auto(day, month, year):
     cursor = cnx.cursor()
 
     actualProjMagic(day, month, year)
+
 if __name__ == "__main__":
     print "Loading data..."
 
@@ -183,8 +181,20 @@ if __name__ == "__main__":
                                   password=constants.databasePassword)
     cursor = cnx.cursor()
 
-    year = constants.yearP
-    month = constants.monthP
-    day = constants.dayP
+    startYear = constants.startYearP
+    startMonth = constants.startMonthP
+    startDay = constants.startDayP
 
-    actualProjMagic(day, month, year)
+    endYear = constants.endYearP
+    endMonth = constants.endMonthP
+    endDay = constants.endDayP
+
+    start_date = wsadate(startYear, startMonth, startDay)
+    end_date = wsadate(endYear, endMonth, endDay)
+
+    for single_date in daterange(start_date, end_date):
+        actualProjMagic(single_date.day, single_date.month, single_date.year, cursor)
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
