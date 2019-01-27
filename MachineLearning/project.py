@@ -30,3 +30,9 @@ def project(startDay, startMonth, startYear, endDay, endMonth, endYear):
     prediction = projectById(startid, endid, cursor)
 
     # prediction returns tuples of (playerid, prediction)
+
+    nameOfModel = ""
+    check = "SELECT " + nameOfModel + " FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA =basetball AND TABLE_NAME =performance;"
+    addCol = "ALTER TABLE performance ADD " + nameOfModel + " float;"
+
+
