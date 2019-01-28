@@ -4,8 +4,6 @@ import constants
 from bs4 import BeautifulSoup
 import urllib
 import requests
-import re
-import json
 
 """
 This file scrapes in spread and moneyline numbers from sportsbookreview for each game every day in any daterange.
@@ -50,7 +48,6 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
                                   password=constants.databasePassword)
 
     cursor = cnx.cursor(buffered=True)
-    idOdds = 0
 
     for url in urls:
 
@@ -64,7 +61,6 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
         for i in range(0, len(teams)//2):
             # splits values from odds so numbers and other characters are separate
             gameOdds = odds[i].text
-            print("Odds: ", gameOdds)
 
             homeIDStatement = ("SELECT teamID FROM basketball.team_reference WHERE bovada = %s")
             cursor.execute(homeIDStatement, (teams[i * 2 + 1].text,))
@@ -74,6 +70,7 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
             cursor.execute(awayIDStatement, (teams[i * 2].text,))
             awayID = cursor.fetchall()
 
+            # separates home and away moneylines
             if len(gameOdds) > 0:
                 if gameOdds[0] == '+':
                     awayOdds = '+' + str(gameOdds[1:3])
@@ -105,16 +102,10 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
                 elif gameOdds[2] == '-':
                     homeOdds = '-' + str(gameOdds[3:])
 
-                print("Away odds: ", awayOdds)
-                print("Home odds: ", homeOdds)
-
                 '''homeSpread = float(''.join(homeOdds[0][1:].replace("½",".5")))
 
                 awaySpread = float(''.join(awayOdds[0][1:].replace("½", ".5")))
                 '''
-
-                idOdds += 1
-                print("Game number: ", idOdds)
 
                 # add home and awaySpread later
                 addGame = ("INSERT INTO game_odds (homeID, awayID, homeMoneyLine, awayMoneyLine) VALUES(%s, %s, %s, %s)")
@@ -150,7 +141,7 @@ if __name__ == "__main__":
     clear_table(cursor, cnx)
 
     now = datetime.today()
-    
+
     InsertGameOdds(constants.startDayP, constants.startMonthP, constants.startYearP,
                              now.day, now.month, now.year)
 
