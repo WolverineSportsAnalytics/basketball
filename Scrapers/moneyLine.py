@@ -85,7 +85,6 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
         for i in range(0, len(teams)//2):
             # splits values from odds so numbers and other characters are separate
             gameOdds = odds[i].text
-            print("Game odds: ", gameOdds)
 
             homeIDStatement = ("SELECT teamID FROM basketball.team_reference WHERE bovada = %s")
             cursor.execute(homeIDStatement, (teams[i * 2 + 1].text,))
@@ -162,7 +161,6 @@ def InsertGameSpread(startDay, startMonth, startYear, endDay, endMonth, endYear)
         for i in range(0, len(teams)//2):
 
             gameSpread = spread[i].text
-            print("Game spread: ", gameSpread)
 
             if len(gameSpread) > 0:
 
@@ -204,9 +202,6 @@ def InsertGameSpread(startDay, startMonth, startYear, endDay, endMonth, endYear)
                             awaySpread = awaySpread[0:3] + awaySpread[3].replace("½", ".5")
                             homeSpread = homeSpread[0] + awaySpread[1:]
 
-                print("Away spread: ", awaySpread)
-                print("Home spread: ", homeSpread)
-
                 id += 1
 
                 # add home and awaySpread by updating table
@@ -243,10 +238,10 @@ if __name__ == "__main__":
 
     now = datetime.today()
 
-    InsertGameOdds(constants.startDayP, constants.startMonthP, constants.startYearP,
-                             now.day, now.month, now.year)
-    InsertGameSpread(constants.startDayP, constants.startMonthP, constants.startYearP,
-                             now.day, now.month, now.year)
+    # moneyline only applies to regular season games
+    # 2018-2019 regular season started Oct 16, 2018
+    InsertGameOdds(16, 10, 2018, now.day, now.month, now.year)
+    InsertGameSpread(16, 10, 2018, now.day, now.month, now.year)
 
     cursor.close()
     cnx.commit()
