@@ -15,7 +15,7 @@ def daterange(start_date, end_date):
         yield start_date + timedelta(n)
 
 # function that generates all sportsbookreview urls within the daterange
-def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
+def generateMoneyLineURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
     start_date = date(startYear, startMonth, startDay)
     end_date = date(endYear, endMonth, endDay)
     urls = []
@@ -38,10 +38,34 @@ def generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
                 str(single_date.month) + '0' + str(single_date.day))
     return urls
 
+def generateSpreadURLs(startDay, startMonth, startYear, endDay, endMonth, endYear):
+    start_date = date(startYear, startMonth, startDay)
+    end_date = date(endYear, endMonth, endDay)
+    urls = []
+    for single_date in daterange(start_date, end_date):
+        if single_date.day > 9 and single_date.month > 9:
+            urls.append(
+                'https://classic.sportsbookreview.com/betting-odds/nba-basketball/?date=' + str(single_date.year) + str(
+                    single_date.month) + str(single_date.day))
+        elif single_date.day > 9 and single_date.month < 10:
+            urls.append(
+                'https://classic.sportsbookreview.com/betting-odds/nba-basketball/?date=' + str(single_date.year) + '0' +
+                str(single_date.month) + str(single_date.day))
+        elif single_date.day < 10 and single_date.month > 9:
+            urls.append(
+                'https://classic.sportsbookreview.com/betting-odds/nba-basketball/?date=' + str(single_date.year) +
+                str(single_date.month) + '0' + str(single_date.day))
+        else:
+            urls.append(
+                'https://classic.sportsbookreview.com/betting-odds/nba-basketball/?date=' + str(single_date.year) + '0' +
+                str(single_date.month) + '0' + str(single_date.day))
+
+    return urls
+
 # inserts the odds into sql
 # inserts teamID, spread, moneyline
 def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
-    urls = generateURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
+    urls = generateMoneyLineURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
     cnx = ms.connect(user=constants.databaseUser,
                                   host=constants.databaseHost,
                                   database=constants.databaseName,
@@ -61,6 +85,7 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
         for i in range(0, len(teams)//2):
             # splits values from odds so numbers and other characters are separate
             gameOdds = odds[i].text
+            print("Game odds: ", gameOdds)
 
             homeIDStatement = ("SELECT teamID FROM basketball.team_reference WHERE bovada = %s")
             cursor.execute(homeIDStatement, (teams[i * 2 + 1].text,))
@@ -102,16 +127,92 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
                 elif gameOdds[2] == '-':
                     homeOdds = '-' + str(gameOdds[3:])
 
-                '''homeSpread = float(''.join(homeOdds[0][1:].replace("½",".5")))
-
-                awaySpread = float(''.join(awayOdds[0][1:].replace("½", ".5")))
-                '''
-
-                # add home and awaySpread later
                 addGame = ("INSERT INTO game_odds (homeID, awayID, homeMoneyLine, awayMoneyLine) VALUES(%s, %s, %s, %s)")
                 addGameD = (homeID[0][0], awayID[0][0], homeOdds[0:], awayOdds[0:])
                 cursor.execute(addGame, addGameD)
-                #insert home and away moneyline
+
+                cnx.commit()
+
+        print("Updated Historical Odds in game_odds for URL: " + str(url))
+
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+
+def InsertGameSpread(startDay, startMonth, startYear, endDay, endMonth, endYear):
+    urls = generateSpreadURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
+    cnx = ms.connect(user=constants.databaseUser,
+                                  host=constants.databaseHost,
+                                  database=constants.databaseName,
+                                  password=constants.databasePassword)
+
+    cursor = cnx.cursor(buffered=True)
+
+    id = 0
+
+    for url in urls:
+
+        print(url)
+        page = requests.get(url)
+        soup = BeautifulSoup(page.text, 'html.parser')
+
+        teams = soup.find_all('span', attrs={'class': 'team-name'})
+        spread = soup.find_all('div', attrs={'class': 'el-div eventLine-opener'})
+
+        for i in range(0, len(teams)//2):
+
+            gameSpread = spread[i].text
+            print("Game spread: ", gameSpread)
+
+            if len(gameSpread) > 0:
+
+                # home and away spreads are same numbers just opposite signs
+                if gameSpread[3] != '+' and gameSpread[3] != '-' and gameSpread[0] != 'P':
+
+                    if gameSpread[0] == '+':
+                        awaySpread = '+' + gameSpread[1:4]
+                        homeSpread = '-' + gameSpread[1:4]
+                    if gameSpread[0] == '-':
+                        awaySpread = '-' + gameSpread[1:4]
+                        homeSpread = '+' + gameSpread[1:4]
+
+                elif gameSpread[3] == '+' or gameSpread[3] == '-' and gameSpread[0] != 'P':
+
+                    if gameSpread[0] == '+':
+                        awaySpread = '+' + gameSpread[1:3]
+                        homeSpread = '-' + gameSpread[1:3]
+                    elif gameSpread[0] == '-':
+                        awaySpread = '-' + gameSpread[1:3]
+                        homeSpread = '+' + gameSpread[1:3]
+
+                # PK means pick 'em so even money wagers
+                if gameSpread[0] == 'P' and gameSpread[1] == 'K':
+                    awaySpread = "PK"
+                    homeSpread = "PK"
+
+                # replaces ½ with .5 in both home and away spreads
+                if gameSpread[0] != 'P':
+                    if awaySpread[1] == "½":
+                        awaySpread = awaySpread[0] + awaySpread[1].replace("½", ".5")
+                        homeSpread = homeSpread[0] + awaySpread[1:]
+                    elif awaySpread[2] == "½":
+                        awaySpread = awaySpread[0:2] + awaySpread[2].replace("½", ".5")
+                        homeSpread = homeSpread[0] + awaySpread[1:]
+
+                    if len(awaySpread) > 3:
+                        if awaySpread[3] == "½" and awaySpread[0] != 'P':
+                            awaySpread = awaySpread[0:3] + awaySpread[3].replace("½", ".5")
+                            homeSpread = homeSpread[0] + awaySpread[1:]
+
+                print("Away spread: ", awaySpread)
+                print("Home spread: ", homeSpread)
+
+                id += 1
+
+                # add home and awaySpread by updating table
+                addGame = ("UPDATE game_odds SET homeSpread=%s, awaySpread=%s WHERE idOdds=%s")
+                addGameD = (homeSpread[0:], awaySpread[0:], id)
+                cursor.execute(addGame, addGameD)
 
                 cnx.commit()
 
@@ -143,6 +244,8 @@ if __name__ == "__main__":
     now = datetime.today()
 
     InsertGameOdds(constants.startDayP, constants.startMonthP, constants.startYearP,
+                             now.day, now.month, now.year)
+    InsertGameSpread(constants.startDayP, constants.startMonthP, constants.startYearP,
                              now.day, now.month, now.year)
 
     cursor.close()
