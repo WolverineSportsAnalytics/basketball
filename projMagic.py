@@ -38,6 +38,9 @@ def actualProjMagic(day, month, year, cursor):
     cursor.execute(getFeaturesB)
 
     features = cursor.fetchall()
+    if len(features == 0):      #add a check to see if there were even any games played that day\
+        return
+
     for feat in features:
         allPlayerFeatures.append(feat)
 
