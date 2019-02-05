@@ -8,7 +8,7 @@ from sklearn.svm import SVR
 
 from sklearn.model_selection import cross_val_score
 
-from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
 
 from sklearn.model_selection import StratifiedKFold 
 
@@ -30,31 +30,19 @@ from sklearn.model_selection import KFold
 
 from sklearn.feature_selection import SelectFromModel
 
-from sklearn.svm import LinearSVC
 
-
-
-from feature_selector import FeatureSelector
+#from feature_selector import FeatureSelector, SelectKBest, f_regression
 
 import pandas as pd
-
-
 
 import models
 
 from feature_selector import FeatureSelector
 
-
-
-
-
-
-
 from sklearn.preprocessing import normalize
 
-
-
 from genetic_selection import GeneticSelectionCV
+
 
 
 
@@ -152,6 +140,7 @@ def feature_selection(train_data, fanduel_points):
                                         'eval_metric': 'l2', 
 
                                         'cumulative_importance': 0.9})
+    fs.plot_feature_importances(threshold = 0.99, plot_n=455);
 
     return(fs.remove(methods = 'all'))
 
@@ -227,7 +216,7 @@ def main():
 
                                   database="basketball",
 
-                                  password="")
+                                  password="Federer123!")
     cursor = cnx.cursor(buffered=True)
 
 
@@ -243,17 +232,17 @@ def main():
 
   
     #split into training and testing sets
-    features_train = features[:10000]
+    features_train = features[:14000]
 
-    response_train = response[:10000]
+    response_train = response[:14000]
 
 
-    features_test = features[10000:]
+    features_test = features[14000:]
 
-    response_test = response[10000:]
+    response_test = response[14000:]
 
     
-    #Run Random Forest without Feature Selection to get Variable Importance
+    #Run Ridge without Feature Selection to get Variable Importance
     model = Ridge() 
 
     #train model
@@ -280,17 +269,48 @@ def main():
     r_squared_test = mean_squared_error(response_test, y_pred2)
 
     
-
+    print features_train.shape
+    print features_test.shape
 
 
     print "Train MSE: ", r_squared_train   
 
     print "Test MSE: ", r_squared_test
 
+    model = SelectFromModel(model, prefit=True)
+    features_train = model.transform(features_train);
+    features_test = model.transform(features_test);
+    print features_train.shape
+    print features_test.shape
+    new_model = Lasso()
+    new_model.fit(features_train, response_train)
+    
+    y_pred1 = new_model.predict(features_train) #train prediction
+
+    y_pred2 = new_model.predict(features_test) #test prediction
+
+
+    print "Ridge Regressor"
+
+    print "Feature Selection Method: K Best"
+
+    r_squared_train = mean_squared_error(response_train, y_pred1)
+
+    r_squared_test = mean_squared_error(response_test, y_pred2)
+
+    print "Train MSE: ", r_squared_train   
+
+    print "Test MSE: ", r_squared_test
+    
+    
+
+   
+    
+
 
     #now, perform feature selection
 
-    reduced_features = feature_selection(features, response);
+    '''reduced_features = feature_selection(features, response);
 
    
     reduced_features_train = reduced_features[:10000]
@@ -299,7 +319,7 @@ def main():
 
     reduced_features_test = reduced_features[10000:]
 
-    response_test = response[10000:]
+    response_test = response[10000:] '''
 
     
 
@@ -355,7 +375,7 @@ def main():
 
 
     
-    model.fit(reduced_features_train,response_train)
+    ''' model.fit(reduced_features_train,response_train)
 
     y_pred1 = model.predict(reduced_features_train) #train prediction
 
@@ -387,7 +407,7 @@ def main():
 
 
 
-    #perform cross-val using MSE as metric
+    #perform cross-val using MSE as metric '''
 
     '''scores = cross_validation(model, X_train, Y_train, 5)
 
