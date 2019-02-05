@@ -31,7 +31,7 @@ from sklearn.model_selection import KFold
 from sklearn.feature_selection import SelectFromModel
 
 
-from feature_selector import FeatureSelector
+#from feature_selector import FeatureSelector, SelectKBest, f_regression
 
 import pandas as pd
 
@@ -42,6 +42,7 @@ from feature_selector import FeatureSelector
 from sklearn.preprocessing import normalize
 
 from genetic_selection import GeneticSelectionCV
+
 
 
 
@@ -139,6 +140,7 @@ def feature_selection(train_data, fanduel_points):
                                         'eval_metric': 'l2', 
 
                                         'cumulative_importance': 0.9})
+    fs.plot_feature_importances(threshold = 0.99, plot_n=455);
 
     return(fs.remove(methods = 'all'))
 
@@ -230,18 +232,18 @@ def main():
 
   
     #split into training and testing sets
-    features_train = features[:10000]
+    features_train = features[:14000]
 
-    response_train = response[:10000]
+    response_train = response[:14000]
 
 
-    features_test = features[10000:]
+    features_test = features[14000:]
 
-    response_test = response[10000:]
+    response_test = response[14000:]
 
     
     #Run Ridge without Feature Selection to get Variable Importance
-    model = Lasso() 
+    model = Ridge() 
 
     #train model
     model.fit(features_train, response_train)
@@ -254,7 +256,7 @@ def main():
 
     #print "MLP RELU", hidden_layer
 
-    print "Lasso Regressor"
+    print "Ridge Regressor"
 
     print "Feature Selection Method: None"
 
@@ -267,23 +269,30 @@ def main():
     r_squared_test = mean_squared_error(response_test, y_pred2)
 
     
-
+    print features_train.shape
+    print features_test.shape
 
 
     print "Train MSE: ", r_squared_train   
 
     print "Test MSE: ", r_squared_test
 
-    model = SelectFromModel(model, prefit = True);
+    model = SelectFromModel(model, prefit=True)
+    features_train = model.transform(features_train);
+    features_test = model.transform(features_test);
+    print features_train.shape
+    print features_test.shape
+    new_model = Lasso()
+    new_model.fit(features_train, response_train)
     
-    y_pred1 = model.predict(features_train) #train prediction
+    y_pred1 = new_model.predict(features_train) #train prediction
 
-    y_pred2 = model.predict(features_test) #test prediction
+    y_pred2 = new_model.predict(features_test) #test prediction
 
 
-    print "Lasso Regressor"
+    print "Ridge Regressor"
 
-    print "Feature Selection Method: Lasso"
+    print "Feature Selection Method: K Best"
 
     r_squared_train = mean_squared_error(response_train, y_pred1)
 
