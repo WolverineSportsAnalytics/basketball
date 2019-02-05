@@ -238,9 +238,9 @@ if __name__ == "__main__":
 
     now = datetime.today()
 
-    # moneyline only applies to regular season games
+    # moneyline only applies to regular and postseason dates/games so only get spread for those games
     # 2018-2019 regular season started Oct 16, 2018
-    InsertGameOdds(16, 10, 2018, now.day, now.month, now.year)
+    InsertGameOdds(constants.startDayP, constants.startMonthP, constants.startYearP, now.day, now.month, now.year)
     InsertGameSpread(16, 10, 2018, now.day, now.month, now.year)
 
     cursor.close()
