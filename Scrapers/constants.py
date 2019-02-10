@@ -1,7 +1,7 @@
-databaseHost=''
-databaseUser=''
+databaseHost='127.0.0.1'
+databaseUser='root'
 databaseName='basketball'
-databasePassword=''
+databasePassword='12345678'
 
 
 #testHost='us-cdbr-iron-east-04.cleardb.net'
