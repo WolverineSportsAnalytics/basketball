@@ -70,7 +70,9 @@ def split_features(featuresMatrix, chosenFeatures):
     fanduel = [features.pop(-1) for features in featuresMatrix]
 
     
-
+    for i in range(5):
+        temp = [features.pop(0) for features in featuresMatrix]
+        
     featuresMatrix = scale(featuresMatrix)
 
 
