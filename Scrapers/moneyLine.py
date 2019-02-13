@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import mysql.connector as ms
 from datetime import timedelta, date, datetime
 import constants
@@ -63,15 +64,9 @@ def generateSpreadURLs(startDay, startMonth, startYear, endDay, endMonth, endYea
     return urls
 
 # inserts the odds into sql
-# inserts teamID, spread, moneyline
-def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
+# inserts teamID, moneyline
+def InsertGameOdds(cursor, cnx, startDay, startMonth, startYear, endDay, endMonth, endYear):
     urls = generateMoneyLineURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
-    cnx = ms.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-
-    cursor = cnx.cursor(buffered=True)
 
     for url in urls:
 
@@ -134,18 +129,10 @@ def InsertGameOdds(startDay, startMonth, startYear, endDay, endMonth, endYear):
 
         print("Updated Historical Odds in game_odds for URL: " + str(url))
 
-    cursor.close()
     cnx.commit()
-    cnx.close()
 
-def InsertGameSpread(startDay, startMonth, startYear, endDay, endMonth, endYear):
+def InsertGameSpread(cursor, cnx, startDay, startMonth, startYear, endDay, endMonth, endYear):
     urls = generateSpreadURLs(startDay, startMonth, startYear, endDay, endMonth, endYear)
-    cnx = ms.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-
-    cursor = cnx.cursor(buffered=True)
 
     id = 0
 
@@ -213,9 +200,7 @@ def InsertGameSpread(startDay, startMonth, startYear, endDay, endMonth, endYear)
 
         print("Updated Historical Odds in game_odds for URL: " + str(url))
 
-    cursor.close()
     cnx.commit()
-    cnx.close()
 
 def clear_table(cursor, cnx):
     ''' Helper Function to call in order to clear table after mistakes '''
@@ -223,9 +208,6 @@ def clear_table(cursor, cnx):
     cursor.execute("Delete from game_odds")
     cursor.execute("ALTER TABLE game_odds AUTO_INCREMENT = 1")
     cnx.commit()
-
-def my_split(s):
-    return re.split(r'(\d+)', s)
 
 if __name__ == "__main__":
     cnx = ms.connect(user="root",
@@ -238,10 +220,10 @@ if __name__ == "__main__":
 
     now = datetime.today()
 
-    # moneyline only applies to regular season games
+    # moneyline only applies to regular and postseason dates/games so only get spread for those games
     # 2018-2019 regular season started Oct 16, 2018
-    InsertGameOdds(16, 10, 2018, now.day, now.month, now.year)
-    InsertGameSpread(16, 10, 2018, now.day, now.month, now.year)
+    InsertGameOdds(cursor, cnx, constants.startDayP, constants.startMonthP, constants.startYearP, now.day, now.month, now.year)
+    InsertGameSpread(cursor, cnx, 16, 10, 2018, now.day, now.month, now.year)
 
     cursor.close()
     cnx.commit()
