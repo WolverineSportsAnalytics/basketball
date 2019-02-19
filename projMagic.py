@@ -3,6 +3,7 @@ import mysql.connector
 import datetime as dt
 import constants
 import models
+import MLPStuff
 from datetime import date as wsadate
 from datetime import timedelta
 
@@ -151,6 +152,49 @@ def actualProjMagic(day, month, year, cursor):
 
     print "Predicted FD Points for Players"
 
+def projMagicMLP(day, month, year, cursor):
+    dateID = getDate(day, month, year, cursor)
+
+    print "Projecting with MLP Model..."
+
+    getAllData = "select * from futures where fanduelPts is not null and dateID = %s"
+    newDateID = (dateID,)
+    cursor.execute(getAllData, newDateID)
+
+    features = [list(feature) for feature in cursor.fetchall()]
+    print len(features)
+    print(len(features[0]))
+
+    # How you would import and us ridge regression
+    mlp = MLPRegressor(features)
+    predictions = mlp.predict()
+    mlp.compare()
+    print predictions
+    print mlp.mse()
+
+    # allPlayerFeatures = []
+    #
+    # cursor.execute(getFeaturesB)
+    #
+    # features = cursor.fetchall()
+    # if len(features == 0):      #add a check to see if there were even any games played that day\
+    #     return
+    #
+    # for feat in features:
+    #     allPlayerFeatures.append(feat)
+    #
+    # targetX = np.asarray(allPlayerFeatures)
+    #
+    # print "Number of target examples: " + str(np.shape(targetX)[0])
+    #
+    # # add bias term
+    # ones = np.ones((np.shape(targetX)[0], 1), dtype=float)
+    # targetX = np.hstack((ones, targetX))
+    #
+    # outfile = open("coefBen.npz", 'r')
+    # thetaSKLearnRidge = np.load(outfile)
+    # # predict
+    # targetBenSimmons = targetX.dot(np.transpose(thetaSKLearnRidge))
 
 def getDate(day, month, year, cursor):
     gameIDP = 0
@@ -196,7 +240,8 @@ if __name__ == "__main__":
     end_date = wsadate(endYear, endMonth, endDay)
 
     for single_date in daterange(start_date, end_date):
-        actualProjMagic(single_date.day, single_date.month, single_date.year, cursor)
+        projMagicMLP(single_date.day, single_date.month, single_date.year, cursor)
+        # actualProjMagic(single_date.day, single_date.month, single_date.year, cursor)
 
     cursor.close()
     cnx.commit()
