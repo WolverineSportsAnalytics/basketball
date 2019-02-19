@@ -3,6 +3,7 @@ from sklearn.linear_model import Ridge
 import mysql.connector
 from sklearn.metrics import mean_squared_error
 
+
 class ridgeRegression(Algorithm):
     def split_data(self):
         ''' This will split the data and allow you to do feature selection here '''
@@ -12,9 +13,10 @@ class ridgeRegression(Algorithm):
         self.target = fanduel
 
     def predict(self):
-        self.model = Ridge(100) # set model
-        self.model.fit(self.features, self.target) # fit model
-        self.predictions = self.model.predict(self.features) # predict for features
+        self.model = Ridge(100)  # set model
+        self.model.fit(self.features, self.target)  # fit model
+        self.predictions = self.model.predict(
+            self.features)  # predict for features
         return self.predictions
 
     def mse(self):
@@ -34,11 +36,11 @@ def test():
 
     features = [list(feature) for feature in cursor.fetchall()]
 
-
-    # How you would import and us ridge regression 
+    # How you would import and us ridge regression
     ridge = ridgeRegression(features)
     predictions = ridge.predict()
     print ridge.mse()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     test()

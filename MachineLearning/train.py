@@ -5,6 +5,7 @@ import datetime as dt
 import models
 import datetime
 
+
 def getDate(day, month, year, cursor):
     gameIDP = 0
 
@@ -17,6 +18,7 @@ def getDate(day, month, year, cursor):
 
     return gameIDP
 
+
 if __name__ == "__main__":
 
     # dates to retrieve data for batter test data
@@ -27,18 +29,16 @@ if __name__ == "__main__":
     year = now.year
     month = now.month
 
-    cnx = mysql.connector.connect(user="wsa@wsabasketball",
-                                  host='wsabasketball.mysql.database.azure.com',
-                                  database="basketball",
-                                  password="LeBron>MJ!")
+    cnx = mysql.connector.connect(
+        user="wsa@wsabasketball",
+        host='wsabasketball.mysql.database.azure.com',
+        database="basketball",
+        password="LeBron>MJ!")
     cursor = cnx.cursor(buffered=True)
-
-
 
     dateID = getDate(day, month, year, cursor)
 
     print "Training Ben Simmons Model..."
-
 
     benSimmonsModel = models.benSimmonsModel
 

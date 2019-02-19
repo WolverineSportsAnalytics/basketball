@@ -11,25 +11,27 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import normalize
 import pickle
 
+
 class MLPRegressor(Algorithm):
     def split_data(self):
         return
+
     def split_features(self):
         self.features = self.data
-        #first, remove the draft_kings points (not needed)
+        # first, remove the draft_kings points (not needed)
         draft_kings = [features.pop(-1) for features in self.features]
 
-        #extract and remove the fanduel points (response variable)
-        self.target= [features.pop(-1) for features in self.features]
-        
+        # extract and remove the fanduel points (response variable)
+        self.target = [features.pop(-1) for features in self.features]
+
         for i in range(5):
             temp = [features.pop(0) for features in self.features]
-            
+
         self.features = scale(self.features)
 
     def run_pca(self):
         '''applies Principal Component Analysis on data with 201 components, returns dimension-reduced training set'''
-   
+
         filename = 'PCA_model.sav'
         pca = pickle.load(open(filename, 'rb'))
         pca.fit(self.features)
@@ -38,10 +40,11 @@ class MLPRegressor(Algorithm):
 
     def predict(self):
         self.split_features()
-        #self.run_pca()
+        # self.run_pca()
         filename = 'MLP_model.sav'
         self.model = pickle.load(open(filename, 'rb'))
-        self.predictions = self.model.predict(self.features) # predict for features
+        self.predictions = self.model.predict(
+            self.features)  # predict for features
         return self.predictions
 
     def mse(self):
@@ -67,12 +70,13 @@ def test():
     print len(features)
     print(len(features[0]))
 
-    # How you would import and us ridge regression 
+    # How you would import and us ridge regression
     mlp = MLPRegressor(features)
     predictions = mlp.predict()
     mlp.compare()
     print predictions
     print mlp.mse()
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     test()
