@@ -1,48 +1,28 @@
 from algorithmClass import Algorithm
-
-import mysql.connector
-
 import sklearn
-
 from sklearn.linear_model import LinearRegression, Ridge, Lasso
-
 from sklearn.preprocessing import scale
-
 import numpy as np
-
 from sklearn.metrics import mean_squared_error, make_scorer, explained_variance_score, mean_absolute_error
-
 import pandas as pd
-
 import models
 from sklearn.decomposition import PCA
-
 from sklearn.preprocessing import normalize
 
 class MLPRegressor(Algorithm):
-  
-
     def split_features(self, chosenFeatures):
-
     #first, remove the draft_kings points (not needed)
     draft_kings = [features.pop(-1) for features in self.features]
 
-    
-
     #extract and remove the fanduel points (response variable)
-
     fanduel = [features.pop(-1) for features in self.features]
-
     
     for i in range(5):
         temp = [features.pop(0) for features in self.features]
         
     self.features = scale(self.features)
 
-
-
     #return only the chosen features from features table, and the fanduel points
-
     return self.features[:, chosenFeatures], fanduel
 
     def run_pca(X_train, X_test):
@@ -80,10 +60,10 @@ def test():
 
     features = [list(feature) for feature in cursor.fetchall()]
 
-
     # How you would import and us ridge regression 
     ridge = ridgeRegression(features)
     predictions = ridge.predict()
+    print predictions
     print ridge.mse()
 
 if __name__=="__main__":
