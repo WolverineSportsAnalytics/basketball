@@ -3,7 +3,8 @@ import mysql.connector
 import datetime as dt
 import models
 import datetime
-import os 
+import os
+
 
 def makeProjections(day, month, year, cursor, cnx):
 
@@ -12,13 +13,12 @@ def makeProjections(day, month, year, cursor, cnx):
 
     dir_path = os.getcwd()
 
-    if dir_path.split("/")[-1]=="basketball":
+    if dir_path.split("/")[-1] == "basketball":
         os.chdir("MachineLearning")
 
     dateID = getDate(day, month, year, cursor)
 
     print "Projecting with Ben Simmons Model..."
-
 
     benSimmonsModel = models.benSimmonsModel
 
@@ -173,6 +173,5 @@ if __name__ == "__main__":
     day = now.day
     year = now.year
     month = now.month
-
 
     actualProjMagic(day, month, year)
