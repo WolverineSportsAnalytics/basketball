@@ -3,6 +3,8 @@ import mysql.connector
 import datetime as dt
 import models
 import datetime
+from ridgeRegression import ridgeRegression
+from mlp_final import MLPRegressor
 import os
 
 
@@ -126,6 +128,29 @@ def makeProjections(day, month, year, cursor, cnx):
 
     targetLeModel = targetX.dot(np.transpose(thetaSKLearnRidge))
 
+
+    # Pick Ridge Regressions
+    print "Predicting with Ridge Regression"
+    
+
+
+    getAllData = "select * from futures where dateID=" + str(dateID)
+    cursor.execute(getAllData) 
+    features = [list(feature) for feature in cursor.fetchall()] # get the features
+
+    ridge = ridgeRegression(features) 
+    ridgePredictions = ridge.predict()
+
+    # picking MLP Regressions
+    print "Predicting with MLP Regression"
+    getAllData = "select * from futures where dateID=" + str(dateID)
+    cursor.execute(getAllData) 
+    features2 = [list(feature) for feature in cursor.fetchall()] # get the features
+
+    mlp = MLPRegressor(features2)
+    mlpPredictions = mlp.predict()
+
+
     statement = "SELECT playerID"
     statement += " FROM futures"    # turn into numpy arrays
     statement += " WHERE dateID = "
@@ -138,18 +163,21 @@ def makeProjections(day, month, year, cursor, cnx):
     for counter, x in enumerate(playerIDs):
         playerID = playerIDs[counter]
         hardawayProj = 0
+        mlpProj = float(mlpPredictions[counter])
+        ridgeProj = float(ridgePredictions[counter])
         leProj = float(targetLeModel[counter])
         simmonsProj = float(targetBenSimmons[counter])
         zoProj = float(targetLonzoBall[counter])
 
-        updateBattersDKPoints = "UPDATE performance SET simmonsProj = %s, zoProj = %s, hardawayProj = %s, leProj = %s WHERE dateID = %s AND playerID = %s"
+        updateBattersDKPoints = "UPDATE performance SET simmonsProj = %s, zoProj = %s, hardawayProj = %s, leProj = %s, ridgeProj = %s, mlpProj = %s WHERE dateID = %s AND playerID = %s"
         updateBatterDKPointsData = (
-            simmonsProj, zoProj, hardawayProj, leProj,
+            simmonsProj, zoProj, hardawayProj, leProj, ridgeProj, mlpProj,
             dateID, x[0])
         cursor.execute(updateBattersDKPoints, updateBatterDKPointsData)
         cnx.commit()
 
     print "Predicted FD Points for Players"
+
     os.chdir(dir_path)
 
 
@@ -169,9 +197,11 @@ def getDate(day, month, year, cursor):
 if __name__ == "__main__":
     print "Loading data..."
 
+
     now = datetime.datetime.now()
     day = now.day
     year = now.year
     month = now.month
 
-    actualProjMagic(day, month, year)
+    makeProjections(day, month, year, cursor, cnx)
+
