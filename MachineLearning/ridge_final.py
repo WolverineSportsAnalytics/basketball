@@ -12,7 +12,7 @@ from sklearn.preprocessing import normalize
 import pickle
 
 
-class MLPRegressor(Algorithm):
+class RidgeRegressor(Algorithm):
     def split_data(self):
         return
 
@@ -41,7 +41,7 @@ class MLPRegressor(Algorithm):
     def predict(self):
         self.split_features()
         # self.run_pca()
-        filename = 'MLP_model.sav'
+        filename = 'Ridge100_model.sav'
         self.model = pickle.load(open(filename, 'rb'))
         self.predictions = self.model.predict(
             self.features)  # predict for features
@@ -71,11 +71,11 @@ def test():
     print(len(features[0]))
 
     # How you would import and us ridge regression
-    mlp = MLPRegressor(features)
-    predictions = mlp.predict()
-    mlp.compare()
+    ridge = RidgeRegressor(features)
+    predictions = ridge.predict()
+    ridge.compare()
     print predictions
-    print mlp.mse()
+    print ridge.mse()
 
 
 if __name__ == "__main__":
