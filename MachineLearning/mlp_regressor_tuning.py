@@ -2,6 +2,7 @@ import mysql.connector
 import pca_step1_modelworkflow
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import Ridge
 import sklearn
 from sklearn.preprocessing import scale
 import numpy as np
@@ -18,7 +19,7 @@ def train_model():
     cnx = mysql.connector.connect(user="root",
                                   host="127.0.0.1",
                                   database="basketball",
-                                  password="")
+                                  password="Federer123!")
     cursor = cnx.cursor(buffered=True)
 
     # extract features from database
@@ -50,18 +51,10 @@ def train_model():
     # print grid_result.best_params_
     mses = []
 
-    model = MLPRegressor(
-        hidden_layer_sizes=(
-            50,
-        ),
-        alpha=100.0,
-        activation='relu',
-        learning_rate='adaptive',
-        solver='sgd',
-        max_iter=200)
+    model = Ridge(100)
     model.fit(features_train_pca, response_train)
 
-    filename = 'MLP_model.sav'
+    filename = 'Ridge100_model.sav'
     pickle.dump(model, open(filename, 'wb'))
 
     y_pred1 = model.predict(features_test_pca)  # test prediction

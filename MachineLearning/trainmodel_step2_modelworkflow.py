@@ -27,7 +27,7 @@ def train_model():
 
     # get features and response variable
     features, response = pca_step1_modelworkflow.split_features(features, np.linspace(
-        0, 455, dtype=int, num=455))  # 456 relevant features after removal of fanduel and draftkings
+        0, 450, dtype=int, num=455))  # 456 relevant features after removal of fanduel and draftkings
 
     # run pca to get sparse representation of data
     features_train = features[:14000]
