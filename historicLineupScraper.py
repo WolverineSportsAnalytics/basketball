@@ -36,9 +36,10 @@ def optimizeAndFill(day, month, year, model, cursor):
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.zoProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.zoProj IS NOT NULL AND p.zoProj > 0"
     elif model == "Simmons":
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.simmonsProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.simmonsProj IS NOT NULL AND p.simmonsProj > 0"
-    elif model == "MLP":
+    elif model == "mlp":
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.mlpProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.mlpProj IS NOT NULL AND p.mlpProj > 0"
-
+    elif model == "ridge":
+        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.ridgeProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.ridgeProj IS NOT NULL AND p.ridgeProj > 0"
     getBPlayersData = (gameID,)
     cursor.execute(getPlayersQuery, getBPlayersData)
 
