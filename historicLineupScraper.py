@@ -36,6 +36,8 @@ def optimizeAndFill(day, month, year, model, cursor):
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.zoProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.zoProj IS NOT NULL AND p.zoProj > 0"
     elif model == "Simmons":
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.simmonsProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.simmonsProj IS NOT NULL AND p.simmonsProj > 0"
+    elif model == "MLP":
+        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.mlpProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.mlpProj IS NOT NULL AND p.mlpProj > 0"
 
     getBPlayersData = (gameID,)
     cursor.execute(getPlayersQuery, getBPlayersData)
@@ -138,11 +140,14 @@ if __name__ == "__main__":
     start_date = wsadate(startYear, startMonth, startDay)
     end_date = wsadate(endYear, endMonth, endDay)
 
+    # for single_date in daterange(start_date, end_date):
+    #     print(single_date)
+    #     optimizeAndFill(single_date.day, single_date.month, single_date.year, "LeBron", cursor)
+    #     optimizeAndFill(single_date.day, single_date.month, single_date.year, "Lonzo", cursor)
+    #     optimizeAndFill(single_date.day, single_date.month, single_date.year, "Simmons", cursor)
+
     for single_date in daterange(start_date, end_date):
-        print(single_date)
-        optimizeAndFill(single_date.day, single_date.month, single_date.year, "LeBron", cursor)
-        optimizeAndFill(single_date.day, single_date.month, single_date.year, "Lonzo", cursor)
-        optimizeAndFill(single_date.day, single_date.month, single_date.year, "Simmons", cursor)
+        optimizeAndFill(single_date.day, single_date.month, single_date.year, "MLP", cursor)
 
     cursor.close()
     cnx.commit()
