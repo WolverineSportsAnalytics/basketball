@@ -3,7 +3,7 @@ import mysql.connector
 import datetime as dt
 import constants
 import models
-import mlp_final
+import mlp_final as mp
 from datetime import date as wsadate
 from datetime import timedelta
 
@@ -156,20 +156,20 @@ def projMagicMLP(day, month, year, cursor):
     dateID = getDate(day, month, year, cursor)
 
     print "Projecting with MLP Model..."
-
+    print dateID
     getAllData = "select * from futures where fanduelPts is not null and dateID = %s"
     newDateID = (dateID,)
     cursor.execute(getAllData, newDateID)
 
     features = [list(feature) for feature in cursor.fetchall()]
-    print len(features)
-    print(len(features[0]))
+    # print features
+    # print(len(features[0]))
 
     # How you would import and us ridge regression
-    mlp = MLPRegressor(features)
+    mlp = mp.MLPRegressor(features)
     predictions = mlp.predict()
     mlp.compare()
-    print predictions
+    print len(predictions)
     print mlp.mse()
 
     # allPlayerFeatures = []
