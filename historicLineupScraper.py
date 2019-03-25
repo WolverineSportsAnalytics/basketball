@@ -21,7 +21,7 @@ def getDate(day, month, year, cursor):
 
     return dateID
 
-def optimizeAndFill(day, month, year, model, cursor):
+def optimizeAndFill(day, month, year, model, cursor,cnx):
     gameID = getDate(day, month, year, cursor)
 
     # get players
@@ -37,7 +37,7 @@ def optimizeAndFill(day, month, year, model, cursor):
     elif model == "Simmons":
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.simmonsProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.simmonsProj IS NOT NULL AND p.simmonsProj > 0"
     elif model == "mlp":
-        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.mlpProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.mlpProj IS NOT NULL AND p.mlpProj > 0"
+        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.mlpProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 and p.mlpProj IS NOT NULL"
     elif model == "ridge":
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.ridgeProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.ridgeProj IS NOT NULL AND p.ridgeProj > 0"
     getBPlayersData = (gameID,)
@@ -45,6 +45,8 @@ def optimizeAndFill(day, month, year, model, cursor):
 
     players = cursor.fetchall()
     #print ("Number of players being considered: " + str(cursor.rowcount))
+    if(len(players) == 0):
+        return
 
     for baller in players:
         positions = []
@@ -64,18 +66,24 @@ def optimizeAndFill(day, month, year, model, cursor):
     # next lineup will generate lineup with next highest amount of points
     numLineups = 5
 
-    lineups = optimizer.optimize(n=numLineups)
+    try:
+        lineups = optimizer.optimize(n=numLineups)
+    except:
+        return
 
     count = 2
 
     modelStr = ""
     modelNum = 1
 
-    for lineup in lineups:
+    try:
+      for lineup in lineups:
         modelStr = model + str(modelNum)
         dateQuery = "INSERT INTO basketball.historic_lineups (dateID, date, model) VALUES (%s, %s, %s)"
         dateQueryT = (gameID, str(month) + "-" + str(day) + "-" + str(year), modelStr)
         cursor.execute(dateQuery, dateQueryT)
+        cnx.commit()
+        print "Inserting Lineup"
 
         # print(lineup)
         # print(lineup.fantasy_points_projection)
@@ -105,6 +113,7 @@ def optimizeAndFill(day, month, year, model, cursor):
             # VALUES (%s, %s, %s, %s, %s)"
             insertHistoryT = (player.id, player.first_name, player.team, player.salary, player.fppg, fdPointsDict[player.id], gameID, modelStr)
             cursor.execute(insertHistory, insertHistoryT)
+            cnx.commit()
 
         for player in playerIDList:
             dkpoints = dkpoints + fdPointsDict[player]
@@ -120,18 +129,21 @@ def optimizeAndFill(day, month, year, model, cursor):
         #print("\n")
 
         modelNum += 1
+    except:
+        print "Cant Lineup Num Players = ", len(players)
 
 if __name__ == "__main__":
     print("Loading data...")
 
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-    cursor = cnx.cursor()
+    cnx = mysql.connector.connect(user="wsa@wsabasketball",
+                                  host='wsabasketball.mysql.database.azure.com',
+                                  database="basketball",
+                                  password="")
+    cursor = cnx.cursor(buffered=True)
+
 
     startYear = constants.startYearP
-    startMonth = constants.startMonthP
+    startMonth = constants.startMonthP + 1
     startDay = constants.startDayP
 
     endYear = constants.endYearP
@@ -148,7 +160,8 @@ if __name__ == "__main__":
     #     optimizeAndFill(single_date.day, single_date.month, single_date.year, "Simmons", cursor)
 
     for single_date in daterange(start_date, end_date):
-        optimizeAndFill(single_date.day, single_date.month, single_date.year, "MLP", cursor)
+
+        optimizeAndFill(single_date.day, single_date.month, single_date.year, "mlp", cursor, cnx)
 
     cursor.close()
     cnx.commit()
