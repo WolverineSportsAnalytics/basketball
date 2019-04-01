@@ -309,7 +309,7 @@ def statsFiller(startDay, startMonth, startYear, endDay, endMonth, endYear, cnx,
     return None
 
 def auto(day, month, year, cnx, cursor):
-    
+
 
     statsFiller(
             day, month, year, day, month, year, cnx, cursor)

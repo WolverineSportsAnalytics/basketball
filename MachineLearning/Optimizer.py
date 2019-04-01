@@ -8,6 +8,7 @@ Pulls in our projections and the sallarys of current players and optimizing for 
 Optimizes using pydfs_lineup_optimizer
 '''
 
+
 def getDate(day, month, year, cursor):
     findGame = 'SELECT iddates FROM new_dates WHERE date = %s'
     findGameData = (date(year, month, day),)
@@ -19,8 +20,8 @@ def getDate(day, month, year, cursor):
 
     return dateID
 
-def optimize(day, month, year, cursor):
 
+def optimize(day, month, year, cursor):
     gameID = getDate(day, month, year, cursor)
     print gameID
 
@@ -45,7 +46,7 @@ def optimize(day, month, year, cursor):
         newPlaya = Player(baller[1], baller[0], "", positions, baller[4], int(baller[5]), float(baller[3]))
         playas.append(newPlaya)
 
-    #instantiate optimizer + run
+    # instantiate optimizer + run
 
     optimizer = get_optimizer(Site.FANDUEL, Sport.BASKETBALL)
     optimizer.load_players(playas)
@@ -59,7 +60,7 @@ def optimize(day, month, year, cursor):
     '''
     Take these lineups and insert into database
     follow from WNBA
-
+ 
     Start without slate first
     '''
 
@@ -67,7 +68,6 @@ def optimize(day, month, year, cursor):
         print(lineup)
         print(lineup.fantasy_points_projection)
         print(lineup.salary_costs)
-
 
         playerIDList = []
         dkpoints = 0
@@ -84,6 +84,7 @@ def optimize(day, month, year, cursor):
         print("Total Points: " + str(dkpoints))
         print ("\n")
 
+
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user="wsa@wsabasketball",
                                   host='wsabasketball.mysql.database.azure.com',
@@ -92,14 +93,15 @@ if __name__ == "__main__":
     cursor = cnx.cursor(buffered=True)
 
 
+    day = 26
+    year = 2016
+    month = 10
 
-    now = datetime.datetime.now()
-    day = now.day
-    year = now.year
-    month = now.month
 
     optimize(day, month, year, cursor)
 
     cursor.close()
     cnx.commit()
     cnx.close()
+
+

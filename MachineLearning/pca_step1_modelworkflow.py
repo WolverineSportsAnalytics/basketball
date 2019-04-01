@@ -1,14 +1,4 @@
-import mysql.connector
-import pickle
-import sklearn
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
 from sklearn.preprocessing import scale
-import numpy as np
-from sklearn.metrics import mean_squared_error, make_scorer, explained_variance_score, mean_absolute_error
-import pandas as pd
-import models
-from sklearn.decomposition import PCA
-from sklearn.preprocessing import normalize
 
 
 def get_features_matrix(cnx, cursor, start_date, end_date):
