@@ -3,7 +3,7 @@ import mysql.connector
 import datetime as dt
 import models
 import datetime
-from ridgeRegression import ridgeRegression
+from ridge_final import ridgeRegression
 from mlp_final import MLPRegressor
 import os
 
@@ -19,6 +19,7 @@ def makeProjections(day, month, year, cursor, cnx):
         os.chdir("MachineLearning")
 
     dateID = getDate(day, month, year, cursor)
+    print dateID
 
     print "Projecting with Ben Simmons Model..."
 
@@ -173,6 +174,7 @@ def makeProjections(day, month, year, cursor, cnx):
         updateBatterDKPointsData = (
             simmonsProj, zoProj, hardawayProj, leProj, ridgeProj, mlpProj,
             dateID, x[0])
+        print updateBatterDKPointsData
         cursor.execute(updateBattersDKPoints, updateBatterDKPointsData)
         cnx.commit()
 
@@ -196,6 +198,13 @@ def getDate(day, month, year, cursor):
 
 if __name__ == "__main__":
     print "Loading data..."
+
+    cnx = mysql.connector.connect(user="wsa@wsabasketball",
+                                  host='wsabasketball.mysql.database.azure.com',
+                                  database="basketball",
+                                  password="LeBron>MJ!")
+    cursor = cnx.cursor(buffered=True)
+
 
 
     now = datetime.datetime.now()
