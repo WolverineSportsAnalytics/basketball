@@ -182,6 +182,65 @@ def makeProjections(day, month, year, cursor, cnx):
 
     os.chdir(dir_path)
 
+# Predict using Simmons Model and update performance table
+def makeSimmonsPrediction(dateID, cursor, cnx):
+    print "Projecting with Ben Simmons Model..."
+
+    benSimmonsModel = models.benSimmonsModel
+
+    getFeaturesB = "SELECT "
+
+    for m in (benSimmonsModel):
+        getFeaturesB += m
+        getFeaturesB += ", "
+    getFeaturesB = getFeaturesB[:-2]
+    getFeaturesB += " FROM futures"  # turn into numpy arrays
+    getFeaturesB += " WHERE dateID = "
+    getFeaturesB += str(dateID)
+
+    allPlayerFeatures = []
+
+    cursor.execute(getFeaturesB)
+
+    features = cursor.fetchall()
+    for feat in features:
+        allPlayerFeatures.append(feat)
+
+    targetX = np.asarray(allPlayerFeatures)
+
+    print "Number of target examples: " + str(np.shape(targetX)[0])
+
+    # add bias term
+    ones = np.ones((np.shape(targetX)[0], 1), dtype=float)
+    targetX = np.hstack((ones, targetX))
+
+    outfile = open("coefBen.npz", 'r')
+    thetaSKLearnRidge = np.load(outfile)
+    # predict
+    targetBenSimmons = targetX.dot(np.transpose(thetaSKLearnRidge))
+
+    statement = "SELECT playerID"
+    statement += " FROM futures"  # turn into numpy arrays
+    statement += " WHERE dateID = "
+    statement += str(dateID)
+
+    cursor.execute(statement)
+
+    playerIDs = cursor.fetchall()
+
+    for counter, x in enumerate(playerIDs):
+        simmonsProj = float(targetBenSimmons[counter])
+
+        updateBattersDKPoints = "UPDATE performance SET simmonsProj = %s WHERE dateID = %s AND playerID = %s"
+        updateBatterDKPointsData = (
+            simmonsProj,
+            dateID, x[0])
+        print updateBatterDKPointsData
+        cursor.execute(updateBattersDKPoints, updateBatterDKPointsData)
+        cnx.commit()
+
+    print "Predicted FD Points for Simmons Model"
+
 
 def getDate(day, month, year, cursor):
     gameIDP = 0
