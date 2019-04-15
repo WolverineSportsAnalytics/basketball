@@ -3,13 +3,17 @@ import mysql.connector
 import datetime as dt
 import models
 import datetime
-from ridgeRegression import ridgeRegression
+from ridge_final import RidgeRegressor
 from mlp_final import MLPRegressor
+from datetime import date as wsadate
+from datetime import timedelta
 import os
 
+def daterange(start_date, end_date):
+    for n in range(int((end_date - start_date).days) + 1):
+        yield start_date + timedelta(n)
 
 def makeProjections(day, month, year, cursor, cnx):
-
     # dates to retrieve data for batter test data
     # start date
 
@@ -19,6 +23,7 @@ def makeProjections(day, month, year, cursor, cnx):
         os.chdir("MachineLearning")
 
     dateID = getDate(day, month, year, cursor)
+    print dateID
 
     print "Projecting with Ben Simmons Model..."
 
@@ -34,7 +39,7 @@ def makeProjections(day, month, year, cursor, cnx):
         getFeaturesB += m
         getFeaturesB += ", "
     getFeaturesB = getFeaturesB[:-2]
-    getFeaturesB += " FROM futures"    # turn into numpy arrays
+    getFeaturesB += " FROM futures"  # turn into numpy arrays
     getFeaturesB += " WHERE dateID = "
     getFeaturesB += str(dateID)
 
@@ -128,31 +133,27 @@ def makeProjections(day, month, year, cursor, cnx):
 
     targetLeModel = targetX.dot(np.transpose(thetaSKLearnRidge))
 
-
     # Pick Ridge Regressions
     print "Predicting with Ridge Regression"
-    
-
 
     getAllData = "select * from futures where dateID=" + str(dateID)
-    cursor.execute(getAllData) 
-    features = [list(feature) for feature in cursor.fetchall()] # get the features
+    cursor.execute(getAllData)
+    features = [list(feature) for feature in cursor.fetchall()]  # get the features
 
-    ridge = ridgeRegression(features) 
+    ridge = RidgeRegressor(features)
     ridgePredictions = ridge.predict()
 
     # picking MLP Regressions
     print "Predicting with MLP Regression"
     getAllData = "select * from futures where dateID=" + str(dateID)
-    cursor.execute(getAllData) 
-    features2 = [list(feature) for feature in cursor.fetchall()] # get the features
+    cursor.execute(getAllData)
+    features2 = [list(feature) for feature in cursor.fetchall()]  # get the features
 
     mlp = MLPRegressor(features2)
     mlpPredictions = mlp.predict()
 
-
     statement = "SELECT playerID"
-    statement += " FROM futures"    # turn into numpy arrays
+    statement += " FROM futures"  # turn into numpy arrays
     statement += " WHERE dateID = "
     statement += str(dateID)
 
@@ -173,6 +174,7 @@ def makeProjections(day, month, year, cursor, cnx):
         updateBatterDKPointsData = (
             simmonsProj, zoProj, hardawayProj, leProj, ridgeProj, mlpProj,
             dateID, x[0])
+        print updateBatterDKPointsData
         cursor.execute(updateBattersDKPoints, updateBatterDKPointsData)
         cnx.commit()
 
@@ -197,11 +199,28 @@ def getDate(day, month, year, cursor):
 if __name__ == "__main__":
     print "Loading data..."
 
+    cnx = mysql.connector.connect(user="wsa@wsabasketball",
+                                  host='wsabasketball.mysql.database.azure.com',
+                                  database="basketball",
+                                  password="LeBron>MJ!")
+    cursor = cnx.cursor(buffered=True)
 
-    now = datetime.datetime.now()
-    day = now.day
-    year = now.year
-    month = now.month
+    startYear = 2016
+    startMonth = 11
+    startDay = 13
 
-    makeProjections(day, month, year, cursor, cnx)
+    endYear = 2018
+    endMonth = 4
+    endDay = 25
 
+
+    start_date = wsadate(startYear, startMonth, startDay)
+    end_date = wsadate(endYear, endMonth, endDay)
+
+    for single_date in daterange(start_date, end_date):
+        try:
+
+            makeProjections(single_date.day, single_date.month, single_date.year, cursor, cnx)
+        except:
+            print single_date
+    

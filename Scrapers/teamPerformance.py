@@ -66,7 +66,7 @@ def statsFiller(startDay, startMonth, startYear, endDay, endMonth, endYear, cnx,
         soup.findAll(text=lambda text: isinstance(text, Comment))
         comments = soup.findAll(text=lambda text: isinstance(text, Comment))
 
-        comment = comments[16]
+        comment = comments[15]
         soup1 = BeautifulSoup(comment, "html.parser")
         for columns in soup1.find_all("tr")[2:3]:
             teamInfo = columns.find_all("a")
@@ -133,11 +133,10 @@ def statsFiller(startDay, startMonth, startYear, endDay, endMonth, endYear, cnx,
 
         # retreives team name
         soup.findAll(text=lambda text: isinstance(text, Comment))
-        comments = soup.findAll(text=lambda text: isinstance(text, Comment))
 
         comment = comments[16]
         box_score = comments[15]
-        fourFactors = comments[17]
+        fourFactors = comments[16]
 
         soup2 = BeautifulSoup(box_score, "html.parser")
         box_scores = []
@@ -257,7 +256,7 @@ def statsFiller(startDay, startMonth, startYear, endDay, endMonth, endYear, cnx,
 
         comment = comments[16]
         box_score = comments[15]
-        fourFactors = comments[17]
+        fourFactors = comments[16]
 
         soup2 = BeautifulSoup(box_score, "html.parser")
         box_scores = []
@@ -320,13 +319,6 @@ def auto(day, month, year, cnx, cursor):
     cnx.close()
 
 def main():
-    cnx = mysql.connector.connect(user="root",
-                                  host="127.0.0.1",
-                                  database="basketball",
-                                  password="test",
-                                  auth_plugin='mysql_native_password')
-    cursor = cnx.cursor(buffered=True)
-
     cursor.close()
     cnx.commit()
     cnx.close()

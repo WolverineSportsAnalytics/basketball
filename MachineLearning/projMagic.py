@@ -3,7 +3,8 @@ import mysql.connector
 import datetime as dt
 import constants
 import models
-import mlp_final
+import mlp_final as mp
+from ridge_final import RidgeRegressor
 from datetime import date as wsadate
 from datetime import timedelta
 
@@ -156,20 +157,20 @@ def projMagicMLP(day, month, year, cursor):
     dateID = getDate(day, month, year, cursor)
 
     print "Projecting with MLP Model..."
-
+    print dateID
     getAllData = "select * from futures where fanduelPts is not null and dateID = %s"
     newDateID = (dateID,)
     cursor.execute(getAllData, newDateID)
 
     features = [list(feature) for feature in cursor.fetchall()]
-    print len(features)
-    print(len(features[0]))
+    # print features
+    # print(len(features[0]))
 
     # How you would import and us ridge regression
-    mlp = MLPRegressor(features)
+    mlp = mp.MLPRegressor(features)
     predictions = mlp.predict()
     mlp.compare()
-    print predictions
+    print len(predictions)
     print mlp.mse()
 
     # allPlayerFeatures = []
@@ -195,6 +196,36 @@ def projMagicMLP(day, month, year, cursor):
     # thetaSKLearnRidge = np.load(outfile)
     # # predict
     # targetBenSimmons = targetX.dot(np.transpose(thetaSKLearnRidge))
+
+def predictRidge(day, month, year, cursor):
+    # print "Predicting with Ridge Regression"
+    dateID = getDate(day, month, year, cursor)
+
+    getAllData = "select * from futures where dateID=" + str(dateID)
+    cursor.execute(getAllData)
+    features = [list(feature) for feature in cursor.fetchall()] # get the features
+
+    ridge = RidgeRegressor(features)
+    ridgePredictions = ridge.predict()
+
+    statement = "SELECT playerID"
+    statement += " FROM futures"    # turn into numpy arrays
+    statement += " WHERE dateID = "
+    statement += str(dateID)
+
+    cursor.execute(statement)
+
+    playerIDs = cursor.fetchall()
+
+    for counter, x in enumerate(playerIDs):
+        playerID = playerIDs[counter]
+        ridgeProj = float(ridgePredictions[counter])
+
+        updateBattersDKPoints = "UPDATE performance SET ridgeProj = %s WHERE dateID = %s AND playerID = %s"
+        updateBatterDKPointsData = (ridgeProj, dateID, x[0])
+        print updateBatterDKPointsData
+        cursor.execute(updateBattersDKPoints, updateBatterDKPointsData)
+        cnx.commit()
 
 def getDate(day, month, year, cursor):
     gameIDP = 0
@@ -240,8 +271,7 @@ if __name__ == "__main__":
     end_date = wsadate(endYear, endMonth, endDay)
 
     for single_date in daterange(start_date, end_date):
-        projMagicMLP(single_date.day, single_date.month, single_date.year, cursor)
-        # actualProjMagic(single_date.day, single_date.month, single_date.year, cursor)
+        predictRidge(single_date.day, single_date.month, single_date.year, cursor)
 
     cursor.close()
     cnx.commit()
