@@ -60,6 +60,13 @@ def makeProjections(modelList, dateID, cursor, cnx):
 
 # Predict using Simmons Model and update performance table
 def makeSimmonsPrediction(dateID, cursor, cnx):
+    dir_path = os.getcwd()
+
+    if dir_path.split("/")[-1] == "basketball":
+        os.chdir("MachineLearning")
+
+    print "DATE: " + dateID
+
     print "Projecting with Ben Simmons Model..."
 
     benSimmonsModel = models.benSimmonsModel
@@ -116,6 +123,8 @@ def makeSimmonsPrediction(dateID, cursor, cnx):
         cnx.commit()
 
     print "Predicted FD Points for Simmons Model"
+    
+    os.chdir(dir_path)
 
 
 def getDate(day, month, year, cursor):
