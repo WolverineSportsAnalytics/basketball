@@ -77,7 +77,7 @@ def insert_into_performance(cursor, cnx, dateID, url):
 	    cursor.execute(update_performance, inserts)
             cnx.commit()
         except Exception as E:
-            print E
+            print(E)
     
 
 def get_urls_in_range(dates):
@@ -116,7 +116,7 @@ def run_scraper_from_today(cursor, cnx, numdays):
     dateIDs = get_date_ids(date_list, cursor)
     
     for i in range(numdays):
-        print dateIDs[i]
+        print(dateIDs[i])
         insert_into_performance(cursor,cnx, dateIDs[i], urls[i])
 
 

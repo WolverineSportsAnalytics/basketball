@@ -4,7 +4,6 @@ import constants
 import csv
 import traceback
 from datetime import date
-import urllib2
 import requests
 from bs4 import BeautifulSoup, Comment
 
@@ -40,7 +39,7 @@ def fixFanduelIDs(cursor):
             insertFDIdsD = (actualFDID, pID)
             cursor.execute(insertFDIds, insertFDIdsD)
 
-            cnx.commit()
+            cursor.commit()
 
 def alignPlayerIDs(cursor):
     selec_id = "select playerID from player_reference where firstName= %s and lastName = %s"
@@ -69,20 +68,19 @@ def alignPlayerIDs(cursor):
                         playerID = id[0]
                     insertData = (row[1].strip(), playerID)
                     cursor.execute(insertRotoguruID, insertData)
-                    cnx.commit()
+                    cursor.commit()
                 else:
-                    print "Must manual insert fanduel id for: " + name
+                    print("Must manual insert fanduel id for: " + name)
             else:
                 playerID = 0
                 for id in cursor:
                     playerID = id[0]
                 insertData = (row[1].strip(), playerID)
                 cursor.execute(insertRotoguruID, insertData)
-                cnx.commit()
+                cursor.commit()
 
+    cursor.commit()
     cursor.close()
-    cnx.commit()
-    cnx.close()
 
 def insert_into_performance(cursor, cnx, dateID):
     #empty will be used to scrape from rotoguru csv
@@ -126,7 +124,7 @@ def insert_into_performance(cursor, cnx, dateID):
 
         	cursor.execute(getPlayerID, getPlayerIDD)
 		if cursor.rowcount == 0:
-			print name, " not in player reference"
+			print(name, " not in player reference")
 
                 player_id = cursor.fetchall()[0][0]
         
@@ -140,7 +138,7 @@ def insert_into_performance(cursor, cnx, dateID):
                         minutes)
 		cursor.execute(update_performance, inserts)
 	except Exception as e:
-		print e
+		print(e)
 
 
     cnx.commit()

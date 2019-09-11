@@ -1,4 +1,4 @@
-# import mysql.connector
+import mysql.connector
 import requests
 from bs4 import BeautifulSoup
 # import constants
@@ -62,14 +62,13 @@ def scrapeHtml(cursor, cnx):
                 updatePQ = (team, bbref)
                 cursor.execute(updatePlayer, updatePQ) 
 	except Exception as e:
-		print e, url
+		print(e, url)
 		
 
 if __name__ == "__main__":
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-
+    cnx = mysql.connector.connect(user="wsa@wsabasketball",
+                                  host='wsabasketball.mysql.database.azure.com',
+                                  database="basketball",
+                                  password="LeBron>MJ!")
     cursor = cnx.cursor(buffered=True)
     scrapeHtml(cursor, cnx)

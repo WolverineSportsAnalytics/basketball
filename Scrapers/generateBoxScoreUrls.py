@@ -12,7 +12,6 @@ import constants
 from bs4 import BeautifulSoup
 import requests
 from datetime import timedelta, date
-import urllib2
 
 
 # returns the dateID for a date in order to load data in for that dateID
@@ -61,7 +60,7 @@ def generateBasketballReferenceURLs(cursor,cnx, year, month, day):
     cursor = cnx.cursor(buffered=True)"""
 
     dateID = findDate(cursor, year, month, day)
-    print dateID
+    print(dateID)
 
     strMonth = ""
     if month == 10:
@@ -106,7 +105,7 @@ def generateBasketballReferenceURLs(cursor,cnx, year, month, day):
                 inserts = (url, dateID)
                 cursor.execute(queryBoxScoreURL, inserts)
                 cnx.commit()
-                print "Inserted URL"
+                print("Inserted URL")
 
 def auto(day, month, year):
     cnx = mysql.connector.connect(user=constants.databaseUser,
@@ -131,7 +130,7 @@ def URLSforDate(cursor, year, month, day):
     id = findDate(cursor, year, month, day)
     #need to get the number of games on that date - potential for loop
     #need to get the home team in abbreviated form to add to url
-    page = requests.get("https://www.basketball-reference.com/leagues/NBA" + str(year) + "_games-" + str(strMonth) + str(day) + "0" + ".html")
+    page = requests.get("https://www.basketball-reference.com/leagues/NBA" + str(year) + "_games-" + str(month) + str(day) + "0" + ".html")
 
 
 #function to insert all these url's into table

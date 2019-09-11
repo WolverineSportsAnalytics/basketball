@@ -1,7 +1,6 @@
 import numpy as np
 import mysql.connector
 import datetime as dt
-import models
 import datetime
 import os 
 
@@ -17,7 +16,7 @@ def makeProjections(day, month, year, cursor, cnx):
 
     dateID = getDate(day, month, year, cursor)
 
-    print "Projecting with Ben Simmons Model..."
+    print("Projecting with Ben Simmons Model...")
 
 
     benSimmonsModel = models.benSimmonsModel
@@ -46,7 +45,7 @@ def makeProjections(day, month, year, cursor, cnx):
 
     targetX = np.asarray(allPlayerFeatures)
 
-    print "Number of target examples: " + str(np.shape(targetX)[0])
+    print("Number of target examples: " + str(np.shape(targetX)[0]))
 
     # add bias term
     ones = np.ones((np.shape(targetX)[0], 1), dtype=float)
@@ -77,9 +76,9 @@ def makeProjections(day, month, year, cursor, cnx):
 
     targetX = np.asarray(allPlayerFeatures)
 
-    print "Projecting with Lonzo Ball Model..."
+    print("Projecting with Lonzo Ball Model...")
 
-    print "Number of target examples: " + str(np.shape(targetX)[0])
+    print("Number of target examples: " + str(np.shape(targetX)[0]))
 
     # add bias term
     ones = np.ones((np.shape(targetX)[0], 1), dtype=float)
@@ -91,7 +90,7 @@ def makeProjections(day, month, year, cursor, cnx):
     targetLonzoBall = targetX.dot(np.transpose(thetaSKLearnRidge))
     # predict
 
-    print "Predicting Le Lebron Model"
+    print("Predicting Le Lebron Model")
 
     getFeaturesLe = "SELECT "
 
@@ -113,9 +112,9 @@ def makeProjections(day, month, year, cursor, cnx):
 
     targetX = np.asarray(allPlayerFeatures)
 
-    print "Projecting with Le Lebron Ball Model..."
+    print("Projecting with Le Lebron Ball Model...")
 
-    print "Number of target examples: " + str(np.shape(targetX)[0])
+    print("Number of target examples: " + str(np.shape(targetX)[0]))
 
     # add bias term
     ones = np.ones((np.shape(targetX)[0], 1), dtype=float)
@@ -149,7 +148,7 @@ def makeProjections(day, month, year, cursor, cnx):
         cursor.execute(updateBattersDKPoints, updateBatterDKPointsData)
         cnx.commit()
 
-    print "Predicted FD Points for Players"
+    print("Predicted FD Points for Players")
     os.chdir(dir_path)
 
 
@@ -167,7 +166,7 @@ def getDate(day, month, year, cursor):
 
 
 if __name__ == "__main__":
-    print "Loading data..."
+    print("Loading data...")
 
     now = datetime.datetime.now()
     day = now.day

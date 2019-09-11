@@ -78,7 +78,7 @@ def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, c
         try:
             player_id = getPlayerID(bbrefID, cursor)
         except:
-            print bbrefID
+            print(bbrefID)
             continue
 
         # get all table cells of basic table
@@ -222,12 +222,12 @@ def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, c
         cursor.execute(check,(date_id,player_id))
         checks = cursor.fetchall()
         if len(checks) > 0:  # if a player already has pos, salary for that day just update
-          print "Updating player", player_id
-          print "DateId", date_id
+          print("Updating player", player_id)
+          print("DateId", date_id)
           cursor.execute(update_performance, inserts)
           cnx.commit()
         else: # the player was not in the table 
-          print "Inserting for first time"
+          print("Inserting for first time")
           cursor.execute(insert_performance, inserts) # insert performance data to database
           cnx.commit()
 

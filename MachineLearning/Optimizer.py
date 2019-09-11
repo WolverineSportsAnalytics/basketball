@@ -2,6 +2,7 @@ from datetime import date
 import mysql.connector
 from pydfs_lineup_optimizer import *
 import datetime
+import csv
 
 '''
 Pulls in our projections and the sallarys of current players and optimizing for the night
@@ -22,14 +23,14 @@ def getDate(day, month, year, cursor):
 def optimize(day, month, year, cursor):
 
     gameID = getDate(day, month, year, cursor)
-    print gameID
+    print(gameID)
 
     # get players
     playas = []
     dkPointsDict = {}
     dkPlayersPoints = {}
 
-    getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.leProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.leProj IS NOT NULL AND p.leProj > 0"
+    getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.leProj, p.team, p.fanduel, p.opponent, p.fanduelPts, b.fanduelID FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.leProj IS NOT NULL AND p.leProj > 0"
     getBPlayersData = (gameID,)
     cursor.execute(getPlayersQuery, getBPlayersData)
 
@@ -41,8 +42,7 @@ def optimize(day, month, year, cursor):
         positions.append(str(baller[2]))
         dkPointsDict[baller[1]] = float(baller[7])
         dkPlayersPoints[baller[1]] = baller[0]
-
-        newPlaya = Player(baller[1], baller[0], "", positions, baller[4], int(baller[5]), float(baller[3]))
+        newPlaya = Player(baller[8], baller[0], "", positions, baller[4], int(baller[5]), float(baller[3]))
         playas.append(newPlaya)
 
     #instantiate optimizer + run
@@ -52,7 +52,7 @@ def optimize(day, month, year, cursor):
 
     # if duplicate player, increase n + generate next lineup,
     # next lineup will generate lineup with next highest amount of points
-    numLineups = 5
+    numLineups = 25
 
     lineups = optimizer.optimize(n=numLineups)
 
@@ -62,27 +62,45 @@ def optimize(day, month, year, cursor):
 
     Start without slate first
     '''
+    todaysFDID = '32570'
 
+    arrayPlayerIDs = []
+
+    baba = 0
     for lineup in lineups:
+        print (baba + 1)
         print(lineup)
         print(lineup.fantasy_points_projection)
         print(lineup.salary_costs)
 
 
         playerIDList = []
+        fdPlayerIDList = []
         dkpoints = 0
         for player in lineup.lineup:
             playerIDList.append(player.id)
-
-        for player in playerIDList:
-            dkpoints = dkpoints + dkPointsDict[player]
-            playerName = dkPlayersPoints[player]
+            if (player.id):
+                fdPlayerIDList.append(todaysFDID + '-' + player.id)
+            else:
+                fdPlayerIDList.append(player.first_name)
+        # for player in playerIDList:
+        #     dkpoints = dkpoints + dkPointsDict[player]
+        #     playerName = dkPlayersPoints[player]
 
             # print optimized lineups
-            print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(dkPointsDict[player]))
+            # print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(dkPointsDict[player]))
+
+        arrayPlayerIDs.append(fdPlayerIDList)
 
         print("Total Points: " + str(dkpoints))
         print ("\n")
+        baba += 1
+
+    with open('fd_mass_entry.csv', 'a') as csvFile:
+        writer = csv.writer(csvFile)
+        writer.writerows(arrayPlayerIDs)
+
+    csvFile.close()
 
 if __name__ == "__main__":
     cnx = mysql.connector.connect(user="wsa@wsabasketball",

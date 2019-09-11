@@ -29,7 +29,7 @@ def run_scrapers():
     now = datetime.datetime.now()
     yesterday = now - datetime.timedelta(days=1)
 
-    print str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
+    print(str(now.year)+ "-" + str(now.month) + "-" + str(now.day))
     date =  str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
 
 
@@ -47,14 +47,14 @@ def run_scrapers():
     # run generate box score urls
     generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, yesterday.year, yesterday.month, yesterday.day)
     # run performance
-    print "Running Perforamnce DateID:", dateID-1
+    print("Running Perforamnce DateID:", dateID-1)
     performance.updateAndInsertPlayerRef(yesterday.day, yesterday.month, yesterday.year, yesterday.day, yesterday.month, yesterday.year, cursor, cnx)
 
     # run team performance
-    print "Running Team Performance DateID:", dateID-1
+    print("Running Team Performance DateID:", dateID-1)
     teamPerformance.statsFiller(yesterday.day, yesterday.month, yesterday.year, yesterday.day, yesterday.month, yesterday.year, cnx, cursor)
 
-    print "Extrapolating:", dateID
+    print("Extrapolating:", dateID)
     dailyPerformanceExtrapolation.auto(dateID,cnx, cursor)
     teamPerformanceExtrapolation.auto(dateID, cnx, cursor)
     teamVsDefenseExtrapolation.auto(dateID, cnx, cursor)

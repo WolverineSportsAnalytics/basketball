@@ -89,7 +89,7 @@ def rotogrindersBasketball(url, csv_filename, stats, dateID):
             # if it fails print out who failed
             player_id = nickName + " Failed"
 
-        print playerData['player_name'], playerData['minutes']
+        print(playerData['player_name'], playerData['minutes'])
         # print nickName, playerData['minutes'], player_id
 
     cursor.close()

@@ -18,7 +18,7 @@ def generatedates(startDay, startMonth, startYear, endDay, endMonth, endYear, cu
 	    new_date = date_statement + "\'" + dates +"\';"
 	    date_stat = (dates,)
 	    cursor.execute(insert, date_stat)
-	    print new_date
+	    print(new_date)
 
 # function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
