@@ -1,6 +1,5 @@
 import mysql.connector
 
-
 models = ["mlp", "ridge"]
 projection_type = ["lower", "regular", "upper"]
 optimizer_type = ["regular", "low_salary"]
@@ -56,10 +55,10 @@ def get_win_percentages(cursor, cnx):
             
 
 def get_metrics():
-    cnx = mysql.connector.connect(user="wsa@wsabasketball",
-                                  host='wsabasketball.mysql.database.azure.com',
+    cnx = mysql.connector.connect(user="wsa",
+                                  host='34.68.250.121',
                                   database="basketball",
-                                  password="")
+                                  password=password)
     cursor = cnx.cursor(buffered=True)
 
     get_average(cursor, cnx)
