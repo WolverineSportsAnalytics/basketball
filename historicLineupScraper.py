@@ -164,6 +164,6 @@ if __name__ == "__main__":
 
             optimizeAndFill(single_date.day, single_date.month, single_date.year, "ridge", cursor, cnx)
 
-    cursor.close()
-    cnx.commit()
-    cnx.close()
+        cursor.close()
+        cnx.commit()
+        cnx.close()
