@@ -135,20 +135,20 @@ def optimizeAndFill(day, month, year, model, cursor,cnx):
 if __name__ == "__main__":
     print("Loading data...")
 
-    cnx = mysql.connector.connect(user="wsa@wsabasketball",
-                                  host='wsabasketball.mysql.database.azure.com',
+    cnx = mysql.connector.connect(user="wsa",
+                                  host="34.68.250.121",
                                   database="basketball",
-                                  password="")
+                                  password="LeBron>MJ!")
     cursor = cnx.cursor(buffered=True)
 
 
-    startYear = constants.startYearP
-    startMonth = constants.startMonthP + 1
-    startDay = constants.startDayP
+    startYear = 2016
+    startMonth = 11
+    startDay = 7
 
-    endYear = constants.endYearP
-    endMonth = constants.endMonthP
-    endDay = constants.endDayP
+    endYear = 2019
+    endMonth = 4
+    endDay = 10
 
     start_date = wsadate(startYear, startMonth, startDay)
     end_date = wsadate(endYear, endMonth, endDay)
@@ -159,9 +159,10 @@ if __name__ == "__main__":
     #     optimizeAndFill(single_date.day, single_date.month, single_date.year, "Lonzo", cursor)
     #     optimizeAndFill(single_date.day, single_date.month, single_date.year, "Simmons", cursor)
 
-    for single_date in daterange(start_date, end_date):
+    try:
+        for single_date in daterange(start_date, end_date):
 
-        optimizeAndFill(single_date.day, single_date.month, single_date.year, "mlp", cursor, cnx)
+            optimizeAndFill(single_date.day, single_date.month, single_date.year, "ridge", cursor, cnx)
 
     cursor.close()
     cnx.commit()
