@@ -1,5 +1,5 @@
 from ridgeRegression import ridgeRegression
-from Scrapers import performance
+'''from Scrapers import performance'''
 import mysql.connector
 
 
@@ -40,17 +40,25 @@ def project(
         endYear,
         cursor):
 
-    startid = performance.getDate(startDay, startMonth, startYear, cursor)
+    '''startid = performance.getDate(startDay, startMonth, startYear, cursor)
     endid = performance.getDate(endDay, endMonth, endYear, cursor)
+    '''
+    cnx = mysql.connector.connect(user="wsa",
+                                  host="34.68.250.121",
+                                  database="basketball",
+                                  password="test")
+    cursor = cnx.cursor(buffered=True)
 
+    startid = 693
+    endid = 694
     prediction = projectById(startid, endid, cursor)
 
     # prediction returns tuples of (playerid, dateid, prediction)
 
-    nameOfModel = ""
+    nameOfModel = "ridge"
     check = "SELECT " + nameOfModel + \
-        " FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA =basetball AND TABLE_NAME =performance;"
-    addCol = "ALTER TABLE performance ADD " + nameOfModel + " float;"
+        " FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA =basketball AND TABLE_NAME =performance;"
+    '''addCol = "ALTER TABLE performance ADD " + nameOfModel + " float;"'''
 
     cursor.execute(check)
     cursor.execute(addCol)

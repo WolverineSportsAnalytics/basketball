@@ -1,7 +1,7 @@
 import numpy as np
 import mysql.connector
 import datetime as dt
-import constants
+
 import models
 import mlp_final as mp
 from ridge_final import RidgeRegressor
@@ -204,7 +204,8 @@ def predictRidge(day, month, year, cursor):
     getAllData = "select * from futures where dateID=" + str(dateID)
     cursor.execute(getAllData)
     features = [list(feature) for feature in cursor.fetchall()] # get the features
-
+    print getAllData
+    print features
     ridge = RidgeRegressor(features)
     ridgePredictions = ridge.predict()
 
@@ -216,6 +217,8 @@ def predictRidge(day, month, year, cursor):
     cursor.execute(statement)
 
     playerIDs = cursor.fetchall()
+    print statement
+    print playerIDs
 
     for counter, x in enumerate(playerIDs):
         playerID = playerIDs[counter]
@@ -242,30 +245,30 @@ def getDate(day, month, year, cursor):
 def auto(day, month, year):
     print "Loading data..."
 
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-    cursor = cnx.cursor()
+    cnx = mysql.connector.connect(user="wsa",
+                                  host="34.68.250.121",
+                                  database="basketball",
+                                  password="LeBron>MJ!")
+    cursor = cnx.cursor(buffered=True)
 
     actualProjMagic(day, month, year)
 
 if __name__ == "__main__":
     print "Loading data..."
 
-    cnx = mysql.connector.connect(user=constants.databaseUser,
-                                  host=constants.databaseHost,
-                                  database=constants.databaseName,
-                                  password=constants.databasePassword)
-    cursor = cnx.cursor()
+    cnx = mysql.connector.connect(user="wsa",
+                                  host="34.68.250.121",
+                                  database="basketball",
+                                  password="LeBron>MJ!")
+    cursor = cnx.cursor(buffered=True)
 
-    startYear = constants.startYearP
-    startMonth = constants.startMonthP
-    startDay = constants.startDayP
+    startYear = 2018
+    startMonth = 2
+    startDay = 8
 
-    endYear = constants.endYearP
-    endMonth = constants.endMonthP
-    endDay = constants.endDayP
+    endYear = 2018
+    endMonth = 2
+    endDay = 9
 
     start_date = wsadate(startYear, startMonth, startDay)
     end_date = wsadate(endYear, endMonth, endDay)
