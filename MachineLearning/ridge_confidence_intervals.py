@@ -16,10 +16,10 @@ from scipy.stats import norm
 
 def train_model():
     '''trains a Ridge Regressor model on PCA-reduced data and tunes the hyperparameters. Returns the model'''
-    cnx = mysql.connector.connect(user="root",
-                                  host="127.0.0.1",
+    cnx = mysql.connector.connect(user="wsa",
+                                  host="34.68.250.121",
                                   database="basketball",
-                                  password="Federer123!")
+                                  password="LeBron>MJ!")
     cursor = cnx.cursor(buffered=True)
 
     # extract features from database
