@@ -16,10 +16,10 @@ from scipy.stats import norm
 
 def train_model():
     '''trains a Ridge Regressor model on PCA-reduced data and tunes the hyperparameters. Returns the model'''
-    cnx = mysql.connector.connect(user="root",
-                                  host="127.0.0.1",
+    cnx = mysql.connector.connect(user="wsa",
+                                  host="34.68.250.121",
                                   database="basketball",
-                                  password="Federer123!")
+                                  password="LeBron>MJ!")
     cursor = cnx.cursor(buffered=True)
 
     # extract features from database
@@ -61,16 +61,29 @@ def train_model():
     upperbound = [];
     prediction = [];
     triples = [];
+    number_in_range = 0
     for i in range(len(features_test)):
         prediction.append(y_pred1[i])
         lowerbound.append(y_pred1[i] - norm.ppf(0.975)*std_dev[i])
         upperbound.append(y_pred1[i] + norm.ppf(0.975)*std_dev[i])
         triples.append([lowerbound[i], prediction[i], upperbound[i]])
+        if (lowerbound[i] < response_train[i] < upperbound[i]) :
+            number_in_range += 1
+        else:
+            # this is the case we werent in range
+            print " Range {}-{} : outcome {}".format(lowerbound[i], upperbound[i], response_train[i])
         
     
     mses.append(mean_squared_error(y_pred1, response_test))
 
-    print triples
+    
+    print "Mean Squared Error"
+    print mses
+    
+    print "Percent in Range"
+    print float(number_in_range)/float(len(response_test))
+
+
 
     
 
