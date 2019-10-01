@@ -8,6 +8,8 @@ from ridge_final import RidgeRegressor
 from datetime import date as wsadate
 from datetime import timedelta
 
+from scipy.stats import norm
+
 # function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days) + 1):
@@ -197,6 +199,49 @@ def projMagicMLP(day, month, year, cursor):
     # # predict
     # targetBenSimmons = targetX.dot(np.transpose(thetaSKLearnRidge))
 
+def predictRidgeConfidence(cursor, cnx, dateID):
+    getAllData = "select * from futures where dateID=" + str(dateID)
+    cursor.execute(getAllData)
+    features = [list(feature) for feature in cursor.fetchall()] # get the features
+
+    std_dev = [] # stdv of all players
+    player_ids = []
+    for player in features:
+        playerid = player[1]
+        player_ids.append(playerid)
+        get_fanduel = "SELECT fanduelPts from performance WHERE fanduelPts is not null AND playerID = " + str(playerid)
+        cursor.execute(get_fanduel)
+        fanduel = cursor.fetchall()
+        std_dev.append(np.nanstd(fanduel));
+
+    ridge = RidgeRegressor(features)
+    ridgePredictions = ridge.predict()
+
+
+
+    lowerbound = []
+    upperbound = []
+    prediction = []
+    triples = []
+
+    ''' This is a sanity check for all are same lenght '''
+    if len(std_dev) != len(ridgePredictions) != len(features) :
+        print "Warning they are not matched"
+        print "STD_DEV {} Predictions {} Players {}".format(len(std_dev), len(ridgePredictions), len(player_ids))
+
+
+    ''' Print that '''
+    for i in range(len(ridgePredictions)):
+        prediction.append(ridgePredictions[i])
+        lowerbound.append(ridgePredictions[i] - norm.ppf(0.95)*std_dev[i])
+        upperbound.append(ridgePredictions[i] + norm.ppf(0.95)*std_dev[i])
+        triples.append([lowerbound[i], prediction[i], upperbound[i]])
+
+    for i in range(len(ridgePredictions)):
+        print player_ids[i], triples[i]
+
+
+
 def predictRidge(day, month, year, cursor):
     # print "Predicting with Ridge Regression"
     dateID = getDate(day, month, year, cursor)
@@ -274,7 +319,11 @@ if __name__ == "__main__":
     end_date = wsadate(endYear, endMonth, endDay)
 
     for single_date in daterange(start_date, end_date):
-        predictRidge(single_date.day, single_date.month, single_date.year, cursor)
+        # predictRidge(single_date.day, single_date.month, single_date.year, cursor)
+
+        dateID = getDate(single_date.day, single_date.month, single_date.year, cursor)
+        predictRidgeConfidence(cursor, cnx, dateID)
+        exit(1)
 
     cursor.close()
     cnx.commit()
