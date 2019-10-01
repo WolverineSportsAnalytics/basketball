@@ -238,8 +238,12 @@ def predictRidgeConfidence(cursor, cnx, dateID):
         triples.append([lowerbound[i], prediction[i], upperbound[i]])
 
     for i in range(len(ridgePredictions)):
-        print player_ids[i], triples[i]
-
+        update_ridgeconfStatement = "UPDATE performance SET ridgeFloor = %s, ridgeProj = %s, ridgeCeil = %s WHERE dateID = %s AND playerID = %s"
+        update_ridgeconfData = (
+            triples[i][0], triples[i][1], triples[i][2],
+            dateID, player_ids[i])
+        cursor.execute(update_ridgeconfStatement, update_ridgeconfData)
+        cnx.commit()
 
 
 def predictRidge(day, month, year, cursor):
