@@ -240,8 +240,8 @@ def predictRidgeConfidence(cursor, cnx, dateID):
     for i in range(len(ridgePredictions)):
         update_ridgeconfStatement = "UPDATE performance SET ridgeFloor = %s, ridgeProj = %s, ridgeCeil = %s WHERE dateID = %s AND playerID = %s"
         update_ridgeconfData = (
-            triples[i][0], triples[i][1], triples[i][2],
-            dateID, player_ids[i])
+            str(triples[i][0]), str(triples[i][1]), str(triples[i][2]),
+            str(dateID), str(player_ids[i]))
         cursor.execute(update_ridgeconfStatement, update_ridgeconfData)
         cnx.commit()
 
