@@ -214,7 +214,7 @@ def predictRidgeConfidence(cursor, cnx, dateID):
         fanduel = cursor.fetchall()
         std_dev.append(np.nanstd(fanduel));
 
-    ridge = RidgeRegressor(features)
+    ridge = mp.MLPRegressor(features)
     ridgePredictions = ridge.predict()
 
 
@@ -238,7 +238,7 @@ def predictRidgeConfidence(cursor, cnx, dateID):
         triples.append([lowerbound[i], prediction[i], upperbound[i]])
 
     for i in range(len(ridgePredictions)):
-        update_ridgeconfStatement = "UPDATE performance SET ridgeFloor = %s, ridgeProj = %s, ridgeCeil = %s WHERE dateID = %s AND playerID = %s"
+        update_ridgeconfStatement = "UPDATE performance SET mlpFloor = %s, mlpProj = %s, mlpCeil = %s WHERE dateID = %s AND playerID = %s"
         update_ridgeconfData = (
             str(triples[i][0]), str(triples[i][1]), str(triples[i][2]),
             str(dateID), str(player_ids[i]))
@@ -311,24 +311,27 @@ if __name__ == "__main__":
                                   password="LeBron>MJ!")
     cursor = cnx.cursor(buffered=True)
 
-    startYear = 2018
-    startMonth = 2
-    startDay = 8
+    startYear = 2016
+    startMonth = 10
+    startDay = 10
 
-    endYear = 2018
-    endMonth = 2
-    endDay = 9
+    endYear = 2019
+    endMonth = 4
+    endDay = 15
 
     start_date = wsadate(startYear, startMonth, startDay)
     end_date = wsadate(endYear, endMonth, endDay)
-
+    
     for single_date in daterange(start_date, end_date):
         # predictRidge(single_date.day, single_date.month, single_date.year, cursor)
-
-        dateID = getDate(single_date.day, single_date.month, single_date.year, cursor)
-        predictRidgeConfidence(cursor, cnx, dateID)
-        exit(1)
-
+        try:
+            dateID = getDate(single_date.day, single_date.month, single_date.year, cursor)
+            
+            predictRidgeConfidence(cursor, cnx, dateID)
+            exit(1)
+        except:
+            print dateID 
+            
     cursor.close()
     cnx.commit()
     cnx.close()
