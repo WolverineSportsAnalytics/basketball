@@ -2,7 +2,7 @@ from datetime import date as wsadate
 from datetime import timedelta
 import mysql.connector
 from pydfs_lineup_optimizer import *
-import constants
+
 
 # function to iterate through a range of dates in the scrapers
 def daterange(start_date, end_date):
@@ -38,8 +38,8 @@ def optimizeAndFill(day, month, year, model, cursor,cnx):
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.simmonsProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.simmonsProj IS NOT NULL AND p.simmonsProj > 0"
     elif model == "mlp":
         getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.mlpProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 and p.mlpProj IS NOT NULL"
-    elif model == "ridge":
-        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.ridgeProj, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.ridgeProj IS NOT NULL AND p.ridgeProj > 0"
+    elif model == "ridgeFloor":
+        getPlayersQuery = "SELECT b.nickName, p.playerID, p.fanduelPosition, p.ridgeFloor, p.team, p.fanduel, p.opponent, p.fanduelPts FROM basketball.performance as p LEFT JOIN basketball.player_reference as b ON b.playerID = p.playerID WHERE p.dateID = %s AND p.projMinutes >= 8 AND p.fanduel > 0 AND p.ridgeFloor IS NOT NULL"
     getBPlayersData = (gameID,)
     cursor.execute(getPlayersQuery, getBPlayersData)
 
@@ -47,6 +47,7 @@ def optimizeAndFill(day, month, year, model, cursor,cnx):
     #print ("Number of players being considered: " + str(cursor.rowcount))
     if(len(players) == 0):
         return
+
 
     for baller in players:
         positions = []
@@ -64,32 +65,37 @@ def optimizeAndFill(day, month, year, model, cursor,cnx):
 
     # if duplicate player, increase n + generate next lineup,
     # next lineup will generate lineup with next highest amount of points
-    numLineups = 5
+    numLineups = 1
+
 
     try:
-        lineups = optimizer.optimize(n=numLineups)
+        lineups = optimizer.optimize(n=1)
+
     except:
+        print "This is where it's wrong"
         return
 
-    count = 2
+    count = 1
 
     modelStr = ""
     modelNum = 1
 
     try:
-      for lineup in lineups:
-        modelStr = model + str(modelNum)
-        dateQuery = "INSERT INTO basketball.historic_lineups (dateID, date, model) VALUES (%s, %s, %s)"
-        dateQueryT = (gameID, str(month) + "-" + str(day) + "-" + str(year), modelStr)
-        cursor.execute(dateQuery, dateQueryT)
-        cnx.commit()
-        print "Inserting Lineup"
+        for lineup in lineups:
 
-        # print(lineup)
-        # print(lineup.fantasy_points_projection)
-        # print(lineup.salary_costs)
-        playerIDList = []
-        dkpoints = 0
+            modelStr = model + str(modelNum)
+            dateQuery = "INSERT INTO basketball.historic_lineups (dateID, date, model) VALUES (%s, %s, %s)"
+            dateQueryT = (gameID, str(month) + "-" + str(day) + "-" + str(year), modelStr)
+            cursor.execute(dateQuery, dateQueryT)
+            print lineup
+            cnx.commit()
+            print "Inserting Lineup"
+
+            # print(lineup)
+            # print(lineup.fantasy_points_projection)
+            # print(lineup.salary_costs)
+            playerIDList = []
+            dkpoints = 0
         for player in lineup.lineup:
             playerIDList.append(player.id)
             if count == 1:
@@ -101,7 +107,7 @@ def optimizeAndFill(day, month, year, model, cursor,cnx):
                 posString = player.lineup_position + str(count)
             else:
                 posString = "C"
-            # insert playerID, name, team, salary, projectedPoints
+              # insert playerID, name, team, salary, projectedPoints
             insertHistory = "UPDATE historic_lineups SET "
             insertHistory += posString + "playerID = %s, "
             insertHistory += posString + " = %s, "
@@ -122,13 +128,13 @@ def optimizeAndFill(day, month, year, model, cursor,cnx):
             # print optimized lineups
             #print("Player Name: " + str(playerName) + "; Actual Points Scored: " + str(fdPointsDict[player]))
 
-        #print("Total Points: " + str(dkpoints))
-        insertTotals = "UPDATE historic_lineups SET projPointsLineup = %s, actualPointsLineup = %s WHERE dateID = %s AND model = %s"
-        insertTotalsData = (lineup.fantasy_points_projection, dkpoints, gameID, modelStr)
-        cursor.execute(insertTotals, insertTotalsData)
-        #print("\n")
+            #print("Total Points: " + str(dkpoints))
+            insertTotals = "UPDATE historic_lineups SET projPointsLineup = %s, actualPointsLineup = %s WHERE dateID = %s AND model = %s"
+            insertTotalsData = (lineup.fantasy_points_projection, dkpoints, gameID, modelStr)
+            cursor.execute(insertTotals, insertTotalsData)
+            #print("\n")
 
-        modelNum += 1
+            modelNum += 1
     except:
         print "Cant Lineup Num Players = ", len(players)
 
@@ -143,12 +149,12 @@ if __name__ == "__main__":
 
 
     startYear = 2016
-    startMonth = 11
-    startDay = 7
+    startMonth = 10
+    startDay = 1
 
-    endYear = 2019
-    endMonth = 4
-    endDay = 10
+    endYear = 2016
+    endMonth = 10
+    endDay = 2
 
     start_date = wsadate(startYear, startMonth, startDay)
     end_date = wsadate(endYear, endMonth, endDay)
@@ -160,10 +166,13 @@ if __name__ == "__main__":
     #     optimizeAndFill(single_date.day, single_date.month, single_date.year, "Simmons", cursor)
 
     try:
+
         for single_date in daterange(start_date, end_date):
+            print single_date
+            optimizeAndFill(single_date.day, single_date.month, single_date.year, "ridgeFloor", cursor, cnx)
+    except:
+        print "Not a valid date"
 
-            optimizeAndFill(single_date.day, single_date.month, single_date.year, "ridge", cursor, cnx)
-
-        cursor.close()
-        cnx.commit()
-        cnx.close()
+    cursor.close()
+    cnx.commit()
+    cnx.close()
