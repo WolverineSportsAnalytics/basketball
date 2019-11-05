@@ -20,7 +20,7 @@ def makeProjections(modelList, dateID, cursor, cnx):
     if dir_path.split("/")[-1] == "basketball":
         os.chdir("MachineLearning")
 
-    print "DATE: " + dateID
+    print "DATE: " + str(dateID)
 
     for model in modelList:
         print "Predicting with " + model + " regression"
