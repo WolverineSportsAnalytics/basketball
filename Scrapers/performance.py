@@ -72,10 +72,10 @@ def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, c
             continue
 
         # get basketball reference ID from html script
-        bbrefID = basic[number].find_all('th')[0]['data-append-csv']
+        try:
+            bbrefID = basic[number].find_all('th')[0]['data-append-csv']
 
         # use bbrefID to get player_id through database
-        try:
             player_id = getPlayerID(bbrefID, cursor)
         except:
             print bbrefID
@@ -140,6 +140,8 @@ def insertperformance(basictable, advancedtable, team, opp, homeaway, date_id, c
 
             # record each respective advanced stats
             tdadvance = advance[number].find_all('td')
+            if len(tdadvance) < 14:
+                continue # check for correct tdadvanced
 
             TS = tdadvance[1].text
             if TS == '':
