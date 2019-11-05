@@ -19,17 +19,19 @@ def main():
 
 def run_scrapers():
     ''' Run the scrapers '''
-    cnx = mysql.connector.connect(user="wsa@wsabasketball",
-                                  host='wsabasketball.mysql.database.azure.com',
+    cnx = mysql.connector.connect(user="wsa",
+                                  host='34.68.250.121',
                                   database="basketball",
                                   password="")
     cursor = cnx.cursor(buffered=True)
 
     cursor = cnx.cursor()
     now = datetime.datetime.now()
+    # now = now - datetime.timedelta(days=1)
     yesterday = now - datetime.timedelta(days=1)
 
     print str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
+    print str(yesterday.year)+ "-" + str(yesterday.month) + "-" + str(yesterday.day)
     date =  str(now.year)+ "-" + str(now.month) + "-" + str(now.day)
 
 
@@ -47,6 +49,7 @@ def run_scrapers():
     # run generate box score urls
     generateBoxScoreUrls.generateBasketballReferenceURLs(cursor, cnx, yesterday.year, yesterday.month, yesterday.day)
     # run performance
+
     print "Running Perforamnce DateID:", dateID-1
     performance.updateAndInsertPlayerRef(yesterday.day, yesterday.month, yesterday.year, yesterday.day, yesterday.month, yesterday.year, cursor, cnx)
 
@@ -69,16 +72,16 @@ def run_scrapers():
     fanduel_scraper.insert_into_performance(cursor, cnx, dateID)
 
     # money scraper
-    moneyLine.clear_table(cursor, cnx)
-    moneyLine.InsertGameOdds(cursor, cnx, 16, 10, 2018, yesterday.day, yesterday.month, yesterday.year)
-    moneyLine.InsertGameSpread(cursor, cnx, 16, 10, 2018, yesterday.day, yesterday.month, yesterday.year)
+    # moneyLine.clear_table(cursor, cnx)
+    # moneyLine.InsertGameOdds(cursor, cnx, 16, 10, 2018, yesterday.day, yesterday.month, yesterday.year)
+    # moneyLine.InsertGameSpread(cursor, cnx, 16, 10, 2018, yesterday.day, yesterday.month, yesterday.year)
 
     # fill fetaures
     fill_features.fill_futures(dateID, cnx, cursor)
 
 
     # machine learning stuff
-    predict.makeProjections(now.day, now.month, now.year, cursor, cnx)
+    predict.makeProjections(["mlp", "ridge"],dateID, cursor, cnx)
 
 if __name__=="__main__":
     main()
