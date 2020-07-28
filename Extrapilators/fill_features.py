@@ -104,7 +104,7 @@ def fill_futures(dateID, cnx, cursor):
     # get opp_team stats
     # get self_team stats
     # get opp_vs_player position states
-    # from perfromance get fanduel point for taraget
+    # from performance get fanduel point for target
     team_ref_query = "SELECT teamID FROM team_reference WHERE bbreff = %s"
 
     counter = 0
